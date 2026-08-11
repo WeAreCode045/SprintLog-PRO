@@ -1,0 +1,578 @@
+import { useMemo, useState, type ReactNode } from 'react';
+import dayjs from 'dayjs';
+import { Trans, useLingui } from '@lingui/react/macro';
+import {
+  MAX_TASK_NEST_DEPTH,
+  TASK_TYPES,
+  TASK_TYPE_LABELS,
+  type ResolvedRole,
+  type TaskRow,
+  type TaskStatus,
+  type TaskType,
+} from '../../appwrite/types';
+import { IconCheck, IconLockOpen } from '../../components/icons';
+import { CheckboxFilterDropdown } from '../../components/CheckboxFilterDropdown';
+import { isStaffRole } from '../../auth/RequireStaff';
+import {
+  useAcceptRequestedTask,
+  useDeleteTask,
+  useReopenTask,
+  useTasks,
+  useTasksByProject,
+  useTasksForCompanies,
+} from './hooks';
+import { MarkFinishedDialog } from './MarkFinishedDialog';
+import { TaskFormDialog } from './TaskFormDialog';
+import { TaskDetailView } from './TaskDetailView';
+import { TaskEditView } from './TaskEditView';
+import { DeveloperTasksTable } from './DeveloperTasksTable';
+import { TaskViewTabs } from './TaskViewTabs';
+import { SortableTodoList } from './SortableTodoList';
+import { taskNestDepth, includeTaskAncestors } from './api';
+import {
+  countTasksByViewTab,
+  clientTasksTabLabel,
+  defaultTaskViewTab,
+  type TaskViewTab,
+} from './taskViewTabUtils';
+
+interface ProjectTasksPanelProps {
+  companyId: string;
+  teamId: string;
+  /** When omitted, loads tasks for the whole company (dashboard). */
+  projectId?: string;
+  /** When set (dashboard multi-company), loads across these company ids. */
+  companyIds?: string[];
+  userId: string;
+  role: ResolvedRole;
+  projectNameById?: Map<string, string>;
+  companyName?: (companyId: string) => string;
+}
+
+export function ProjectTasksPanel({
+  companyId,
+  teamId,
+  projectId,
+  companyIds,
+  userId,
+  role,
+  projectNameById,
+  companyName,
+}: ProjectTasksPanelProps) {
+  const { t } = useLingui();
+  const companyWide = !projectId;
+  const multiIds = companyIds && companyIds.length > 0 ? companyIds : [companyId];
+  const projectTasksQuery = useTasksByProject(projectId);
+  const companyTasksQuery = useTasks(companyWide && multiIds.length === 1 ? companyId : '', 'all');
+  const multiCompanyQuery = useTasksForCompanies(
+    companyWide && multiIds.length > 1 ? multiIds : [],
+    'all',
+  );
+  const { data: tasks = [], isLoading } = !companyWide
+    ? projectTasksQuery
+    : multiIds.length > 1
+      ? multiCompanyQuery
+      : companyTasksQuery;
+  const staff = isStaffRole(role);
+  const deleteTask = useDeleteTask(companyId);
+  const reopenTask = useReopenTask(companyId);
+  const acceptRequested = useAcceptRequestedTask(companyId);
+  const [showAdd, setShowAdd] = useState(false);
+  const [addAudience, setAddAudience] = useState<'internal' | 'client'>('internal');
+  const [editingTask, setEditingTask] = useState<TaskRow | null>(null);
+  const [viewingTask, setViewingTask] = useState<TaskRow | null>(null);
+  const [finishingTask, setFinishingTask] = useState<TaskRow | null>(null);
+  const [parentForSubtask, setParentForSubtask] = useState<TaskRow | null>(null);
+  const [activeTab, setActiveTab] = useState<TaskViewTab>(() => defaultTaskViewTab(role));
+  const [excludedStatuses, setExcludedStatuses] = useState<Set<TaskStatus>>(
+    new Set<TaskStatus>(['finished', 'requested', 'archived']),
+  );
+  const [excludedTypes, setExcludedTypes] = useState<Set<TaskType>>(new Set());
+  const [excludedCompanyIds, setExcludedCompanyIds] = useState<Set<string>>(new Set());
+
+  const uniqueCompanyIds = useMemo(() => [...new Set(tasks.map((t) => t.companyId))], [tasks]);
+
+  const TASK_STATUS_OPTIONS: { id: TaskStatus; label: string }[] = useMemo(
+    () => [
+      { id: 'open', label: t`Open` },
+      { id: 'finished', label: t`Afgerond` },
+      { id: 'requested', label: t`Aangevraagd` },
+      { id: 'archived', label: t`Gearchiveerd` },
+    ],
+    [t],
+  );
+
+  const TASK_TYPE_OPTIONS = useMemo(
+    () =>
+      TASK_TYPES.map((type) => ({
+        id: type,
+        label: TASK_TYPE_LABELS[type],
+      })),
+    [],
+  );
+
+  const taskStatuses = useMemo(() => new Set(tasks.map((t) => t.status)), [tasks]);
+  const statusFilterOptions = useMemo(
+    () => TASK_STATUS_OPTIONS.filter((o) => taskStatuses.has(o.id)),
+    [TASK_STATUS_OPTIONS, taskStatuses],
+  );
+
+  const taskTypes = useMemo(() => new Set(tasks.map((t) => t.taskType)), [tasks]);
+  const typeFilterOptions = useMemo(
+    () => TASK_TYPE_OPTIONS.filter((o) => taskTypes.has(o.id)),
+    [TASK_TYPE_OPTIONS, taskTypes],
+  );
+
+  const companyOptions = useMemo(
+    () =>
+      uniqueCompanyIds.map((id) => ({
+        id,
+        label: companyName?.(id) ?? id,
+      })),
+    [uniqueCompanyIds, companyName],
+  );
+
+  const visibleTasks = useMemo(() => {
+    return tasks
+      .filter(() => {
+        if (staff) return true;
+        if (role === 'client') return true;
+        const _exhaustive: never = role;
+        return _exhaustive;
+      })
+      .slice()
+      .sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
+  }, [tasks, role, staff]);
+
+  const requestedTasks = useMemo(
+    () =>
+      visibleTasks.filter(
+        (task) => task.status === 'requested' && (task.audience ?? 'internal') === 'internal',
+      ),
+    [visibleTasks],
+  );
+
+  const developerTasks = useMemo(() => {
+    const base = visibleTasks.filter((task) => {
+      if ((task.audience ?? 'internal') !== 'internal') return false;
+      return task.status !== 'requested';
+    });
+    // Keep parent rows in the tree even when filters/role hide them from the base set.
+    return includeTaskAncestors(base, tasks);
+  }, [visibleTasks, tasks]);
+
+  const yourTasks = useMemo(() => {
+    return visibleTasks.filter(
+      (task) =>
+        (task.audience ?? 'internal') === 'client' && !excludedStatuses.has(task.status),
+    );
+  }, [visibleTasks, excludedStatuses]);
+
+  const tabCounts = useMemo(() => countTasksByViewTab(visibleTasks), [visibleTasks]);
+  const clientTabLabel = clientTasksTabLabel(role);
+
+  const canAddInternal = role === 'admin' || role === 'developer' || role === 'client';
+  const canAddClient = role === 'admin' || role === 'developer' || role === 'client';
+  const clientCreatesRequested = role === 'client';
+
+  function projectLabel(taskProjectId: string) {
+    return projectNameById?.get(taskProjectId) ?? '—';
+  }
+
+  function canEdit(task: TaskRow) {
+    if (staff) return true;
+    if (role === 'client') {
+      return task.status === 'open' || task.status === 'requested';
+    }
+    const _exhaustive: never = role;
+    return _exhaustive;
+  }
+
+  function canDelete(task: TaskRow) {
+    if (staff) return true;
+    if (role === 'client' && task.status === 'requested' && task.createdBy === userId) return true;
+    return false;
+  }
+
+  function canAddSubtask(task: TaskRow) {
+    if (task.status !== 'open' && task.status !== 'requested') return false;
+    const byId = new Map(visibleTasks.map((row) => [row.$id, row]));
+    if (taskNestDepth(task, byId) >= MAX_TASK_NEST_DEPTH - 1) return false;
+    if (staff) return true;
+    if (role === 'client') return canEdit(task);
+    const _exhaustive: never = role;
+    return _exhaustive;
+  }
+
+  function canFinish(task: TaskRow) {
+    if (task.status !== 'open') return false;
+    if (staff) return true;
+    if (role === 'client') {
+      return (task.audience ?? 'internal') === 'client';
+    }
+    const _exhaustive: never = role;
+    return _exhaustive;
+  }
+
+  function canAccept(task: TaskRow) {
+    if (task.status !== 'requested') return false;
+    return staff;
+  }
+
+  function canReorder(task: TaskRow) {
+    if (task.status === 'finished') return false;
+    if (role === 'client') return task.status === 'open' || task.status === 'requested';
+    return canEdit(task);
+  }
+
+  function renderListTaskRow(task: TaskRow, dragHandle: ReactNode = null) {
+    return (
+      <>
+        <div className="todo-item-header">
+          {dragHandle}
+          <button type="button" className="todo-item-title-button" onClick={() => setViewingTask(task)}>
+            {task.title}
+          </button>
+          {task.status === 'requested' && <span className="badge badge-requested">{t`Aangevraagd`}</span>}
+          {task.audience === 'client' && <span className="badge badge-client">{t`Jouw taak`}</span>}
+          {task.parentTaskId && <span className="badge badge-subtask">{t`Subtaak`}</span>}
+          <span className="todo-item-finished-meta">
+            {companyWide ? `${projectLabel(task.projectId)} · ` : ''}
+            {task.status === 'finished'
+              ? `${t`Afgerond`} · ${task.completedDate ? dayjs(task.completedDate).format('D MMM') : ''}`
+              : task.status === 'requested'
+                ? t`Aangevraagd`
+                : t`Open`}
+          </span>
+          <div className="todo-item-actions">
+            {canAccept(task) && (
+              <button
+                type="button"
+                className="btn-link"
+                onClick={() =>
+                  void acceptRequested.mutateAsync({
+                    taskId: task.$id,
+                    teamId,
+                    createdBy: task.createdBy,
+                    assigneeIds: task.assigneeIds,
+                  })
+                }
+              >
+                <Trans>Accepteren</Trans>
+              </button>
+            )}
+            {canFinish(task) && (
+              <button
+                type="button"
+                className="icon-button"
+                title={t`Afronden`}
+                onClick={() => setFinishingTask(task)}
+              >
+                <IconCheck />
+              </button>
+            )}
+            {task.status === 'finished' && staff && (
+              <button
+                type="button"
+                className="icon-button"
+                title={t`Heropenen`}
+                onClick={() =>
+                  void reopenTask.mutateAsync({
+                    taskId: task.$id,
+                    teamId,
+                    companyId,
+                    projectId: task.projectId,
+                    createdBy: task.createdBy,
+                    assigneeIds: task.assigneeIds,
+                  })
+                }
+              >
+                <IconLockOpen />
+              </button>
+            )}
+            {canAddSubtask(task) && (
+              <button type="button" className="btn-link" onClick={() => setParentForSubtask(task)}>
+                <Trans>+ Sub</Trans>
+              </button>
+            )}
+          </div>
+        </div>
+      </>
+    );
+  }
+
+  if (isLoading) return <p><Trans>Laden…</Trans></p>;
+
+  const canAddOnActiveTab =
+    (activeTab === 'developer' && canAddInternal && !clientCreatesRequested) ||
+    (activeTab === 'client' && canAddClient) ||
+    (activeTab === 'requested' && clientCreatesRequested);
+
+  return (
+    <div className="project-tasks-panel">
+      {viewingTask ? (
+        <TaskDetailView
+          companyId={companyId}
+          task={viewingTask}
+          canEdit={canEdit(viewingTask)}
+          canDelete={canDelete(viewingTask)}
+          onEdit={() => {
+            const task = viewingTask;
+            setViewingTask(null);
+            setEditingTask(task);
+          }}
+          onDelete={() => {
+            if (confirm(t`Taak verwijderen?`)) {
+              void deleteTask.mutateAsync(viewingTask.$id);
+              setViewingTask(null);
+            }
+          }}
+          onBack={() => setViewingTask(null)}
+        />
+      ) : editingTask ? (
+        <TaskEditView
+          companyId={companyId}
+          teamId={teamId}
+          userId={userId}
+          canManageProjects={staff}
+          task={editingTask}
+          onBack={() => setEditingTask(null)}
+        />
+      ) : (
+        <>
+      <TaskViewTabs
+        activeTab={activeTab}
+        onTabChange={setActiveTab}
+        counts={tabCounts}
+        role={role}
+        filters={
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', flexWrap: 'wrap' }}>
+            {statusFilterOptions.length > 1 && (
+              <CheckboxFilterDropdown
+                options={statusFilterOptions}
+                excludedIds={excludedStatuses}
+                onToggle={(id) =>
+                  setExcludedStatuses((prev) => {
+                    const next = new Set(prev);
+                    if (next.has(id)) next.delete(id);
+                    else next.add(id);
+                    return next;
+                  })
+                }
+                onSelectAll={() => setExcludedStatuses(new Set())}
+                onSelectNone={() => setExcludedStatuses(new Set(statusFilterOptions.map((o) => o.id)))}
+                labelPlural={t`statussen`}
+              />
+            )}
+            {typeFilterOptions.length > 1 && (
+              <CheckboxFilterDropdown
+                options={typeFilterOptions}
+                excludedIds={excludedTypes}
+                onToggle={(id) =>
+                  setExcludedTypes((prev) => {
+                    const next = new Set(prev);
+                    if (next.has(id)) next.delete(id);
+                    else next.add(id);
+                    return next;
+                  })
+                }
+                onSelectAll={() => setExcludedTypes(new Set())}
+                onSelectNone={() => setExcludedTypes(new Set(typeFilterOptions.map((o) => o.id)))}
+                labelPlural={t`typen`}
+              />
+            )}
+            {companyWide && uniqueCompanyIds.length > 1 && (
+              <CheckboxFilterDropdown
+                options={companyOptions}
+                excludedIds={excludedCompanyIds}
+                onToggle={(id) =>
+                  setExcludedCompanyIds((prev) => {
+                    const next = new Set(prev);
+                    if (next.has(id)) next.delete(id);
+                    else next.add(id);
+                    return next;
+                  })
+                }
+                onSelectAll={() => setExcludedCompanyIds(new Set())}
+                onSelectNone={() => setExcludedCompanyIds(new Set(uniqueCompanyIds))}
+                labelPlural={t`bedrijven`}
+              />
+            )}
+          </div>
+        }
+        endAction={
+          canAddOnActiveTab ? (
+            <button
+              type="button"
+              className="btn-accent"
+              onClick={() => {
+                setAddAudience(activeTab === 'client' ? 'client' : 'internal');
+                setShowAdd(true);
+              }}
+            >
+              {activeTab === 'client'
+                ? role === 'client'
+                  ? t`+ Taak toevoegen`
+                  : t`+ Klanttaak`
+                : activeTab === 'requested'
+                  ? t`+ Taak aanvragen`
+                  : t`+ Taak`}
+            </button>
+          ) : null
+        }
+      />
+
+      <div className="project-tasks-panel-body">
+        {activeTab === 'developer' && (
+          <DeveloperTasksTable
+            companyId={companyId}
+            teamId={teamId}
+            userId={userId}
+            role={role}
+            tasks={developerTasks}
+            showProjectColumn={companyWide}
+            projectName={companyWide ? projectLabel : undefined}
+            canFinish={canFinish}
+            canAccept={canAccept}
+            canEdit={canEdit}
+            canAddSubtask={canAddSubtask}
+            onFinish={setFinishingTask}
+            onReopen={(task) =>
+              void reopenTask.mutateAsync({
+                taskId: task.$id,
+                teamId,
+                companyId,
+                projectId: task.projectId,
+                createdBy: task.createdBy,
+                assigneeIds: task.assigneeIds,
+              })
+            }
+            onAccept={(task) =>
+              void acceptRequested.mutateAsync({
+                taskId: task.$id,
+                teamId,
+                companyId,
+                createdBy: task.createdBy,
+                assigneeIds: task.assigneeIds,
+              })
+            }
+            onView={setViewingTask}
+            onAddSubtask={setParentForSubtask}
+            excludedStatuses={excludedStatuses}
+            excludedTypes={excludedTypes}
+            excludedCompanyIds={excludedCompanyIds}
+          />
+        )}
+
+        {activeTab === 'requested' &&
+          (requestedTasks.length === 0 ? (
+            <p className="empty-state">
+              {role === 'client' ? <Trans>Nog geen aanvragen.</Trans> : <Trans>Geen openstaande aanvragen.</Trans>}
+            </p>
+          ) : (
+            <DeveloperTasksTable
+              companyId={companyId}
+              teamId={teamId}
+              userId={userId}
+              role={role}
+              tasks={requestedTasks}
+              showProjectColumn={companyWide}
+              projectName={companyWide ? projectLabel : undefined}
+              canFinish={canFinish}
+              canAccept={canAccept}
+              canEdit={canEdit}
+              canAddSubtask={canAddSubtask}
+              onFinish={setFinishingTask}
+              onReopen={(task) =>
+                void reopenTask.mutateAsync({
+                  taskId: task.$id,
+                  teamId,
+                  companyId,
+                  projectId: task.projectId,
+                  createdBy: task.createdBy,
+                  assigneeIds: task.assigneeIds,
+                })
+              }
+              onAccept={(task) =>
+                void acceptRequested.mutateAsync({
+                  taskId: task.$id,
+                  teamId,
+                  companyId,
+                  createdBy: task.createdBy,
+                  assigneeIds: task.assigneeIds,
+                })
+              }
+              onView={setViewingTask}
+              onAddSubtask={setParentForSubtask}
+              statusFilter="requested"
+              excludedTypes={excludedTypes}
+              excludedCompanyIds={excludedCompanyIds}
+            />
+          ))}
+
+        {activeTab === 'client' &&
+          (yourTasks.length === 0 ? (
+            <p className="empty-state">
+              {role === 'client' ? (
+                <Trans>Geen taken.</Trans>
+              ) : (
+                t`Geen ${clientTabLabel.toLowerCase()}.`
+              )}
+            </p>
+          ) : (
+            <SortableTodoList
+              companyId={companyId}
+              tasks={yourTasks}
+              canDrag={canReorder}
+              renderItem={renderListTaskRow}
+            />
+          ))}
+      </div>
+        </>
+      )}
+
+      {showAdd && (
+        <TaskFormDialog
+          companyId={companyId}
+          teamId={teamId}
+          userId={userId}
+          canManageProjects={staff}
+          defaultProjectId={projectId}
+          defaultAudience={addAudience}
+          defaultStatus={
+            addAudience === 'internal' && (clientCreatesRequested || activeTab === 'requested')
+              ? 'requested'
+              : 'open'
+          }
+          lockAudience
+          onClose={() => setShowAdd(false)}
+        />
+      )}
+      {parentForSubtask && (
+        <TaskFormDialog
+          companyId={companyId}
+          teamId={teamId}
+          userId={userId}
+          canManageProjects={staff}
+          parentTask={parentForSubtask}
+          defaultAudience={parentForSubtask.audience ?? 'internal'}
+          defaultStatus={
+            role === 'client' && (parentForSubtask.audience ?? 'internal') === 'internal'
+              ? 'requested'
+              : 'open'
+          }
+          lockAudience
+          onClose={() => setParentForSubtask(null)}
+        />
+      )}
+      {finishingTask && (
+        <MarkFinishedDialog
+          task={finishingTask}
+          teamId={teamId}
+          companyId={companyId}
+          onClose={() => setFinishingTask(null)}
+        />
+      )}
+    </div>
+  );
+}

@@ -1,0 +1,50 @@
+{
+  "name": "sprintlog-pro",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "sync:specs": "node scripts/sync-specs.mjs",
+    "predev": "node scripts/sync-specs.mjs",
+    "prebuild": "node scripts/sync-specs.mjs",
+    "dev": "vite",
+    "build": "tsc -b && vite build",
+    "lint": "oxlint",
+    "preview": "vite preview",
+    "lingui:extract": "lingui extract",
+    "lingui:compile": "lingui compile"
+  },
+  "dependencies": {
+    "@dnd-kit/core": "^6.3.1",
+    "@dnd-kit/sortable": "^10.0.0",
+    "@dnd-kit/utilities": "^3.2.2",
+    "@lingui/core": "^6.6.0",
+    "@lingui/react": "^6.6.0",
+    "@react-pdf/renderer": "^4.6.0",
+    "@tanstack/react-query": "^5.101.4",
+    "@tanstack/react-table": "^9.0.0",
+    "appwrite": "^26.2.0",
+    "bootstrap": "^5.3.8",
+    "dayjs": "^1.11.21",
+    "lucide-react": "^1.29.0",
+    "react": "^19.2.8",
+    "react-bootstrap": "^2.10.10",
+    "react-dom": "^19.2.8",
+    "react-pdf": "^10.4.1",
+    "react-router-dom": "^7.18.2",
+    "sass": "^1.102.0"
+  },
+  "devDependencies": {
+    "@babel/preset-typescript": "^7.29.7",
+    "@lingui/babel-plugin-lingui-macro": "^6.6.0",
+    "@lingui/cli": "^6.6.0",
+    "@types/node": "^24.13.3",
+    "@types/react": "^19.2.17",
+    "@types/react-dom": "^19.2.3",
+    "@vitejs/plugin-react": "^6.0.4",
+    "oxlint": "^1.75.0",
+    "typescript": "~6.0.2",
+    "vite": "^8.2.0",
+    "vite-plugin-babel": "^1.7.3"
+  }
+}

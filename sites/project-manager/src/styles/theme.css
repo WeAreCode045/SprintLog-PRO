@@ -1,0 +1,38 @@
+@import 'bootstrap/dist/css/bootstrap.min.css';
+
+:root {
+  --bg: #f1f2f6;
+  --surface: #ffffff;
+  --border: #e7e8ee;
+  --text: #1c1c1f;
+  --text-muted: #6b7280;
+  --accent: #f4622c;
+  --accent-2: #ff8a4c;
+  --accent-contrast: #ffffff;
+  --accent-blue: #3b82f6;
+  --accent-blue-2: #60a5fa;
+  --danger: #c73a3a;
+  --sidebar-bg: #16202e;
+  --sidebar-text: #a9b4c4;
+  --sidebar-text-strong: #ffffff;
+  --sidebar-active-bg: #23324a;
+  --card-shadow: 0 2px 10px rgba(20, 24, 40, 0.06);
+  --radius: 12px;
+  --bs-primary: #f4622c;
+  --bs-primary-rgb: 244, 98, 44;
+  --bs-link-color: #f4622c;
+  --bs-link-hover-color: #d94f1f;
+}
+
+/* Keep Bootstrap from overriding App.css accent controls */
+.btn-accent,
+button.btn-accent,
+a.btn-accent {
+  --bs-btn-color: var(--accent-contrast);
+  --bs-btn-bg: transparent;
+  --bs-btn-border-color: transparent;
+  background: linear-gradient(135deg, var(--accent), var(--accent-2));
+  color: var(--accent-contrast);
+  border-color: transparent;
+  text-decoration: none;
+}

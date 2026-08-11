@@ -1,0 +1,48 @@
+export type {
+  AccessibleCompany,
+  AccessibleProject,
+  AdminUser,
+  AdminUserCompany,
+  CompanyRow,
+  DiscussionCategoryType,
+  DiscussionReplyRow,
+  DiscussionRow,
+  GlobalRole,
+  InvoiceItemRow,
+  InvoiceRow,
+  InvoiceSettingsRow,
+  InvoiceStatus,
+  NotificationRow,
+  NotificationType,
+  ProjectAssignmentRow,
+  ProjectFileRow,
+  ProjectPriority,
+  ProjectRow,
+  ProjectStatus,
+  ResolvedRole,
+  TaskAudience,
+  TaskGroupRow,
+  TaskPriority,
+  TaskRow,
+  TaskStatus,
+  TaskType,
+  TeamMemberRole,
+  TimeEntryRow,
+  UserProfileRow,
+} from '../specs/types';
+
+export {
+  DISCUSSION_CATEGORY_IDS,
+  DISCUSSION_CATEGORY_LABELS,
+  DISCUSSION_CATEGORY_TYPES,
+  DISCUSSION_NO_PROJECT_ID,
+  INVOICE_STATUSES,
+  MAX_TASK_NEST_DEPTH,
+  NOTIFICATION_TYPES,
+  TASK_TYPES,
+  TASK_TYPE_LABELS,
+  TEAM_ROLES,
+} from '../specs/types';
+
+/** @deprecated Use TeamMemberRole — kept briefly for invite migration */
+export type MemberRole = 'client';

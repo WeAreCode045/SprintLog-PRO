@@ -1,0 +1,11 @@
+{
+  "name": "send-invoice",
+  "version": "1.0.0",
+  "type": "module",
+  "main": "src/main.js",
+  "dependencies": {
+    "node-appwrite": "^27.0.0",
+    "react": "^19.2.8",
+    "@react-pdf/renderer": "^4.3.1"
+  }
+}

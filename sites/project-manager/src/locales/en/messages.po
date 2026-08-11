@@ -1,0 +1,2394 @@
+msgid ""
+msgstr ""
+"POT-Creation-Date: 2026-08-09 06:20+0200\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: @lingui/cli\n"
+"Language: en\n"
+"Project-Id-Version: \n"
+"Report-Msgid-Bugs-To: \n"
+"PO-Revision-Date: \n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"Plural-Forms: \n"
+
+#: src/features/invites/MembersList.tsx:30
+msgid "(geen naam)"
+msgstr "(no name)"
+
+#. placeholder {0}: users.length
+#: src/pages/UsersAdminPage.tsx:58
+#~ msgid "{0, plural, one {# gebruiker} other {# gebruikers}}"
+#~ msgstr "{0, plural, one {# user} other {# users}}"
+
+#. placeholder {0}: entryIds.length
+#: src/features/timeEntries/UnlockTimeEntriesDialog.tsx:37
+msgid "{0, plural, one {# goedgekeurde urenregel deblokkeren} other {# goedgekeurde urenregels deblokkeren}}"
+msgstr "{0, plural, one {Unlock # approved time entry} other {Unlock # approved time entries}}"
+
+#. placeholder {0}: replies.length
+#: src/features/discussions/TopicDetailPanel.tsx:124
+msgid "{0} reacties"
+msgstr "{0} replies"
+
+#. placeholder {0}: company.name
+#: src/features/profiles/CompanyAutocomplete.tsx:56
+msgid "{0} verwijderen"
+msgstr "Remove {0}"
+
+#. placeholder {0}: discussion.title
+#: src/features/dashboard/useDashboardOverview.ts:157
+msgid "{author} reageerde op: {0}"
+msgstr "{author} replied to: {0}"
+
+#. placeholder {0}: d.title
+#: src/features/dashboard/useDashboardOverview.ts:143
+msgid "{author} startte een nieuw topic: {0}"
+msgstr "{author} started a new topic: {0}"
+
+#. placeholder {0}: options.length
+#: src/components/CheckboxFilterDropdown.tsx:56
+msgid "{selectedCount} van {0} {plural}"
+msgstr "{selectedCount} of {0} {plural}"
+
+#. placeholder {0}: projects.length
+#: src/components/ProjectFilterDropdown.tsx:39
+#~ msgid "{selectedCount} van {0} projecten"
+#~ msgstr "{selectedCount} of {0} projects"
+
+#: src/pages/ClientManagerPage.tsx:90
+#~ msgid "← Alle klanten"
+#~ msgstr "← All clients"
+
+#: src/features/discussions/TopicDetailPanel.tsx:87
+#: src/pages/ClientManagerPage.tsx:75
+msgid "← Terug naar overzicht"
+msgstr "← Back to overview"
+
+#: src/features/tasks/TaskList.tsx:363
+#~ msgid "+ Client Task"
+#~ msgstr "+ Client Task"
+
+#: src/features/invites/MembersList.tsx:22
+#~ msgid "+ Client toevoegen"
+#~ msgstr "+ Add client"
+
+#: src/pages/UsersAdminPage.tsx:61
+msgid "+ Gebruiker toevoegen"
+msgstr "+ Add user"
+
+#: src/features/invites/MembersList.tsx:22
+msgid "+ Klant toevoegen"
+msgstr "+ Add client"
+
+#: src/features/tasks/ProjectTasksPanel.tsx:416
+#: src/features/tasks/TaskList.tsx:504
+msgid "+ Klanttaak"
+msgstr "+ Client task"
+
+#: src/features/projects/ProjectSelect.tsx:114
+msgid "+ Nieuw project…"
+msgstr "+ New project…"
+
+#: src/features/companies/ClientsListPage.tsx:33
+msgid "+ Nieuwe klant"
+msgstr "+ New client"
+
+#: src/features/tasks/TaskList.tsx:507
+msgid "+ Nieuwe taak"
+msgstr "+ New task"
+
+#: src/features/tasks/ProjectTasksPanel.tsx:295
+#: src/features/tasks/TaskList.tsx:119
+msgid "+ Sub"
+msgstr "+ Sub"
+
+#: src/features/tasks/ProjectTasksPanel.tsx:419
+msgid "+ Taak"
+msgstr "+ Task"
+
+#: src/features/tasks/ProjectTasksPanel.tsx:418
+#: src/features/tasks/TaskList.tsx:506
+msgid "+ Taak aanvragen"
+msgstr "+ Request task"
+
+#: src/features/tasks/ProjectTasksPanel.tsx:415
+#: src/features/tasks/TaskList.tsx:503
+msgid "+ Taak toevoegen"
+msgstr "+ Add task"
+
+#. placeholder {0}: stats.openTasks
+#. placeholder {1}: stats.completedTasks
+#: src/features/projects/ProjectsListPage.tsx:378
+msgid "<0>{0}</0> open · <1>{1}</1> voltooid"
+msgstr "<0>{0}</0> open · <1>{1}</1> completed"
+
+#: src/features/discussions/TopicDetailPanel.tsx:122
+msgid "1 reactie"
+msgstr "1 reply"
+
+#: src/pages/InvoicesAdminPage.tsx:278
+msgid "Aangemaakt"
+msgstr "Created At"
+
+#: src/features/reports/ReportsTabPanel.tsx:44
+msgid "Aangepast"
+msgstr "Custom"
+
+#: src/features/tasks/DeveloperTasksTable.tsx:60
+#: src/features/tasks/ProjectTasksPanel.tsx:99
+#: src/features/tasks/ProjectTasksPanel.tsx:236
+#: src/features/tasks/ProjectTasksPanel.tsx:244
+#: src/features/tasks/TaskDetailView.tsx:26
+#: src/features/tasks/TaskList.tsx:98
+#: src/features/tasks/TaskList.tsx:200
+msgid "Aangevraagd"
+msgstr "Requested"
+
+#: src/features/tasks/taskViewTabUtils.ts:19
+msgid "Aangevraagde taken"
+msgstr "Requested tasks"
+
+#: src/features/companies/NewClientDialog.tsx:32
+#: src/features/projects/NewProjectDialog.tsx:91
+msgid "Aanmaken"
+msgstr "Create"
+
+#: src/features/projects/NewProjectDialog.tsx:51
+msgid "Aanmaken mislukt."
+msgstr "Failed to create."
+
+#: src/features/timeEntries/TimeEntryForm.tsx:84
+msgid "Aantal uren"
+msgstr "Number of hours"
+
+#: src/features/dashboard/DashboardStatsCards.tsx:17
+msgid "Aanvragen:"
+msgstr "Requests:"
+
+#: src/features/tasks/DeveloperTasksTable.tsx:480
+#: src/features/tasks/ProjectTasksPanel.tsx:261
+#: src/features/tasks/TaskList.tsx:113
+#: src/features/tasks/TaskList.tsx:114
+msgid "Accepteren"
+msgstr "Accept"
+
+#: src/pages/AcceptInvitePage.tsx:89
+msgid "Account voltooien"
+msgstr "Complete account"
+
+#: src/pages/UserAccountPage.tsx:8
+msgid "Accountinstellingen"
+msgstr "Account settings"
+
+#: src/pages/ClientManagerPage.tsx:115
+msgid "Accounts"
+msgstr "Accounts"
+
+#: src/features/dashboard/DashboardSidebar.tsx:46
+msgid "Actie vereist"
+msgstr "Action required"
+
+#: src/features/invites/MembersList.tsx:35
+#: src/features/projects/ProjectSidebar.tsx:54
+#: src/features/projects/ProjectsListPage.tsx:165
+msgid "Actief"
+msgstr "Active"
+
+#: src/features/tasks/DeveloperTasksTable.tsx:816
+#~ msgid "Acties"
+#~ msgstr "Actions"
+
+#: src/features/profiles/EditUserDialog.tsx:20
+#: src/features/profiles/NewUserDialog.tsx:23
+#: src/pages/UsersAdminPage.tsx:14
+msgid "Admin"
+msgstr "Admin"
+
+#: src/features/invoiceSettings/InvoiceSettingsPanel.tsx:197
+#: src/pages/ClientCompanySettingsPage.tsx:98
+msgid "Adres"
+msgstr "Address"
+
+#: src/pages/ClientManagerPage.tsx:163
+msgid "Adres klant"
+msgstr "Client address"
+
+#: src/features/tasks/DeveloperTasksTable.tsx:64
+#: src/features/tasks/ProjectTasksPanel.tsx:98
+#: src/features/tasks/ProjectTasksPanel.tsx:242
+#: src/features/tasks/TaskDetailView.tsx:30
+#: src/features/tasks/TaskList.tsx:199
+msgid "Afgerond"
+msgstr "Finished"
+
+#: src/features/tasks/TaskDetailView.tsx:132
+msgid "Afgerond op"
+msgstr "Finished on"
+
+#: src/features/dashboard/DashboardStatsCards.tsx:16
+msgid "Afgerond:"
+msgstr "Finished:"
+
+#: src/features/tasks/DeveloperTasksTable.tsx:489
+#: src/features/tasks/MarkFinishedDialog.tsx:138
+#: src/features/tasks/ProjectTasksPanel.tsx:268
+#: src/features/tasks/TaskList.tsx:123
+msgid "Afronden"
+msgstr "Complete"
+
+#: src/features/invoiceSettings/InvoiceSettingsPanel.tsx:158
+#~ msgid "Afzender"
+#~ msgstr "Sender"
+
+#: src/pages/ClientInvoicesPage.tsx:38
+msgid "Al je facturen op een rij."
+msgstr "All your invoices in one place."
+
+#: src/features/discussions/TopicList.tsx:17
+msgid "Algemeen"
+msgstr "General"
+
+#. placeholder {0}: primaryCompany.name
+#: src/features/discussions/DiscussionsPage.tsx:102
+msgid "Algemeen, ideeën en projectthreads voor {0}."
+msgstr "General, ideas and project threads for {0}."
+
+#: src/features/discussions/DiscussionsPage.tsx:100
+msgid "Algemeen, ideeën en projectthreads voor geselecteerde bedrijven."
+msgstr "General, ideas and project threads for selected companies."
+
+#: src/features/projects/ProjectSidebar.tsx:328
+msgid "Alle"
+msgstr "All"
+
+#. placeholder {0}: options.length
+#: src/components/CheckboxFilterDropdown.tsx:55
+msgid "Alle {plural} ({0})"
+msgstr "All {plural} ({0})"
+
+#: src/pages/UsersAdminPage.tsx:55
+msgid "Alle accounts"
+msgstr "All accounts"
+
+#: src/pages/InvoicesAdminPage.tsx:175
+msgid "Alle facturen en factuurinstellingen."
+msgstr "All invoices and invoice settings."
+
+#: src/features/companies/ClientsListPage.tsx:31
+msgid "Alle klanten"
+msgstr "All clients"
+
+#: src/features/companies/ClientsListPage.tsx:22
+msgid "Alle klanten en hun uurtarief."
+msgstr "All clients and their hourly rate."
+
+#. placeholder {0}: projects.length
+#: src/components/ProjectFilterDropdown.tsx:38
+#~ msgid "Alle projecten ({0})"
+#~ msgstr "All projects ({0})"
+
+#: src/features/projects/ProjectsListPage.tsx:229
+msgid "Alle projecten van je geselecteerde bedrijven."
+msgstr "All projects from your selected companies."
+
+#: src/components/CheckboxFilterDropdown.tsx:68
+#: src/features/discussions/DiscussionCategorySidebar.tsx:19
+msgid "Alles"
+msgstr "All"
+
+#: src/features/timeEntries/TimeApprovalsTabPanel.tsx:104
+msgid "Alles goedkeuren"
+msgstr "Approve all"
+
+#: src/features/companies/NewClientDialog.tsx:35
+#: src/features/discussions/NewTopicDialog.tsx:157
+#: src/features/invites/InviteDialog.tsx:130
+#: src/features/profiles/EditUserDialog.tsx:145
+#: src/features/profiles/NewUserDialog.tsx:146
+#: src/features/projects/NewProjectDialog.tsx:94
+#: src/features/projects/ProjectEditDialog.tsx:86
+#: src/features/projects/ProjectSelect.tsx:77
+#: src/features/projects/ProjectSelect.tsx:97
+#: src/features/tasks/MarkFinishedDialog.tsx:141
+#: src/features/tasks/TaskForm.tsx:295
+#: src/features/timeEntries/TimeEntryForm.tsx:124
+#: src/features/timeEntries/UnlockTimeEntriesDialog.tsx:67
+msgid "Annuleren"
+msgstr "Cancel"
+
+#: src/features/reports/ReportsTabPanel.tsx:367
+#~ msgid "Assignee"
+#~ msgstr "Assignee"
+
+#: src/features/invoiceSettings/InvoiceSettingsPanel.tsx:167
+msgid "Bankgegevens"
+msgstr "Bank details"
+
+#: src/features/invoiceSettings/InvoiceSettingsPanel.tsx:249
+msgid "Banknaam"
+msgstr "Bank name"
+
+#: src/pages/ClientInvoicesPage.tsx:60
+#: src/pages/InvoicesAdminPage.tsx:315
+msgid "Bedrag"
+msgstr "Amount"
+
+#: src/features/invoiceSettings/InvoicePreviewDocument.tsx:241
+msgid "Bedrag excl. BTW"
+msgstr "Amount excl. VAT"
+
+#: src/features/discussions/NewTopicDialog.tsx:86
+#: src/features/projects/NewProjectDialog.tsx:60
+#: src/features/projects/ProjectsListPage.tsx:259
+#: src/features/projects/ProjectsListPage.tsx:318
+#: src/features/reports/ReportsTabPanel.tsx:311
+#: src/features/reports/ReportsTabPanel.tsx:354
+#: src/features/tasks/DeveloperTasksTable.tsx:874
+#: src/features/tasks/TaskForm.tsx:196
+#: src/layouts/PortalLayout.tsx:66
+#: src/pages/ClientCompanySettingsPage.tsx:72
+#: src/pages/ClientInvoicesPage.tsx:57
+#: src/pages/InvoiceDetailPage.tsx:152
+#: src/pages/InvoicesAdminPage.tsx:217
+#: src/pages/InvoicesAdminPage.tsx:293
+msgid "Bedrijf"
+msgstr "Company"
+
+#: src/features/invoiceSettings/InvoiceSettingsPanel.tsx:153
+#: src/layouts/PortalLayout.tsx:69
+#: src/pages/ClientCompanySettingsPage.tsx:55
+#: src/pages/ClientCompanySettingsPage.tsx:63
+msgid "Bedrijfsgegevens"
+msgstr "Company Details"
+
+#: src/features/invoiceSettings/InvoicePreviewDocument.tsx:262
+#: src/features/invoiceSettings/InvoiceSettingsPanel.tsx:189
+#: src/pages/ClientCompanySettingsPage.tsx:90
+msgid "Bedrijfsnaam"
+msgstr "Company name"
+
+#: src/features/projects/ProjectsListPage.tsx:273
+#: src/features/reports/ReportsTabPanel.tsx:375
+#: src/features/tasks/ProjectTasksPanel.tsx:398
+#: src/features/tasks/TaskList.tsx:466
+#: src/pages/InvoicesAdminPage.tsx:231
+msgid "bedrijven"
+msgstr "companies"
+
+#: src/features/companies/CompanyScopeControl.tsx:36
+#: src/features/profiles/EditUserDialog.tsx:122
+#: src/features/profiles/NewUserDialog.tsx:129
+#: src/pages/UsersAdminPage.tsx:78
+msgid "Bedrijven"
+msgstr "Companies"
+
+#: src/layouts/PortalLayout.tsx:54
+msgid "Beheer"
+msgstr "Manage"
+
+#: src/pages/UsersAdminPage.tsx:40
+#~ msgid "Beheer alle accounts: rol, naam, e-mail en bij clients de gekoppelde companies."
+#~ msgstr "Manage all accounts: role, name, email, and for clients the linked companies."
+
+#: src/pages/UsersAdminPage.tsx:40
+msgid "Beheer alle accounts: rol, naam, e-mail en bij klanten de gekoppelde bedrijven."
+msgstr "Manage all accounts: role, name, email, and for clients the linked companies."
+
+#: src/pages/ClientManagerPage.tsx:92
+#: src/pages/ManageCompaniesPage.tsx:16
+#: src/pages/ManageCompaniesPage.tsx:20
+msgid "Beheren"
+msgstr "Manage"
+
+#: src/features/discussions/NewTopicDialog.tsx:146
+msgid "Bericht"
+msgstr "Message"
+
+#: src/features/projects/ProjectEditDialog.tsx:73
+#: src/features/tasks/TaskForm.tsx:191
+msgid "Beschrijving"
+msgstr "Description"
+
+#: src/features/invites/InviteDialog.tsx:106
+msgid "Bestaande accounts worden direct aan dit bedrijf gekoppeld. Nieuwe accounts hebben een wachtwoord nodig om in te loggen."
+msgstr "Existing accounts are linked to this company immediately. New accounts need a password to log in."
+
+#. placeholder {0}: row.name
+#: src/features/files/ProjectFileManager.tsx:58
+msgid "Bestand \"{0}\" verwijderen?"
+msgstr "Delete file \"{0}\"?"
+
+#: src/features/projects/ProjectSidebar.tsx:73
+msgid "Bestand aangevraagd"
+msgstr "File requested"
+
+#: src/features/projects/ProjectSidebar.tsx:81
+msgid "Bestand geüpload"
+msgstr "File uploaded"
+
+#: src/features/tasks/TaskDetailView.tsx:140
+msgid "Bestand uploaden"
+msgstr "File upload"
+
+#: src/features/projects/ProjectDetailPage.tsx:80
+#: src/features/projects/ProjectDetailPage.tsx:216
+#: src/features/projects/ProjectSidebar.tsx:325
+msgid "Bestanden"
+msgstr "Files"
+
+#: src/features/tasks/TaskForm.tsx:249
+msgid "Bestandsaanlevering vereist"
+msgstr "File delivery required"
+
+#: src/features/invoiceSettings/InvoicePreviewDocument.tsx:277
+msgid "Betaalgegevens"
+msgstr "Payment details"
+
+#: src/features/invoiceSettings/InvoiceSettingsPanel.tsx:301
+msgid "Betalingstermijn (dagen)"
+msgstr "Payment term (days)"
+
+#: src/features/projects/ProjectsListPage.tsx:422
+#: src/features/projects/ProjectsListPage.tsx:423
+msgid "Bevat niet-goedgekeurde uren"
+msgstr "Contains unapproved hours"
+
+#: src/components/ChangePasswordForm.tsx:70
+msgid "Bevestig nieuw wachtwoord"
+msgstr "Confirm new password"
+
+#: src/pages/AcceptInvitePage.tsx:112
+msgid "Bevestig wachtwoord"
+msgstr "Confirm password"
+
+#: src/features/tasks/TaskDetailView.tsx:151
+#: src/features/timeEntries/TaskHoursDialog.tsx:120
+#: src/pages/UsersAdminPage.tsx:95
+msgid "Bewerken"
+msgstr "Edit"
+
+#: src/components/ChangePasswordForm.tsx:82
+#: src/components/ProfileInformationForm.tsx:86
+#: src/features/profiles/NewUserDialog.tsx:143
+#: src/features/timeEntries/UnlockTimeEntriesDialog.tsx:64
+#: src/pages/InvoiceDetailPage.tsx:218
+#: src/pages/InvoiceDetailPage.tsx:228
+#: src/pages/InvoicesAdminPage.tsx:263
+msgid "Bezig…"
+msgstr "Working…"
+
+#: src/features/tasks/TaskDetailView.tsx:111
+msgid "Bovenliggende taak"
+msgstr "Parent task"
+
+#: src/features/tasks/TaskForm.tsx:265
+msgid "Bovenliggende taak (optioneel)"
+msgstr "Parent task (optional)"
+
+#: src/features/invoiceSettings/InvoicePreviewDocument.tsx:195
+#: src/pages/InvoiceDetailPage.tsx:188
+msgid "BTW"
+msgstr "VAT"
+
+#: src/pages/ClientManagerPage.tsx:171
+msgid "BTW / VAT nummer"
+msgstr "VAT number"
+
+#: src/pages/ClientCompanySettingsPage.tsx:106
+msgid "BTW / VAT Nummer"
+msgstr "VAT Number"
+
+#: src/features/invoiceSettings/InvoiceSettingsPanel.tsx:174
+msgid "BTW & betaling"
+msgstr "VAT & payment"
+
+#: src/features/invoiceSettings/InvoiceSettingsPanel.tsx:287
+msgid "BTW label"
+msgstr "VAT label"
+
+#: src/features/invoiceSettings/InvoicePreviewDocument.tsx:284
+#: src/features/invoiceSettings/InvoiceSettingsPanel.tsx:292
+msgid "BTW nummer"
+msgstr "VAT number"
+
+#: src/features/invoiceSettings/InvoiceSettingsPanel.tsx:275
+msgid "BTW percentage (%)"
+msgstr "VAT percentage (%)"
+
+#: src/features/invoiceSettings/InvoiceSettingsPanel.tsx:271
+msgid "BTW toepassen op facturen"
+msgstr "Apply VAT to invoices"
+
+#: src/features/discussions/NewTopicDialog.tsx:104
+msgid "Categorie"
+msgstr "Category"
+
+#: src/features/discussions/DiscussionCategorySidebar.tsx:34
+msgid "Categorieën"
+msgstr "Categories"
+
+#: src/components/ChangePasswordForm.tsx:82
+#~ msgid "Change Password"
+#~ msgstr "Change Password"
+
+#: src/features/invites/MembersList.tsx:33
+#: src/features/profiles/EditUserDialog.tsx:22
+#: src/pages/UsersAdminPage.tsx:14
+#~ msgid "Client"
+#~ msgstr "Client"
+
+#: src/features/companies/ClientsListPage.tsx:19
+#~ msgid "Client Manager"
+#~ msgstr ""
+
+#: src/features/tasks/TaskList.tsx:98
+#~ msgid "Client Task"
+#~ msgstr "Client Task"
+
+#: src/features/tasks/TaskFormDialog.tsx:243
+#~ msgid "Client Task (geen uren)"
+#~ msgstr "Client Task (no hours)"
+
+#: src/features/tasks/TaskFormDialog.tsx:250
+#~ msgid "Client Tasks worden door de client uitgevoerd en tellen niet mee in time reports."
+#~ msgstr "Client Tasks are performed by the client and do not count towards time reports."
+
+#: src/features/invites/InviteDialog.tsx:54
+#~ msgid "Client toevoegen"
+#~ msgstr "Add client"
+
+#: src/layouts/PortalLayout.tsx:55
+#~ msgid "Clients"
+#~ msgstr "Clients"
+
+#: src/features/profiles/EditUserDialog.tsx:122
+#~ msgid "Companies"
+#~ msgstr "Companies"
+
+#: src/components/ChangePasswordForm.tsx:70
+#~ msgid "Confirm New Password"
+#~ msgstr "Confirm New Password"
+
+#: src/features/invoiceSettings/InvoiceSettingsPanel.tsx:160
+msgid "Contact"
+msgstr "Contact"
+
+#: src/features/invoiceSettings/InvoicePreviewDocument.tsx:271
+msgid "Contact informatie"
+msgstr "Contact information"
+
+#: src/features/invoiceSettings/InvoiceSettingsPanel.tsx:193
+msgid "Contactpersoon"
+msgstr "Contact person"
+
+#: src/pages/InvoicesAdminPage.tsx:349
+msgid "Creditnota"
+msgstr "Credit note"
+
+#: src/pages/InvoiceDetailPage.tsx:228
+msgid "Creditnota maken"
+msgstr "Create credit note"
+
+#: src/pages/InvoiceDetailPage.tsx:79
+msgid "Creditnota maken mislukt."
+msgstr "Failed to create credit note."
+
+#. placeholder {0}: invoice.invoiceNumber
+#: src/pages/InvoiceDetailPage.tsx:70
+msgid "Creditnota maken voor {0}? De gefactureerde uren worden weer beschikbaar voor facturatie en de originele factuur wordt vervallen verklaard."
+msgstr "Create a credit note for {0}? The invoiced hours become available for billing again and the original invoice is marked void."
+
+#. placeholder {0}: originalInvoice ? ( <Link to={`/app/invoices/${originalInvoice.$id}`}>{originalInvoice.invoiceNumber}</Link> ) : ( invoice.creditForInvoiceId )
+#: src/pages/InvoiceDetailPage.tsx:127
+msgid "Creditnota voor factuur {0}"
+msgstr "Credit note for invoice {0}"
+
+#: src/pages/TimeReportingPage.tsx:61
+#~ msgid "CSV export"
+#~ msgstr "CSV export"
+
+#: src/features/reports/ReportsTabPanel.tsx:420
+msgid "CSV exporteren"
+msgstr "Export CSV"
+
+#: src/components/ChangePasswordForm.tsx:48
+#~ msgid "Current Password"
+#~ msgstr "Current Password"
+
+#: src/features/companies/ClientsListPage.tsx:25
+#: src/features/discussions/DiscussionsPage.tsx:110
+#: src/features/discussions/DiscussionsPage.tsx:119
+#: src/features/projects/ProjectDetailPage.tsx:146
+#: src/features/projects/ProjectsListPage.tsx:232
+#: src/features/tasks/TaskList.tsx:386
+#: src/layouts/PortalLayout.tsx:44
+#: src/pages/ClientCompanySettingsPage.tsx:63
+#: src/pages/ClientDashboardPage.tsx:34
+#: src/pages/ClientInvoicesPage.tsx:41
+#: src/pages/ClientManagerPage.tsx:91
+#: src/pages/InvoiceDetailPage.tsx:108
+#: src/pages/InvoicesAdminPage.tsx:178
+#: src/pages/ManageCompaniesPage.tsx:20
+#: src/pages/TimeReportingPage.tsx:28
+#: src/pages/UsersAdminPage.tsx:43
+msgid "Dashboard"
+msgstr "Dashboard"
+
+#: src/features/invoiceSettings/InvoicePreviewDocument.tsx:201
+#~ msgid "Data"
+#~ msgstr "Dates"
+
+#: src/features/invoiceSettings/InvoicePreviewDocument.tsx:222
+#: src/features/projects/ProjectDetailPage.tsx:252
+#: src/features/reports/ReportsTabPanel.tsx:161
+#: src/features/reports/ReportsTabPanel.tsx:311
+#: src/features/reports/ReportsTabPanel.tsx:312
+#: src/features/tasks/MarkFinishedDialog.tsx:132
+#: src/features/timeEntries/TaskHoursDialog.tsx:94
+#: src/features/timeEntries/TimeApprovalsTabPanel.tsx:112
+#: src/features/timeEntries/TimeEntryForm.tsx:96
+msgid "Datum"
+msgstr "Date"
+
+#: src/features/invites/InviteDialog.tsx:116
+msgid "De uitgenodigde krijgt een e-mail en moet de uitnodiging accepteren voordat toegang actief is."
+msgstr "The invitee will receive an email and must accept the invitation before access is active."
+
+#: src/features/timeEntries/TaskHoursDialog.tsx:139
+#: src/features/timeEntries/UnlockTimeEntriesDialog.tsx:64
+msgid "Deblokkeren"
+msgstr "Unlock"
+
+#: src/features/timeEntries/UnlockTimeEntriesDialog.tsx:31
+msgid "Deblokkeren mislukt."
+msgstr "Unlock failed."
+
+#: src/features/projects/ProjectEditDialog.tsx:73
+#~ msgid "Description"
+#~ msgstr "Description"
+
+#: src/features/profiles/EditUserDialog.tsx:21
+#: src/features/profiles/NewUserDialog.tsx:24
+#: src/features/projects/ProjectDetailPage.tsx:255
+#: src/features/reports/ReportsTabPanel.tsx:164
+#: src/features/reports/ReportsTabPanel.tsx:311
+#: src/features/reports/ReportsTabPanel.tsx:312
+#: src/features/reports/ReportsTabPanel.tsx:393
+#: src/features/tasks/DeveloperTasksTable.tsx:908
+#: src/features/timeEntries/TaskHoursDialog.tsx:95
+#: src/features/timeEntries/TimeApprovalsTabPanel.tsx:115
+#: src/pages/UsersAdminPage.tsx:15
+msgid "Developer"
+msgstr "Developer"
+
+#: src/features/tasks/TaskDetailView.tsx:73
+msgid "Developer taak"
+msgstr "Developer task"
+
+#: src/features/tasks/TaskList.tsx:382
+msgid "Developer taken, client taken en aanvragen per tab."
+msgstr "Developer tasks, client tasks and requests per tab."
+
+#: src/features/tasks/TaskList.tsx:381
+msgid "Developer taken, client taken en aanvragen."
+msgstr "Developer tasks, client tasks and requests."
+
+#: src/features/tasks/TaskDetailView.tsx:115
+msgid "Developer(s)"
+msgstr "Developer(s)"
+
+#: src/features/reports/ReportsTabPanel.tsx:407
+msgid "developers"
+msgstr "developers"
+
+#: src/features/projects/ProjectSidebar.tsx:247
+msgid "Developers"
+msgstr "Developers"
+
+#: src/features/assignments/ProjectAssignmentsPanel.tsx:71
+msgid "Developers toewijzen"
+msgstr "Assign developers"
+
+#: src/pages/ClientCompanySettingsPage.tsx:57
+msgid "Deze gegevens worden gebruikt op je facturen. Uurtarief wordt door de beheerder ingesteld."
+msgstr "This information is used on your invoices. Hourly rate is set by the administrator."
+
+#: src/features/dashboard/DashboardSidebar.tsx:153
+#: src/features/reports/ReportsTabPanel.tsx:40
+msgid "Deze maand"
+msgstr "This month"
+
+#: src/features/tasks/TaskFormDialog.tsx:191
+#~ msgid "Deze taak wordt als aanvraag ingediend. Een developer moet hem accepteren voordat hij in Project Tasks staat."
+#~ msgstr "This task will be submitted as a request. A developer must accept it before it appears in Project Tasks."
+
+#: src/features/tasks/TaskForm.tsx:180
+msgid "Deze taak wordt als aanvraag ingediend. Een developer moet hem accepteren voordat hij in Projecttaken staat."
+msgstr "This task will be submitted as a request. A developer must accept it before it appears in Project Tasks."
+
+#: src/pages/AcceptInvitePage.tsx:30
+msgid "Deze uitnodigingslink is ongeldig of onvolledig."
+msgstr "This invitation link is invalid or incomplete."
+
+#: src/features/timeEntries/TaskHoursDialog.tsx:51
+msgid "Deze urenregel verwijderen?"
+msgstr "Delete this time entry?"
+
+#: src/features/dashboard/DashboardSidebar.tsx:148
+#: src/features/reports/ReportsTabPanel.tsx:38
+msgid "Deze week"
+msgstr "This week"
+
+#: src/features/invites/InviteDialog.tsx:62
+msgid "Direct toevoegen"
+msgstr "Add directly"
+
+#: src/features/discussions/DiscussionsPage.tsx:115
+#: src/features/discussions/TopicDetailPanel.tsx:52
+#: src/features/projects/ProjectDetailPage.tsx:78
+#: src/features/projects/ProjectSidebar.tsx:77
+msgid "Discussie"
+msgstr "Discussion"
+
+#: src/features/discussions/DiscussionCategorySidebar.tsx:32
+msgid "Discussiecategorieën"
+msgstr "Discussion categories"
+
+#: src/features/dashboard/DashboardSidebar.tsx:162
+#: src/features/dashboard/DashboardStatsCards.tsx:34
+#: src/features/discussions/DiscussionsPage.tsx:97
+#: src/features/discussions/DiscussionsPage.tsx:111
+#: src/features/discussions/DiscussionsPage.tsx:119
+#: src/features/projects/ProjectDetailPage.tsx:207
+#: src/layouts/PortalLayout.tsx:46
+msgid "Discussies"
+msgstr "Discussions"
+
+#: src/features/timeEntries/UnlockTimeEntriesDialog.tsx:45
+msgid "Dit maakt de geselecteerde uren weer bewerkbaar voor de developer. Al gefactureerde uren kunnen niet worden gedeblokkeerd."
+msgstr "This makes the selected hours editable again for the developer. Already invoiced hours cannot be unlocked."
+
+#: src/features/tasks/TaskDetailView.tsx:103
+#: src/features/tasks/TaskForm.tsx:226
+msgid "Doelgroep"
+msgstr "Audience"
+
+#: src/features/files/ProjectFileManager.tsx:108
+msgid "Download"
+msgstr "Download"
+
+#: src/components/ProfileInformationForm.tsx:65
+#: src/features/companies/ClientsListPage.tsx:46
+#: src/features/invoiceSettings/InvoiceSettingsPanel.tsx:236
+#: src/features/profiles/EditUserDialog.tsx:101
+#: src/features/profiles/NewUserDialog.tsx:97
+#: src/pages/ClientCompanySettingsPage.tsx:94
+#: src/pages/UsersAdminPage.tsx:76
+msgid "E-mail"
+msgstr "Email"
+
+#: src/pages/ClientManagerPage.tsx:159
+msgid "E-mail klant"
+msgstr "Client email"
+
+#: src/features/invites/InviteDialog.tsx:74
+#: src/pages/LoginPage.tsx:38
+msgid "E-mailadres"
+msgstr "Email address"
+
+#: src/features/reports/ReportsTabPanel.tsx:342
+#: src/features/reports/ReportsTabPanel.tsx:343
+msgid "Eindtotaal"
+msgstr "Grand total"
+
+#: src/components/ProfileInformationForm.tsx:65
+#~ msgid "Email"
+#~ msgstr "Email"
+
+#: src/features/dashboard/DashboardSidebar.tsx:89
+msgid "Er zijn taakaanvragen die je goedkeuring nodig hebben."
+msgstr "There are task requests that need your approval."
+
+#: src/features/tasks/DeveloperTasksTable.tsx:1016
+msgid "Extra filters of kolomsortering actief — sleepvolgorde is tijdelijk uitgeschakeld. Zet filters op Alle en/of klik opnieuw op de actieve kolomtitel voor handmatige volgorde."
+msgstr "Extra filters or column sorting are active — drag order is temporarily disabled. Set filters to All and/or click the active column header again for manual order."
+
+#: src/features/tasks/MarkFinishedDialog.tsx:109
+msgid "Extra uren (optioneel)"
+msgstr "Extra hours (optional)"
+
+#: src/layouts/PortalLayout.tsx:59
+#: src/layouts/PortalLayout.tsx:68
+#: src/pages/ClientInvoicesPage.tsx:37
+#: src/pages/ClientInvoicesPage.tsx:41
+#: src/pages/InvoiceDetailPage.tsx:109
+#: src/pages/InvoicesAdminPage.tsx:174
+#: src/pages/InvoicesAdminPage.tsx:178
+#: src/pages/InvoicesAdminPage.tsx:191
+msgid "Facturen"
+msgstr "Invoices"
+
+#: src/features/invoiceSettings/InvoicePreviewDocument.tsx:178
+#: src/pages/ClientInvoicesPage.tsx:56
+#: src/pages/InvoicesAdminPage.tsx:285
+msgid "Factuur"
+msgstr "Invoice"
+
+#: src/features/invoiceSettings/InvoicePreviewDocument.tsx:205
+#: src/pages/InvoiceDetailPage.tsx:164
+msgid "Factuurdatum"
+msgstr "Invoice date"
+
+#: src/pages/InvoiceDetailPage.tsx:119
+msgid "Factuurgegevens"
+msgstr "Invoice details"
+
+#: src/features/invoiceSettings/InvoicePreviewDocument.tsx:201
+msgid "Factuurnummer"
+msgstr "Invoice number"
+
+#: src/features/invoiceSettings/InvoiceSettingsPanel.tsx:181
+msgid "Factuurteksten"
+msgstr "Invoice texts"
+
+#: src/components/ChangePasswordForm.tsx:36
+#~ msgid "Failed to update password."
+#~ msgstr "Failed to update password."
+
+#: src/components/ProfileInformationForm.tsx:43
+#~ msgid "Failed to update profile."
+#~ msgstr "Failed to update profile."
+
+#: src/features/tasks/TaskViewTabs.tsx:84
+msgid "Filter"
+msgstr "Filter"
+
+#: src/features/projects/ProjectSidebar.tsx:60
+#: src/features/projects/ProjectsListPage.tsx:171
+#: src/features/tasks/DeveloperTasksTable.tsx:66
+#: src/features/tasks/ProjectTasksPanel.tsx:100
+#: src/features/tasks/TaskDetailView.tsx:32
+#: src/features/tasks/TaskList.tsx:201
+msgid "Gearchiveerd"
+msgstr "Archived"
+
+#: src/features/dashboard/useDashboardOverview.ts:140
+#: src/features/dashboard/useDashboardOverview.ts:154
+msgid "Gebruiker"
+msgstr "User"
+
+#: src/pages/UsersAdminPage.tsx:26
+msgid "Gebruiker “{label}” permanent verwijderen?"
+msgstr "Permanently delete user “{label}”?"
+
+#: src/features/profiles/EditUserDialog.tsx:88
+msgid "Gebruiker bewerken"
+msgstr "Edit user"
+
+#: src/features/profiles/NewUserDialog.tsx:79
+msgid "Gebruiker toevoegen mislukt."
+msgstr "Failed to add user."
+
+#: src/layouts/PortalLayout.tsx:57
+#: src/pages/UsersAdminPage.tsx:39
+#: src/pages/UsersAdminPage.tsx:43
+msgid "Gebruikers"
+msgstr "Users"
+
+#. placeholder {0}: creditInvoice ? ( <Link to={`/app/invoices/${creditInvoice.$id}`}>{creditInvoice.invoiceNumber}</Link> ) : ( invoice.creditedByInvoiceId )
+#: src/pages/InvoiceDetailPage.tsx:139
+msgid "Gecrediteerd door {0}"
+msgstr "Credited by {0}"
+
+#: src/components/CheckboxFilterDropdown.tsx:71
+msgid "Geen"
+msgstr "None"
+
+#: src/features/tasks/TaskForm.tsx:271
+msgid "Geen (hoofdtaak)"
+msgstr "None (main task)"
+
+#. placeholder {0}: clientTabLabel.toLowerCase()
+#: src/features/tasks/ProjectTasksPanel.tsx:519
+msgid "Geen {0}."
+msgstr "No {0}."
+
+#: src/components/CheckboxFilterDropdown.tsx:53
+msgid "Geen {plural}"
+msgstr "No {plural}"
+
+#: src/features/profiles/NewUserDialog.tsx:54
+msgid "Geen bedrijf beschikbaar om de gebruiker aan te koppelen."
+msgstr "No company available to assign user to."
+
+#: src/features/profiles/CompanyAutocomplete.tsx:83
+msgid "Geen bedrijf gevonden."
+msgstr "No company found."
+
+#: src/pages/ClientDashboardPage.tsx:24
+msgid "Geen bedrijven geselecteerd."
+msgstr "No companies selected."
+
+#: src/features/tasks/TaskList.tsx:440
+#~ msgid "Geen client tasks."
+#~ msgstr "No client tasks."
+
+#: src/features/profiles/CompanyAutocomplete.tsx:83
+#~ msgid "Geen company gevonden."
+#~ msgstr "No company found."
+
+#: src/features/dashboard/DashboardSidebar.tsx:166
+msgid "Geen discussies."
+msgstr "No discussions."
+
+#: src/pages/ManageCompaniesPage.tsx:26
+msgid "Geen klanten gevonden."
+msgstr "No clients found."
+
+#: src/features/tasks/TaskList.tsx:533
+msgid "Geen klanttaken."
+msgstr "No client tasks."
+
+#: src/features/dashboard/DashboardSidebar.tsx:121
+msgid "Geen lopende projecten."
+msgstr "No ongoing projects."
+
+#: src/features/tasks/ProjectTasksPanel.tsx:470
+#: src/features/tasks/TaskList.tsx:518
+msgid "Geen openstaande aanvragen."
+msgstr "No pending requests."
+
+#: src/features/tasks/DeveloperTasksTable.tsx:736
+#~ msgid "Geen project tasks in deze weergave."
+#~ msgstr "No project tasks in this view."
+
+#: src/features/tasks/TaskList.tsx:472
+#~ msgid "Geen project tasks."
+#~ msgstr "No project tasks."
+
+#: src/components/ProjectFilterDropdown.tsx:36
+#~ msgid "Geen projecten"
+#~ msgstr "No projects"
+
+#: src/features/reports/ReportsTabPanel.tsx:472
+msgid "Geen projecten geselecteerd."
+msgstr "No projects selected."
+
+#: src/features/projects/ProjectsListPage.tsx:301
+msgid "Geen projecten."
+msgstr "No projects."
+
+#: src/features/projects/ProjectSidebar.tsx:300
+msgid "Geen projectmeldingen."
+msgstr "No project notifications."
+
+#: src/features/tasks/DeveloperTasksTable.tsx:839
+msgid "Geen projecttaken in deze weergave."
+msgstr "No project tasks in this view."
+
+#: src/features/tasks/TaskList.tsx:565
+msgid "Geen projecttaken."
+msgstr "No project tasks."
+
+#: src/features/tasks/DeveloperTasksTable.tsx:851
+msgid "Geen taken voor deze filters."
+msgstr "No tasks for these filters."
+
+#: src/features/tasks/ProjectTasksPanel.tsx:517
+#: src/features/tasks/TaskList.tsx:533
+msgid "Geen taken."
+msgstr "No tasks."
+
+#: src/layouts/PortalLayout.tsx:39
+msgid "Geen toegang tot een klant."
+msgstr "No access to a client."
+
+#: src/features/reports/ReportsTabPanel.tsx:155
+msgid "Geen uren in deze periode."
+msgstr "No hours in this period."
+
+#: src/features/timeEntries/TimeApprovalsTabPanel.tsx:81
+msgid "Geen uren om te beoordelen."
+msgstr "No hours to review."
+
+#: src/features/reports/ReportsTabPanel.tsx:123
+#: src/features/timeEntries/TaskHoursDialog.tsx:110
+msgid "Gefactureerd"
+msgstr "Invoiced"
+
+#: src/features/reports/ReportsTabPanel.tsx:119
+msgid "Gefactureerd — bekijk factuur"
+msgstr "Invoiced — view invoice"
+
+#: src/pages/ClientInvoicesPage.tsx:19
+#: src/pages/InvoiceDetailPage.tsx:25
+#: src/pages/InvoicesAdminPage.tsx:34
+#: src/pages/InvoicesAdminPage.tsx:145
+msgid "Gegenereerd"
+msgstr "Generated"
+
+#: src/features/projects/ProjectSidebar.tsx:175
+msgid "Gekopieerd"
+msgstr "Copied"
+
+#: src/features/profiles/EditUserDialog.tsx:124
+msgid "Gekoppelde bedrijven laden…"
+msgstr "Loading linked companies…"
+
+#: src/features/profiles/EditUserDialog.tsx:124
+#~ msgid "Gekoppelde companies laden…"
+#~ msgstr "Loading linked companies…"
+
+#: src/features/dashboard/DashboardStatsCards.tsx:28
+msgid "Gem/Proj:"
+msgstr "Avg/Proj:"
+
+#: src/features/dashboard/DashboardStatsCards.tsx:27
+msgid "Gem/Taak:"
+msgstr "Avg/Task:"
+
+#: src/features/projects/ProjectDetailPage.tsx:185
+msgid "Gewerkte uren"
+msgstr "Hours worked"
+
+#: src/features/reports/ReportsTabPanel.tsx:138
+#: src/features/timeEntries/TaskHoursDialog.tsx:110
+msgid "Goedgekeurd"
+msgstr "Approved"
+
+#: src/features/reports/ReportsTabPanel.tsx:132
+msgid "Goedgekeurd — klik om te deblokkeren"
+msgstr "Approved — click to unlock"
+
+#: src/features/timeEntries/TimeApprovalsTabPanel.tsx:135
+msgid "Goedkeuren"
+msgstr "Approve"
+
+#: src/features/projects/ProjectsListPage.tsx:400
+#: src/features/tasks/DeveloperTasksTable.tsx:494
+#: src/features/tasks/ProjectTasksPanel.tsx:278
+#: src/features/tasks/TaskList.tsx:131
+msgid "Heropenen"
+msgstr "Reopen"
+
+#: src/components/ChangePasswordForm.tsx:48
+msgid "Huidig wachtwoord"
+msgstr "Current password"
+
+#: src/features/invoiceSettings/InvoiceSettingsPanel.tsx:253
+msgid "IBAN"
+msgstr "IBAN"
+
+#: src/features/discussions/TopicList.tsx:19
+msgid "Ideeën"
+msgstr "Ideas"
+
+#: src/features/projects/ProjectSidebar.tsx:56
+#: src/features/projects/ProjectsListPage.tsx:167
+msgid "In de wacht"
+msgstr "On hold"
+
+#: src/features/invoiceSettings/InvoicePreviewDocument.tsx:193
+#~ msgid "Informatie over de opdracht of bestelling"
+#~ msgstr "Information about the assignment or order"
+
+#: src/pages/LoginPage.tsx:36
+#: src/pages/LoginPage.tsx:58
+msgid "Inloggen"
+msgstr "Log in"
+
+#: src/pages/LoginPage.tsx:27
+msgid "Inloggen mislukt."
+msgstr "Login failed."
+
+#: src/pages/AcceptInvitePage.tsx:68
+msgid "Instellen is mislukt."
+msgstr "Setup failed."
+
+#: src/pages/InvoicesAdminPage.tsx:200
+msgid "Instellingen"
+msgstr "Settings"
+
+#: src/features/invoiceSettings/InvoiceSettingsPanel.tsx:339
+msgid "Instructietekst voor creditnota's (boven op de creditnota)"
+msgstr "Instructions text for credit notes (shown above the credit note)"
+
+#: src/layouts/PortalLayout.tsx:59
+#~ msgid "Invoices"
+#~ msgstr "Invoices"
+
+#: src/components/CheckboxFilterDropdown.tsx:50
+msgid "items"
+msgstr "items"
+
+#: src/pages/HomeRedirect.tsx:32
+#: src/pages/HomeRedirect.tsx:38
+msgid "Je account heeft nog geen toegang tot een klant."
+msgstr "Your account does not yet have access to a client."
+
+#: src/features/dashboard/DashboardSidebar.tsx:52
+msgid "Je hebt uren die goedkeuring nodig hebben, per bedrijf:"
+msgstr "You have hours that need approval, per company:"
+
+#: src/features/dashboard/DashboardSidebar.tsx:54
+msgid "Je hebt uren die goedkeuring nodig hebben."
+msgstr "You have hours that need approval."
+
+#: src/features/invoiceSettings/InvoicePreviewDocument.tsx:183
+msgid "Jouw bedrijfsnaam"
+msgstr "Your company name"
+
+#: src/features/tasks/ProjectTasksPanel.tsx:237
+msgid "Jouw taak"
+msgstr "Your task"
+
+#: src/features/tasks/TaskDetailView.tsx:73
+msgid "Jouw taak (klant)"
+msgstr "Your task (client)"
+
+#: src/features/tasks/TaskList.tsx:357
+#: src/features/tasks/taskViewTabUtils.ts:9
+msgid "Jouw taken"
+msgstr "Your tasks"
+
+#: src/features/assignments/ProjectAssignmentsPanel.tsx:80
+msgid "Kies developer…"
+msgstr "Choose developer…"
+
+#: src/features/tasks/TaskForm.tsx:123
+msgid "Kies een geldige bovenliggende taak."
+msgstr "Choose a valid parent task."
+
+#: src/features/discussions/NewTopicDialog.tsx:58
+msgid "Kies een project."
+msgstr "Choose a project."
+
+#: src/features/discussions/NewTopicDialog.tsx:126
+#: src/features/projects/ProjectSelect.tsx:107
+msgid "Kies project…"
+msgstr "Choose project…"
+
+#: src/features/invites/MembersList.tsx:33
+#: src/features/profiles/EditUserDialog.tsx:22
+#: src/features/profiles/NewUserDialog.tsx:25
+#: src/pages/UsersAdminPage.tsx:16
+msgid "Klant"
+msgstr "Client"
+
+#. placeholder {0}: client.name
+#: src/features/companies/ClientsListPage.tsx:71
+msgid "Klant \"{0}\" en alle bijbehorende data verwijderen?"
+msgstr "Delete client \"{0}\" and all associated data?"
+
+#: src/features/invites/InviteDialog.tsx:54
+msgid "Klant toevoegen"
+msgstr "Add client"
+
+#: src/features/companies/ClientsListPage.tsx:69
+msgid "Klant verwijderen"
+msgstr "Delete client"
+
+#: src/pages/ClientManagerPage.tsx:86
+msgid "Klantbeheer"
+msgstr "Client management"
+
+#: src/features/companies/CompanyScopeControl.tsx:65
+#: src/features/invites/MembersList.tsx:20
+#: src/layouts/PortalLayout.tsx:56
+msgid "Klanten"
+msgstr "Clients"
+
+#: src/features/companies/ClientsListPage.tsx:21
+#: src/features/companies/ClientsListPage.tsx:25
+msgid "Klantenbeheer"
+msgstr "Client management"
+
+#: src/pages/ClientManagerPage.tsx:106
+msgid "Klantgegevens"
+msgstr "Client details"
+
+#: src/features/companies/NewClientDialog.tsx:27
+#: src/pages/ClientManagerPage.tsx:155
+msgid "Klantnaam"
+msgstr "Client name"
+
+#: src/features/tasks/TaskList.tsx:99
+msgid "Klanttaak"
+msgstr "Client Task"
+
+#: src/features/tasks/TaskForm.tsx:233
+msgid "Klanttaak (geen uren)"
+msgstr "Client Task (no hours)"
+
+#: src/features/tasks/taskViewTabUtils.ts:9
+msgid "Klanttaken"
+msgstr "Client Tasks"
+
+#: src/features/tasks/MarkFinishedDialog.tsx:98
+#~ msgid "Klanttaken hebben geen urenregistratie. Markeer deze taak als afgerond wanneer de client-actie klaar is."
+#~ msgstr "Client tasks have no time tracking. Mark this task as finished when the client action is complete."
+
+#: src/features/tasks/MarkFinishedDialog.tsx:95
+msgid "Klanttaken hebben geen urenregistratie. Markeer deze taak als afgerond wanneer de klantactie klaar is."
+msgstr "Client tasks have no time tracking. Mark this task as finished when the client action is complete."
+
+#: src/features/tasks/TaskFormDialog.tsx:250
+#~ msgid "Klanttaken worden door de client uitgevoerd en tellen niet mee in urenrapportages."
+#~ msgstr "Client Tasks are performed by the client and do not count towards time reports."
+
+#: src/features/tasks/TaskForm.tsx:241
+msgid "Klanttaken worden door de klant uitgevoerd en tellen niet mee in urenrapportages."
+msgstr "Client Tasks are performed by the client and do not count towards time reports."
+
+#: src/features/projects/ProjectSidebar.tsx:232
+msgid "Kopieer link"
+msgstr "Copy link"
+
+#: src/features/projects/ProjectSidebar.tsx:178
+msgid "Kopiëren mislukt"
+msgstr "Copy failed"
+
+#: src/features/projects/ProjectSidebar.tsx:267
+msgid "Laatste discussies"
+msgstr "Latest discussions"
+
+#: src/pages/UsersAdminPage.tsx:50
+msgid "Laden mislukt"
+msgstr "Loading failed"
+
+#: src/auth/RequireAdmin.tsx:10
+#: src/auth/RequireAuth.tsx:10
+#: src/auth/RequireStaff.tsx:11
+#: src/features/assignments/ProjectAssignmentsPanel.tsx:65
+#: src/features/companies/ClientsListPage.tsx:37
+#: src/features/discussions/TopicDetailPanel.tsx:79
+#: src/features/discussions/TopicDetailPanel.tsx:130
+#: src/features/discussions/TopicList.tsx:156
+#: src/features/files/ProjectFileManager.tsx:90
+#: src/features/invoiceSettings/InvoiceSettingsPanel.tsx:142
+#: src/features/projects/ProjectDetailPage.tsx:132
+#: src/features/projects/ProjectsListPage.tsx:300
+#: src/features/reports/ReportsTabPanel.tsx:455
+#: src/features/tasks/ProjectTasksPanel.tsx:304
+#: src/features/tasks/TaskList.tsx:513
+#: src/features/timeEntries/TaskHoursDialog.tsx:86
+#: src/features/timeEntries/TimeApprovalsTabPanel.tsx:73
+#: src/layouts/PortalLayout.tsx:31
+#: src/layouts/PortalLayout.tsx:35
+#: src/pages/ClientCompanySettingsPage.tsx:86
+#: src/pages/ClientDashboardPage.tsx:39
+#: src/pages/ClientInvoicesPage.tsx:48
+#: src/pages/ClientManagerPage.tsx:73
+#: src/pages/HomeRedirect.tsx:10
+#: src/pages/InvoiceDetailPage.tsx:48
+#: src/pages/InvoicesAdminPage.tsx:208
+#: src/pages/InvoicesAdminPage.tsx:269
+#: src/pages/UsersAdminPage.tsx:65
+msgid "Laden…"
+msgstr "Loading…"
+
+#: src/features/invoiceSettings/InvoiceSettingsPanel.tsx:214
+msgid "Land"
+msgstr "Country"
+
+#: src/features/projects/ProjectEditDialog.tsx:63
+msgid "Link"
+msgstr "Link"
+
+#: src/features/invoiceSettings/InvoiceSettingsPanel.tsx:308
+#~ msgid "Live voorbeeld"
+#~ msgstr "Live preview"
+
+#: src/features/dashboard/DashboardSidebar.tsx:112
+msgid "Lopende projecten"
+msgstr "Ongoing projects"
+
+#: src/layouts/PortalLayout.tsx:57
+#~ msgid "Manage"
+#~ msgstr "Manage"
+
+#: src/features/projects/ProjectSidebar.tsx:297
+msgid "Meldingen"
+msgstr "Notifications"
+
+#: src/layouts/AppShell.tsx:334
+msgid "Menu"
+msgstr "Menu"
+
+#: src/features/profiles/NewUserDialog.tsx:123
+msgid "Minimaal {MIN_PASSWORD_LENGTH} tekens"
+msgstr "At least {MIN_PASSWORD_LENGTH} characters"
+
+#: src/components/ProfileInformationForm.tsx:55
+#: src/features/companies/ClientsListPage.tsx:45
+#: src/features/invites/InviteDialog.tsx:87
+#: src/features/profiles/EditUserDialog.tsx:91
+#: src/features/profiles/NewUserDialog.tsx:87
+#: src/features/projects/ProjectEditDialog.tsx:53
+#: src/features/projects/ProjectsListPage.tsx:309
+#: src/pages/AcceptInvitePage.tsx:92
+#: src/pages/UsersAdminPage.tsx:75
+msgid "Naam"
+msgstr "Name"
+
+#: src/features/profiles/EditUserDialog.tsx:67
+#: src/features/profiles/NewUserDialog.tsx:46
+msgid "Naam en e-mail zijn verplicht."
+msgstr "Name and email are required."
+
+#: src/features/projects/ProjectSelect.tsx:68
+msgid "Naam nieuw project"
+msgstr "New project name"
+
+#: src/features/invoiceSettings/InvoicePreviewDocument.tsx:191
+msgid "Naar"
+msgstr "To"
+
+#: src/components/ProfileInformationForm.tsx:55
+#: src/features/projects/ProjectEditDialog.tsx:53
+#~ msgid "Name"
+#~ msgstr "Name"
+
+#: src/components/ChangePasswordForm.tsx:59
+#~ msgid "New Password"
+#~ msgstr "New Password"
+
+#: src/components/ChangePasswordForm.tsx:17
+#~ msgid "New passwords do not match."
+#~ msgstr "New passwords do not match."
+
+#: src/features/tasks/MarkFinishedDialog.tsx:54
+#: src/features/timeEntries/TimeEntryForm.tsx:37
+msgid "Niet ingelogd."
+msgstr "Not logged in."
+
+#: src/features/tasks/TaskDetailView.tsx:142
+msgid "Niet verplicht"
+msgstr "Not required"
+
+#: src/features/projects/NewProjectDialog.tsx:56
+#: src/features/projects/ProjectsListPage.tsx:244
+msgid "Nieuw project"
+msgstr "New project"
+
+#: src/features/projects/NewProjectDialog.tsx:78
+msgid "Nieuw project…"
+msgstr "New project…"
+
+#: src/features/discussions/DiscussionBoard.tsx:52
+#: src/features/discussions/DiscussionsPage.tsx:150
+#: src/features/discussions/NewTopicDialog.tsx:82
+msgid "Nieuw topic"
+msgstr "New topic"
+
+#: src/components/ChangePasswordForm.tsx:59
+msgid "Nieuw wachtwoord"
+msgstr "New password"
+
+#: src/features/dashboard/DashboardStatsCards.tsx:15
+#: src/features/dashboard/DashboardStatsCards.tsx:48
+msgid "Nieuw:"
+msgstr "New:"
+
+#: src/features/projects/ProjectSidebar.tsx:282
+msgid "Nieuwe activiteit"
+msgstr "New activity"
+
+#: src/features/profiles/NewUserDialog.tsx:84
+msgid "Nieuwe gebruiker toevoegen"
+msgstr "Add new user"
+
+#: src/features/companies/NewClientDialog.tsx:24
+msgid "Nieuwe klant"
+msgstr "New client"
+
+#: src/features/tasks/TaskFormDialog.tsx:15
+msgid "Nieuwe subtaak"
+msgstr "New subtask"
+
+#: src/features/projects/ProjectSidebar.tsx:75
+#: src/features/tasks/TaskFormDialog.tsx:18
+msgid "Nieuwe taak"
+msgstr "New task"
+
+#: src/components/ChangePasswordForm.tsx:17
+msgid "Nieuwe wachtwoorden komen niet overeen."
+msgstr "New passwords do not match."
+
+#: src/features/tasks/ProjectTasksPanel.tsx:470
+msgid "Nog geen aanvragen."
+msgstr "No requests yet."
+
+#: src/features/tasks/TaskList.tsx:518
+msgid "Nog geen aanvragen. Dien een nieuwe taak in."
+msgstr "No requests yet. Submit a new task."
+
+#: src/features/files/ProjectFileManager.tsx:91
+#: src/features/projects/ProjectSidebar.tsx:332
+msgid "Nog geen bestanden."
+msgstr "No files yet."
+
+#: src/features/assignments/ProjectAssignmentsPanel.tsx:95
+#: src/features/projects/ProjectSidebar.tsx:250
+msgid "Nog geen developers toegewezen."
+msgstr "No developers assigned yet."
+
+#: src/features/discussions/DiscussionBoard.tsx:63
+msgid "Nog geen discussies voor dit project."
+msgstr "No discussions for this project yet."
+
+#: src/features/discussions/TopicList.tsx:159
+#: src/features/projects/ProjectSidebar.tsx:274
+msgid "Nog geen discussies."
+msgstr "No discussions yet."
+
+#: src/pages/ClientInvoicesPage.tsx:50
+#: src/pages/InvoicesAdminPage.tsx:271
+msgid "Nog geen facturen."
+msgstr "No invoices yet."
+
+#: src/pages/UsersAdminPage.tsx:67
+msgid "Nog geen gebruikers."
+msgstr "No users yet."
+
+#: src/features/companies/ClientsListPage.tsx:38
+msgid "Nog geen klanten."
+msgstr "No clients yet."
+
+#: src/features/projects/ProjectDetailPage.tsx:242
+msgid "Nog geen losse urenregels; totaal komt uit afgeronde taken."
+msgstr "No separate time entries yet; total comes from finished tasks."
+
+#: src/features/discussions/TopicDetailPanel.tsx:133
+msgid "Nog geen reacties. Wees de eerste om te reageren."
+msgstr "No replies yet. Be the first to reply."
+
+#: src/features/timeEntries/TaskHoursDialog.tsx:88
+msgid "Nog geen uren geboekt op deze taak."
+msgstr "No hours logged on this task yet."
+
+#: src/features/projects/ProjectDetailPage.tsx:244
+msgid "Nog geen uren geboekt op dit project."
+msgstr "No hours logged on this project yet."
+
+#: src/features/invites/MembersList.tsx:25
+msgid "Nog niemand uitgenodigd."
+msgstr "No one invited yet."
+
+#: src/pages/InvoicesAdminPage.tsx:263
+msgid "Nu uitvoeren"
+msgstr "Run now"
+
+#: src/features/tasks/TaskDetailView.tsx:95
+msgid "Omschrijving"
+msgstr "Description"
+
+#: src/features/invoiceSettings/InvoicePreviewDocument.tsx:282
+#: src/features/invoiceSettings/InvoiceSettingsPanel.tsx:219
+msgid "Ondernemingsnummer"
+msgstr "Registration number"
+
+#: src/features/assignments/ProjectAssignmentsPanel.tsx:112
+msgid "Ontkoppelen"
+msgstr "Unassign"
+
+#: src/features/assignments/ProjectAssignmentsPanel.tsx:60
+msgid "Ontkoppelen mislukt"
+msgstr "Unassign failed"
+
+#: src/features/projects/ProjectSidebar.tsx:270
+#: src/features/tasks/DeveloperTasksTable.tsx:62
+#: src/features/tasks/ProjectTasksPanel.tsx:97
+#: src/features/tasks/ProjectTasksPanel.tsx:245
+#: src/features/tasks/TaskDetailView.tsx:28
+#: src/features/tasks/TaskList.tsx:198
+msgid "Open"
+msgstr "Open"
+
+#: src/features/dashboard/DashboardSidebar.tsx:115
+msgid "Open taken"
+msgstr "Open tasks"
+
+#: src/features/invoiceSettings/InvoiceSettingsPanel.tsx:370
+#: src/pages/ClientCompanySettingsPage.tsx:115
+#: src/pages/ClientManagerPage.tsx:192
+msgid "Opgeslagen"
+msgstr "Saved"
+
+#: src/pages/InvoiceDetailPage.tsx:95
+msgid "Opnieuw genereren mislukt."
+msgstr "Regeneration failed."
+
+#: src/features/invoiceSettings/InvoiceSettingsPanel.tsx:366
+#: src/features/profiles/EditUserDialog.tsx:142
+#: src/features/projects/ProjectEditDialog.tsx:83
+#: src/features/projects/ProjectSelect.tsx:94
+#: src/features/tasks/TaskForm.tsx:292
+#: src/features/timeEntries/TimeEntryForm.tsx:111
+#: src/pages/ClientCompanySettingsPage.tsx:111
+#: src/pages/ClientManagerPage.tsx:188
+msgid "Opslaan"
+msgstr "Save"
+
+#: src/features/timeEntries/TimeEntryForm.tsx:120
+msgid "Opslaan & taak afronden"
+msgstr "Save & finish task"
+
+#: src/features/profiles/EditUserDialog.tsx:83
+msgid "Opslaan mislukt"
+msgstr "Save failed"
+
+#: src/features/invoiceSettings/InvoiceSettingsPanel.tsx:137
+#: src/features/projects/ProjectEditDialog.tsx:45
+#: src/features/tasks/TaskForm.tsx:166
+msgid "Opslaan mislukt."
+msgstr "Save failed."
+
+#: src/features/invites/InviteDialog.tsx:92
+#: src/features/tasks/MarkFinishedDialog.tsx:125
+#: src/features/timeEntries/TimeEntryForm.tsx:105
+msgid "Optioneel"
+msgstr "Optional"
+
+#: src/features/discussions/TopicDetailPanel.tsx:97
+#: src/features/projects/ProjectDetailPage.tsx:74
+msgid "Overzicht"
+msgstr "Overview"
+
+#: src/pages/ClientDashboardPage.tsx:36
+msgid "Overzicht van je projecten, taken en meldingen."
+msgstr "Overview of your projects, tasks and notifications."
+
+#: src/components/ChangePasswordForm.tsx:21
+#~ msgid "Password must be at least 8 characters long."
+#~ msgstr "Password must be at least 8 characters long."
+
+#: src/components/ChangePasswordForm.tsx:31
+#~ msgid "Password updated successfully!"
+#~ msgstr "Password updated successfully!"
+
+#: src/pages/ClientInvoicesPage.tsx:91
+#: src/pages/InvoiceDetailPage.tsx:206
+#: src/pages/InvoicesAdminPage.tsx:378
+msgid "PDF downloaden"
+msgstr "Download PDF"
+
+#: src/features/invoices/InvoicePdfViewer.tsx:49
+msgid "PDF kon niet worden weergegeven."
+msgstr "PDF could not be displayed."
+
+#: src/features/invoices/InvoicePdfViewer.tsx:58
+#: src/features/invoices/InvoicePdfViewer.tsx:67
+#: src/features/invoices/InvoicePdfViewer.tsx:68
+#: src/pages/InvoiceDetailPage.tsx:238
+msgid "PDF laden…"
+msgstr "Loading PDF…"
+
+#: src/features/invoices/InvoicePdfViewer.tsx:51
+msgid "PDF openen in nieuw tabblad"
+msgstr "Open PDF in new tab"
+
+#: src/pages/InvoiceDetailPage.tsx:218
+msgid "PDF opnieuw genereren"
+msgstr "Regenerate PDF"
+
+#. placeholder {0}: invoice.invoiceNumber
+#: src/pages/InvoiceDetailPage.tsx:87
+msgid "PDF opnieuw genereren voor {0}? De PDF wordt vernieuwd met de huidige klantgegevens en factuurstyling. Factuurnummer en bedragen blijven gelijk."
+msgstr "Regenerate the PDF for {0}? The PDF will be refreshed with the current customer details and invoice styling. Invoice number and amounts stay the same."
+
+#: src/pages/ClientInvoicesPage.tsx:100
+#: src/pages/InvoiceDetailPage.tsx:242
+#: src/pages/InvoicesAdminPage.tsx:387
+msgid "PDF wordt gegenereerd…"
+msgstr "PDF is being generated…"
+
+#: src/features/tasks/TaskList.tsx:488
+msgid "Per project"
+msgstr "By project"
+
+#: src/pages/ClientInvoicesPage.tsx:58
+#: src/pages/InvoiceDetailPage.tsx:156
+#: src/pages/InvoicesAdminPage.tsx:300
+msgid "Periode"
+msgstr "Period"
+
+#: src/components/ProfileInformationForm.tsx:75
+#~ msgid "Phone Number"
+#~ msgstr "Phone Number"
+
+#: src/features/invoiceSettings/InvoiceSettingsPanel.tsx:210
+msgid "Plaats"
+msgstr "City"
+
+#: src/features/discussions/TopicDetailPanel.tsx:166
+msgid "Plaats reactie"
+msgstr "Post reply"
+
+#: src/features/discussions/NewTopicDialog.tsx:164
+#: src/features/discussions/TopicDetailPanel.tsx:182
+msgid "Plaatsen"
+msgstr "Post"
+
+#: src/features/invoiceSettings/InvoiceSettingsPanel.tsx:202
+msgid "Postcode"
+msgstr "Postal code"
+
+#: src/layouts/AppShell.tsx:241
+msgid "Profiel bewerken"
+msgstr "Edit profile"
+
+#: src/components/ProfileInformationForm.tsx:43
+msgid "Profiel bijwerken mislukt."
+msgstr "Failed to update profile."
+
+#: src/components/ProfileInformationForm.tsx:86
+msgid "Profiel opslaan"
+msgstr "Save profile"
+
+#: src/components/ProfileInformationForm.tsx:41
+msgid "Profiel succesvol bijgewerkt!"
+msgstr "Profile updated successfully!"
+
+#: src/pages/UserAccountPage.tsx:11
+msgid "Profielgegevens"
+msgstr "Profile information"
+
+#: src/components/ProfileInformationForm.tsx:41
+#~ msgid "Profile updated successfully!"
+#~ msgstr "Profile updated successfully!"
+
+#: src/features/discussions/DiscussionsPage.tsx:57
+#: src/features/discussions/NewTopicDialog.tsx:119
+#: src/features/reports/ReportsTabPanel.tsx:311
+#: src/features/reports/ReportsTabPanel.tsx:312
+#: src/features/reports/ReportsTabPanel.tsx:381
+#: src/features/tasks/DeveloperTasksTable.tsx:883
+#: src/features/tasks/TaskDetailView.tsx:107
+#: src/features/tasks/TaskForm.tsx:255
+msgid "Project"
+msgstr "Project"
+
+#: src/features/projects/ProjectsListPage.tsx:410
+msgid "Project afsluiten"
+msgstr "Close project"
+
+#: src/features/projects/ProjectEditDialog.tsx:50
+#: src/features/projects/ProjectSidebar.tsx:203
+msgid "Project bewerken"
+msgstr "Edit project"
+
+#: src/features/projects/ProjectSidebar.tsx:197
+msgid "Project info"
+msgstr "Project info"
+
+#: src/features/tasks/TaskFormDialog.tsx:242
+#~ msgid "Project Task (urenregistratie)"
+#~ msgstr "Project Task (time tracking)"
+
+#: src/features/reports/ReportsTabPanel.tsx:184
+msgid "Project totaal"
+msgstr "Project total"
+
+#: src/components/ProjectFilterDropdown.tsx:30
+msgid "projecten"
+msgstr "projects"
+
+#: src/features/dashboard/DashboardStatsCards.tsx:44
+#: src/features/discussions/TopicList.tsx:21
+#: src/features/projects/ProjectDetailPage.tsx:147
+#: src/features/projects/ProjectsListPage.tsx:228
+#: src/features/projects/ProjectsListPage.tsx:232
+#: src/layouts/PortalLayout.tsx:45
+#: src/pages/ClientManagerPage.tsx:146
+msgid "Projecten"
+msgstr "Projects"
+
+#: src/features/projects/NewProjectDialog.tsx:74
+msgid "Projectnaam"
+msgstr "Project name"
+
+#: src/features/projects/ProjectSelect.tsx:117
+msgid "Projectnaam wijzigen"
+msgstr "Change project name"
+
+#: src/features/projects/ProjectDetailPage.tsx:153
+msgid "Projectonderdelen"
+msgstr "Project sections"
+
+#: src/features/projects/ProjectsListPage.tsx:144
+#~ msgid "Projects"
+#~ msgstr "Projects"
+
+#: src/features/tasks/TaskForm.tsx:232
+msgid "Projecttaak (urenregistratie)"
+msgstr "Project Task (time tracking)"
+
+#: src/features/tasks/taskViewTabUtils.ts:15
+msgid "Projecttaken"
+msgstr "Project Tasks"
+
+#: src/pages/TimeReportingPage.tsx:43
+msgid "Rapportages"
+msgstr "Reports"
+
+#: src/pages/TimeReportingPage.tsx:25
+msgid "Rapportages en goedkeuring van geboekte uren."
+msgstr "Reports and approval of logged hours."
+
+#: src/features/discussions/TopicDetailPanel.tsx:115
+#: src/features/discussions/TopicDetailPanel.tsx:120
+#: src/features/discussions/TopicList.tsx:119
+msgid "Reacties"
+msgstr "Replies"
+
+#: src/features/dashboard/DashboardStatsCards.tsx:38
+msgid "Reacties:"
+msgstr "Replies:"
+
+#: src/features/discussions/TopicDetailPanel.tsx:74
+msgid "Reageren mislukt."
+msgstr "Reply failed."
+
+#: src/features/timeEntries/UnlockTimeEntriesDialog.tsx:51
+msgid "Reden"
+msgstr "Reason"
+
+#: src/features/timeEntries/UnlockTimeEntriesDialog.tsx:24
+msgid "Reden is verplicht."
+msgstr "Reason is required."
+
+#: src/pages/TimeReportingPage.tsx:40
+#~ msgid "Reports"
+#~ msgstr "Reports"
+
+#: src/features/profiles/EditUserDialog.tsx:110
+#: src/features/profiles/NewUserDialog.tsx:106
+#: src/pages/UsersAdminPage.tsx:77
+msgid "Rol"
+msgstr "Role"
+
+#: src/features/tasks/TaskList.tsx:325
+msgid "Rond eerst alle open subtaken af."
+msgstr "Finish all open subtasks first."
+
+#: src/components/ProfileInformationForm.tsx:86
+#~ msgid "Save Profile"
+#~ msgstr "Save Profile"
+
+#: src/components/ProfileInformationForm.tsx:86
+#~ msgid "Saving..."
+#~ msgstr "Saving..."
+
+#: src/features/discussions/TopicDetailPanel.tsx:171
+msgid "Schrijf een reactie…"
+msgstr "Write a reply…"
+
+#: src/features/projects/NewProjectDialog.tsx:43
+msgid "Selecteer een geldig bedrijf."
+msgstr "Select a valid company."
+
+#: src/pages/ManageCompaniesPage.tsx:17
+msgid "Selecteer een klant om te beheren."
+msgstr "Select a client to manage."
+
+#: src/features/tasks/DeveloperTasksTable.tsx:421
+#: src/features/tasks/SortableTodoList.tsx:46
+msgid "Sleep om prioriteit te wijzigen"
+msgstr "Drag to change priority"
+
+#: src/features/tasks/DeveloperTasksTable.tsx:926
+#~ msgid "Sleep taken via het handvat om de prioriteitsvolgorde te wijzigen (binnen hetzelfde niveau). Klik op een kolomtitel om te sorteren."
+#~ msgstr "Drag tasks by the handle to change the priority order (within the same level). Click a column header to sort."
+
+#: src/components/Modal.tsx:17
+#: src/features/timeEntries/TaskHoursDialog.tsx:165
+#: src/layouts/AppShell.tsx:163
+msgid "Sluiten"
+msgstr "Close"
+
+#: src/features/tasks/MarkFinishedDialog.tsx:84
+msgid "Sluiten mislukt."
+msgstr "Closing failed."
+
+#. placeholder {0}: task.title
+#: src/features/tasks/MarkFinishedDialog.tsx:91
+msgid "Sluiten: {0}"
+msgstr "Close: {0}"
+
+#: src/components/ListFilterBar.tsx:22
+msgid "Sorteren"
+msgstr "Sort"
+
+#: src/features/invoiceSettings/InvoiceSettingsPanel.tsx:321
+msgid "Standaard instructietekst (boven op de factuur)"
+msgstr "Default instructions text (top of invoice)"
+
+#: src/features/projects/ProjectsListPage.tsx:349
+msgid "Startdatum"
+msgstr "Start Date"
+
+#: src/features/projects/ProjectsListPage.tsx:279
+#: src/features/projects/ProjectsListPage.tsx:326
+#: src/features/tasks/DeveloperTasksTable.tsx:900
+#: src/pages/ClientInvoicesPage.tsx:61
+#: src/pages/InvoicesAdminPage.tsx:237
+#: src/pages/InvoicesAdminPage.tsx:330
+msgid "Status"
+msgstr "Status"
+
+#: src/features/projects/ProjectsListPage.tsx:293
+#: src/features/tasks/ProjectTasksPanel.tsx:364
+#: src/features/tasks/TaskList.tsx:442
+#: src/pages/InvoicesAdminPage.tsx:251
+msgid "statussen"
+msgstr "statuses"
+
+#: src/features/tasks/DeveloperTasksTable.tsx:441
+#: src/features/tasks/DeveloperTasksTable.tsx:975
+msgid "Sub"
+msgstr "Sub"
+
+#: src/features/tasks/DeveloperTasksTable.tsx:449
+msgid "subtaak"
+msgstr "subtask"
+
+#: src/features/tasks/ProjectTasksPanel.tsx:238
+#: src/features/tasks/TaskList.tsx:100
+msgid "Subtaak"
+msgstr "Subtask"
+
+#: src/features/tasks/DeveloperTasksTable.tsx:502
+#: src/features/tasks/TaskList.tsx:118
+msgid "Subtaak toevoegen"
+msgstr "Add subtask"
+
+#: src/features/tasks/DeveloperTasksTable.tsx:449
+msgid "subtaken"
+msgstr "subtasks"
+
+#: src/pages/InvoiceDetailPage.tsx:183
+msgid "Subtotaal"
+msgstr "Subtotal"
+
+#: src/features/invoiceSettings/InvoiceSettingsPanel.tsx:257
+msgid "SWIFT/BIC"
+msgstr "SWIFT/BIC"
+
+#: src/features/invoiceSettings/InvoicePreviewDocument.tsx:223
+#: src/features/projects/ProjectDetailPage.tsx:253
+#: src/features/reports/ReportsTabPanel.tsx:162
+#: src/features/reports/ReportsTabPanel.tsx:311
+#: src/features/reports/ReportsTabPanel.tsx:312
+#: src/features/timeEntries/TimeApprovalsTabPanel.tsx:113
+msgid "Taak"
+msgstr "Task"
+
+#. placeholder {0}: viewingTask.title
+#: src/features/tasks/TaskList.tsx:403
+msgid "Taak \"{0}\" verwijderen?"
+msgstr "Delete task \"{0}\"?"
+
+#: src/features/tasks/TaskFormDialog.tsx:17
+msgid "Taak aanvragen"
+msgstr "Request task"
+
+#: src/features/projects/ProjectSidebar.tsx:71
+msgid "Taak afgerond"
+msgstr "Task finished"
+
+#: src/features/tasks/TaskEditView.tsx:32
+#: src/features/tasks/TaskFormDialog.tsx:13
+msgid "Taak bewerken"
+msgstr "Edit task"
+
+#: src/features/projects/ProjectSidebar.tsx:79
+msgid "Taak toegewezen"
+msgstr "Task assigned"
+
+#: src/features/tasks/ProjectTasksPanel.tsx:325
+msgid "Taak verwijderen?"
+msgstr "Delete task?"
+
+#: src/features/dashboard/DashboardSidebar.tsx:85
+msgid "Taakaanvragen"
+msgstr "Task requests"
+
+#: src/features/tasks/TaskDetailDialog.tsx:74
+#~ msgid "Taakdetails"
+#~ msgstr "Task details"
+
+#: src/features/tasks/TaskForm.tsx:215
+msgid "Taaktype"
+msgstr "Task type"
+
+#: src/features/tasks/TaskViewTabs.tsx:41
+msgid "Taakweergaven"
+msgstr "Task views"
+
+#: src/components/LanguageSwitcher.tsx:28
+msgid "Taal"
+msgstr "Language"
+
+#: src/features/dashboard/DashboardStatsCards.tsx:12
+#: src/features/projects/ProjectsListPage.tsx:333
+#: src/features/tasks/TaskList.tsx:357
+#: src/pages/ClientManagerPage.tsx:137
+msgid "Taken"
+msgstr "Tasks"
+
+#. placeholder {0}: taskStats.open
+#. placeholder {1}: taskStats.completed
+#: src/features/projects/ProjectDetailPage.tsx:195
+msgid "Taken · {0} open · {1} afgerond"
+msgstr "Tasks · {0} open · {1} finished"
+
+#: src/features/invoiceSettings/InvoicePreviewDocument.tsx:225
+msgid "Tarief"
+msgstr "Rate"
+
+#: src/features/tasks/TaskFormDialog.tsx:225
+#~ msgid "Task type"
+#~ msgstr "Task type"
+
+#: src/features/invoiceSettings/InvoiceSettingsPanel.tsx:232
+#: src/pages/ClientCompanySettingsPage.tsx:102
+msgid "Telefoon"
+msgstr "Phone"
+
+#: src/components/ProfileInformationForm.tsx:75
+#: src/pages/ClientManagerPage.tsx:167
+msgid "Telefoonnummer"
+msgstr "Phone number"
+
+#: src/features/projects/ProjectsListPage.tsx:286
+#~ msgid "Ter goedkeuring"
+#~ msgstr "Pending approval"
+
+#: src/features/tasks/TaskDetailView.tsx:78
+#: src/features/tasks/TaskEditView.tsx:30
+msgid "Terug naar taken"
+msgstr "Back to tasks"
+
+#: src/pages/TimeReportingPage.tsx:50
+#~ msgid "Time Approvals"
+#~ msgstr "Time Approvals"
+
+#: src/pages/TimeReportingPage.tsx:26
+#~ msgid "Time Sheets"
+#~ msgstr "Time Sheets"
+
+#: src/features/discussions/NewTopicDialog.tsx:136
+#: src/features/tasks/DeveloperTasksTable.tsx:865
+#: src/features/tasks/TaskDetailView.tsx:83
+#: src/features/tasks/TaskForm.tsx:187
+msgid "Titel"
+msgstr "Title"
+
+#: src/features/invites/MembersList.tsx:40
+msgid "Toegang intrekken"
+msgstr "Revoke access"
+
+#. placeholder {0}: member.userEmail
+#: src/features/invites/MembersList.tsx:42
+msgid "Toegang voor {0} intrekken?"
+msgstr "Revoke access for {0}?"
+
+#: src/features/projects/ProjectDetailPage.tsx:254
+#: src/features/reports/ReportsTabPanel.tsx:163
+#: src/features/reports/ReportsTabPanel.tsx:311
+#: src/features/reports/ReportsTabPanel.tsx:312
+#: src/features/tasks/MarkFinishedDialog.tsx:120
+#: src/features/timeEntries/TaskHoursDialog.tsx:96
+#: src/features/timeEntries/TimeApprovalsTabPanel.tsx:114
+#: src/features/timeEntries/TimeEntryForm.tsx:100
+msgid "Toelichting"
+msgstr "Notes"
+
+#: src/features/invites/InviteDialog.tsx:127
+#: src/features/profiles/NewUserDialog.tsx:143
+#: src/features/projects/ProjectSelect.tsx:74
+#: src/features/tasks/TaskForm.tsx:292
+msgid "Toevoegen"
+msgstr "Add"
+
+#: src/features/invites/InviteDialog.tsx:49
+msgid "Toevoegen mislukt."
+msgstr "Add failed."
+
+#: src/features/assignments/ProjectAssignmentsPanel.tsx:88
+msgid "Toewijzen"
+msgstr "Assign"
+
+#: src/features/assignments/ProjectAssignmentsPanel.tsx:46
+msgid "Toewijzen mislukt"
+msgstr "Assign failed"
+
+#: src/features/tasks/DeveloperTasksTable.tsx:983
+msgid "Tonen {startItem}–{endItem} van {totalTasks} taken"
+msgstr "Showing {startItem}–{endItem} of {totalTasks} tasks"
+
+#: src/features/tasks/DeveloperTasksTable.tsx:431
+msgid "Toon subtaken"
+msgstr "Show subtasks"
+
+#: src/features/discussions/NewTopicDialog.tsx:77
+msgid "Topic aanmaken mislukt."
+msgstr "Creating topic failed."
+
+#: src/features/discussions/TopicDetailPanel.tsx:85
+msgid "Topic niet gevonden."
+msgstr "Topic not found."
+
+#: src/features/dashboard/DashboardStatsCards.tsx:37
+msgid "Topics:"
+msgstr "Topics:"
+
+#: src/features/reports/ReportsTabPanel.tsx:441
+msgid "Tot"
+msgstr "To"
+
+#: src/features/invoiceSettings/InvoicePreviewDocument.tsx:226
+#: src/features/projects/ProjectDetailPage.tsx:289
+#: src/features/reports/ReportsTabPanel.tsx:335
+#: src/features/reports/ReportsTabPanel.tsx:336
+#: src/features/timeEntries/TaskHoursDialog.tsx:153
+#: src/pages/InvoiceDetailPage.tsx:193
+msgid "Totaal"
+msgstr "Total"
+
+#. placeholder {0}: formatHours(existingTotal)
+#: src/features/tasks/MarkFinishedDialog.tsx:103
+msgid "Totaal geboekt: <0>{0}</0>. Optioneel kun je nog uren toevoegen voordat de taak wordt afgerond."
+msgstr "Total logged: <0>{0}</0>. Optionally you can add more hours before the task is finished."
+
+#: src/pages/ClientManagerPage.tsx:128
+msgid "Totaal uren"
+msgstr "Total hours"
+
+#: src/features/dashboard/DashboardStatsCards.tsx:26
+#: src/features/dashboard/DashboardStatsCards.tsx:47
+#: src/features/reports/ReportsTabPanel.tsx:476
+msgid "Totaal:"
+msgstr "Total:"
+
+#: src/features/invoiceSettings/InvoicePreviewDocument.tsx:253
+msgid "Totaalbedrag"
+msgstr "Total amount"
+
+#: src/features/tasks/DeveloperTasksTable.tsx:892
+msgid "Type"
+msgstr "Type"
+
+#: src/features/tasks/ProjectTasksPanel.tsx:381
+msgid "typen"
+msgstr "types"
+
+#: src/lib/formatHours.ts:6
+msgid "u"
+msgstr "h"
+
+#: src/layouts/AppShell.tsx:267
+msgid "Uitloggen"
+msgstr "Log out"
+
+#: src/features/invites/InviteDialog.tsx:127
+msgid "Uitnodigen"
+msgstr "Invite"
+
+#: src/features/invites/InviteDialog.tsx:69
+msgid "Uitnodigen per e-mail"
+msgstr "Invite by email"
+
+#: src/pages/AcceptInvitePage.tsx:38
+msgid "Uitnodiging accepteren is mislukt."
+msgstr "Accepting the invitation failed."
+
+#: src/pages/AcceptInvitePage.tsx:75
+msgid "Uitnodiging accepteren…"
+msgstr "Accepting invitation…"
+
+#: src/features/invites/MembersList.tsx:35
+msgid "Uitnodiging verzonden"
+msgstr "Invitation sent"
+
+#: src/components/ChangePasswordForm.tsx:82
+#~ msgid "Updating..."
+#~ msgstr "Updating..."
+
+#: src/features/files/ProjectFileManager.tsx:76
+msgid "Upload bestand"
+msgstr "Upload file"
+
+#: src/features/files/ProjectFileManager.tsx:51
+msgid "Upload mislukt"
+msgstr "Upload failed"
+
+#: src/features/files/ProjectFileManager.tsx:88
+msgid "Uploaden…"
+msgstr "Uploading…"
+
+#: src/features/dashboard/DashboardSidebar.tsx:116
+#: src/features/dashboard/DashboardStatsCards.tsx:23
+#: src/features/invoiceSettings/InvoicePreviewDocument.tsx:224
+#: src/features/projects/ProjectDetailPage.tsx:76
+#: src/features/projects/ProjectDetailPage.tsx:256
+#: src/features/projects/ProjectsListPage.tsx:341
+#: src/features/reports/ReportsTabPanel.tsx:165
+#: src/features/reports/ReportsTabPanel.tsx:311
+#: src/features/reports/ReportsTabPanel.tsx:312
+#: src/features/tasks/DeveloperTasksTable.tsx:484
+#: src/features/tasks/DeveloperTasksTable.tsx:916
+#: src/features/tasks/TaskDetailView.tsx:119
+#: src/features/timeEntries/TaskHoursDialog.tsx:84
+#: src/features/timeEntries/TaskHoursDialog.tsx:97
+#: src/features/timeEntries/TimeApprovalsTabPanel.tsx:116
+#: src/pages/ClientInvoicesPage.tsx:59
+#: src/pages/InvoiceDetailPage.tsx:175
+#: src/pages/InvoicesAdminPage.tsx:307
+msgid "Uren"
+msgstr "Hours"
+
+#: src/features/projects/ProjectDetailPage.tsx:276
+#: src/features/reports/ReportsTabPanel.tsx:108
+#: src/features/timeEntries/LogHoursDialog.tsx:16
+#: src/features/timeEntries/TaskHoursDialog.tsx:58
+msgid "Uren bewerken"
+msgstr "Edit hours"
+
+#: src/features/timeEntries/LogHoursDialog.tsx:16
+#: src/features/timeEntries/TaskHoursDialog.tsx:58
+msgid "Uren boeken"
+msgstr "Log hours"
+
+#: src/features/timeEntries/TimeEntryForm.tsx:77
+msgid "Uren boeken mislukt."
+msgstr "Logging hours failed."
+
+#: src/features/projects/ProjectSidebar.tsx:85
+msgid "Uren gedeblokkeerd"
+msgstr "Hours unlocked"
+
+#: src/features/projects/ProjectSidebar.tsx:83
+msgid "Uren goedgekeurd"
+msgstr "Hours approved"
+
+#: src/pages/TimeReportingPage.tsx:53
+msgid "Uren goedkeuren"
+msgstr "Approve hours"
+
+#: src/features/dashboard/DashboardSidebar.tsx:73
+msgid "Uren ter goedkeuring"
+msgstr "Hours pending approval"
+
+#: src/features/timeEntries/TaskHoursDialog.tsx:162
+msgid "Uren toevoegen"
+msgstr "Add hours"
+
+#: src/layouts/PortalLayout.tsx:47
+#: src/pages/TimeReportingPage.tsx:24
+#: src/pages/TimeReportingPage.tsx:28
+msgid "Urenregistratie"
+msgstr "Time tracking"
+
+#: src/features/dashboard/DashboardSidebar.tsx:135
+#: src/features/tasks/DeveloperTasksTable.tsx:473
+msgid "Urenregistratie / rapportages"
+msgstr "Time tracking / reports"
+
+#: src/pages/TimeReportingPage.tsx:34
+msgid "Urenregistratie weergaven"
+msgstr "Time tracking views"
+
+#: src/features/profiles/EditUserDialog.tsx:88
+#~ msgid "User bewerken"
+#~ msgstr "Edit user"
+
+#: src/layouts/PortalLayout.tsx:56
+#~ msgid "Users"
+#~ msgstr "Users"
+
+#: src/features/companies/ClientsListPage.tsx:47
+#: src/pages/InvoiceDetailPage.tsx:179
+msgid "Uurtarief"
+msgstr "Hourly rate"
+
+#: src/pages/ClientManagerPage.tsx:176
+msgid "Uurtarief (€)"
+msgstr "Hourly rate (€)"
+
+#: src/features/invoiceSettings/InvoiceSettingsPanel.tsx:311
+msgid "Valuta"
+msgstr "Currency"
+
+#: src/features/invoiceSettings/InvoicePreviewDocument.tsx:182
+#: src/features/reports/ReportsTabPanel.tsx:433
+msgid "Van"
+msgstr "From"
+
+#: src/features/reports/ReportsTabPanel.tsx:36
+msgid "Vandaag"
+msgstr "Today"
+
+#: src/features/tasks/DeveloperTasksTable.tsx:431
+msgid "Verberg subtaken"
+msgstr "Hide subtasks"
+
+#: src/features/tasks/TaskDetailView.tsx:142
+msgid "Verplicht"
+msgstr "Required"
+
+#: src/features/invites/InviteDialog.tsx:102
+msgid "Verplicht bij nieuwe users"
+msgstr "Required for new users"
+
+#: src/features/invoiceSettings/InvoicePreviewDocument.tsx:209
+#: src/pages/InvoiceDetailPage.tsx:170
+#: src/pages/InvoicesAdminPage.tsx:323
+msgid "Vervaldag"
+msgstr "Due date"
+
+#: src/features/tasks/TaskDetailView.tsx:124
+msgid "Vervaldatum"
+msgstr "Due date"
+
+#: src/pages/ClientInvoicesPage.tsx:19
+#: src/pages/InvoiceDetailPage.tsx:25
+#: src/pages/InvoicesAdminPage.tsx:34
+#: src/pages/InvoicesAdminPage.tsx:146
+msgid "Vervallen"
+msgstr "Void"
+
+#: src/features/invoiceSettings/InvoiceSettingsPanel.tsx:333
+#: src/features/invoiceSettings/InvoiceSettingsPanel.tsx:355
+msgid "Vervangcodes:"
+msgstr "Replacement codes:"
+
+#: src/features/files/ProjectFileManager.tsx:116
+#: src/features/tasks/TaskDetailView.tsx:156
+#: src/features/timeEntries/TaskHoursDialog.tsx:128
+#: src/pages/UsersAdminPage.tsx:103
+msgid "Verwijderen"
+msgstr "Delete"
+
+#: src/features/files/ProjectFileManager.tsx:63
+#: src/pages/UsersAdminPage.tsx:31
+msgid "Verwijderen mislukt"
+msgstr "Delete failed"
+
+#: src/features/invoiceSettings/InvoiceSettingsPanel.tsx:329
+msgid "Voettekst (onder de totalen)"
+msgstr "Footer text (below totals)"
+
+#: src/features/invoiceSettings/InvoiceSettingsPanel.tsx:347
+msgid "Voettekst voor creditnota's (onder de totalen)"
+msgstr "Footer text for credit notes (shown below the totals)"
+
+#: src/features/tasks/DeveloperTasksTable.tsx:1003
+msgid "Volgende"
+msgstr "Next"
+
+#: src/features/projects/ProjectSidebar.tsx:58
+#: src/features/projects/ProjectsListPage.tsx:169
+msgid "Voltooid"
+msgstr "Completed"
+
+#: src/features/invoiceSettings/InvoiceSettingsPanel.tsx:309
+#~ msgid "Voorbeeldfactuur met testgegevens — wordt niet opgeslagen."
+#~ msgstr "Sample invoice with test data — will not be saved."
+
+#: src/features/tasks/DeveloperTasksTable.tsx:993
+msgid "Vorige"
+msgstr "Previous"
+
+#: src/features/reports/ReportsTabPanel.tsx:42
+msgid "Vorige maand"
+msgstr "Last month"
+
+#: src/features/tasks/MarkFinishedDialog.tsx:59
+msgid "Vul een geldig aantal uren in, of laat leeg."
+msgstr "Enter a valid number of hours, or leave empty."
+
+#: src/features/timeEntries/TimeEntryForm.tsx:42
+msgid "Vul een geldig aantal uren in."
+msgstr "Enter a valid number of hours."
+
+#: src/features/projects/NewProjectDialog.tsx:39
+#: src/features/projects/ProjectEditDialog.tsx:34
+msgid "Vul een projectnaam in."
+msgstr "Enter a project name."
+
+#: src/pages/AcceptInvitePage.tsx:90
+msgid "Vul je naam in en kies een wachtwoord om voortaan mee in te loggen."
+msgstr "Enter your name and choose a password to log in with from now on."
+
+#: src/pages/AcceptInvitePage.tsx:49
+msgid "Vul je naam in."
+msgstr "Enter your name."
+
+#: src/features/tasks/TaskForm.tsx:119
+msgid "Vul titel en project in."
+msgstr "Enter a title and project."
+
+#: src/features/invites/InviteDialog.tsx:96
+#: src/features/profiles/NewUserDialog.tsx:116
+#: src/pages/AcceptInvitePage.tsx:102
+#: src/pages/LoginPage.tsx:48
+msgid "Wachtwoord"
+msgstr "Password"
+
+#: src/components/ChangePasswordForm.tsx:36
+msgid "Wachtwoord bijwerken mislukt."
+msgstr "Failed to update password."
+
+#: src/pages/AcceptInvitePage.tsx:123
+msgid "Wachtwoord instellen"
+msgstr "Set password"
+
+#: src/features/invites/InviteDialog.tsx:38
+#: src/features/profiles/NewUserDialog.tsx:50
+msgid "Wachtwoord moet minimaal {MIN_PASSWORD_LENGTH} tekens zijn."
+msgstr "Password must be at least {MIN_PASSWORD_LENGTH} characters."
+
+#: src/components/ChangePasswordForm.tsx:21
+msgid "Wachtwoord moet minimaal 8 tekens lang zijn."
+msgstr "Password must be at least 8 characters long."
+
+#: src/pages/AcceptInvitePage.tsx:53
+msgid "Wachtwoord moet minimaal 8 tekens zijn."
+msgstr "Password must be at least 8 characters."
+
+#: src/components/ChangePasswordForm.tsx:31
+msgid "Wachtwoord succesvol bijgewerkt!"
+msgstr "Password updated successfully!"
+
+#: src/components/ChangePasswordForm.tsx:82
+#: src/pages/UserAccountPage.tsx:16
+msgid "Wachtwoord wijzigen"
+msgstr "Change password"
+
+#: src/pages/AcceptInvitePage.tsx:57
+msgid "Wachtwoorden komen niet overeen."
+msgstr "Passwords do not match."
+
+#: src/features/invoiceSettings/InvoiceSettingsPanel.tsx:240
+msgid "Website"
+msgstr "Website"
+
+#: src/layouts/AppShell.tsx:137
+msgid "Zijbalk inklappen"
+msgstr "Collapse sidebar"
+
+#: src/layouts/AppShell.tsx:137
+msgid "Zijbalk uitklappen"
+msgstr "Expand sidebar"
+
+#: src/features/profiles/CompanyAutocomplete.tsx:67
+msgid "Zoek bedrijf…"
+msgstr "Search company…"
+
+#: src/features/profiles/CompanyAutocomplete.tsx:67
+#~ msgid "Zoek company…"
+#~ msgstr "Search company…"

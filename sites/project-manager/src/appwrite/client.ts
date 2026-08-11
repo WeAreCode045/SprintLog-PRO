@@ -1,0 +1,16 @@
+import { Account, Client, Functions, Storage, TablesDB, Teams } from 'appwrite';
+
+const endpoint = import.meta.env.VITE_APPWRITE_ENDPOINT as string;
+const projectId = import.meta.env.VITE_APPWRITE_PROJECT_ID as string;
+
+if (!endpoint || !projectId) {
+  throw new Error('Missing VITE_APPWRITE_ENDPOINT or VITE_APPWRITE_PROJECT_ID env vars');
+}
+
+export const client = new Client().setEndpoint(endpoint).setProject(projectId);
+
+export const account = new Account(client);
+export const tablesDB = new TablesDB(client);
+export const teams = new Teams(client);
+export const storage = new Storage(client);
+export const functions = new Functions(client);

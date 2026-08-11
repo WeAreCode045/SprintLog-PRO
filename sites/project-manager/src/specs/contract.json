@@ -1,0 +1,217 @@
+{
+  "databaseId": "main",
+  "labels": ["admin", "developer"],
+  "teamRoles": ["client", "owner"],
+  "buckets": [
+    {
+      "$id": "project-files",
+      "name": "Project Files",
+      "enabled": true,
+      "maximumFileSize": 30000000,
+      "allowedFileExtensions": [],
+      "encryption": true,
+      "antivirus": true,
+      "fileSecurity": true,
+      "$permissions": [
+        "create(\"users\")",
+        "read(\"label:admin\")",
+        "update(\"label:admin\")",
+        "delete(\"label:admin\")"
+      ]
+    },
+    {
+      "$id": "invoice-pdfs",
+      "name": "Invoice PDFs",
+      "enabled": true,
+      "maximumFileSize": 10000000,
+      "allowedFileExtensions": ["pdf"],
+      "encryption": true,
+      "antivirus": true,
+      "fileSecurity": true,
+      "$permissions": [
+        "read(\"label:admin\")",
+        "update(\"label:admin\")",
+        "delete(\"label:admin\")"
+      ]
+    }
+  ],
+  "tables": [
+    {
+      "$id": "companies",
+      "columns": ["name", "teamId", "email", "address", "phone", "hourlyRate", "vatNumber"]
+    },
+    {
+      "$id": "projects",
+      "columns": ["companyId", "name", "description", "link", "status", "priority"]
+    },
+    {
+      "$id": "taskGroups",
+      "columns": ["projectId", "companyId", "name", "order"]
+    },
+    {
+      "$id": "tasks",
+      "columns": [
+        "companyId",
+        "projectId",
+        "taskGroupId",
+        "title",
+        "description",
+        "status",
+        "hours",
+        "completedDate",
+        "createdBy",
+        "order",
+        "parentTaskId",
+        "audience",
+        "assigneeIds",
+        "requiresFileUpload",
+        "priority",
+        "taskType",
+        "dueDate"
+      ]
+    },
+    {
+      "$id": "timeEntries",
+      "columns": [
+        "companyId",
+        "projectId",
+        "taskId",
+        "userId",
+        "hours",
+        "workedDate",
+        "comment",
+        "approved",
+        "invoiced",
+        "invoiceId"
+      ]
+    },
+    {
+      "$id": "userProfiles",
+      "columns": ["userId", "displayName", "email", "globalRole", "avatarFileId"]
+    },
+    {
+      "$id": "projectAssignments",
+      "columns": ["companyId", "projectId", "userId", "assignedBy"]
+    },
+    {
+      "$id": "discussions",
+      "columns": [
+        "companyId",
+        "projectId",
+        "categoryType",
+        "categoryId",
+        "title",
+        "body",
+        "createdBy",
+        "totalReplies"
+      ]
+    },
+    {
+      "$id": "discussionReplies",
+      "columns": ["discussionId", "companyId", "projectId", "body", "createdBy"]
+    },
+    {
+      "$id": "projectFiles",
+      "columns": [
+        "companyId",
+        "projectId",
+        "taskId",
+        "bucketFileId",
+        "name",
+        "mimeType",
+        "size",
+        "uploadedBy"
+      ]
+    },
+    {
+      "$id": "notifications",
+      "columns": [
+        "userId",
+        "companyId",
+        "projectId",
+        "type",
+        "title",
+        "body",
+        "href",
+        "readAt",
+        "sourceId"
+      ]
+    },
+    {
+      "$id": "invoices",
+      "columns": [
+        "companyId",
+        "invoiceNumber",
+        "periodStart",
+        "periodEnd",
+        "totalHours",
+        "totalAmount",
+        "currency",
+        "status",
+        "pdfFileId",
+        "issueDate",
+        "dueDate",
+        "sentAt",
+        "paymentTermDays",
+        "instructionsText",
+        "footerText",
+        "vatAmount",
+        "totalWithVat",
+        "creditForInvoiceId",
+        "creditedByInvoiceId"
+      ]
+    },
+    {
+      "$id": "invoiceItems",
+      "columns": [
+        "invoiceId",
+        "companyId",
+        "description",
+        "quantity",
+        "unitPrice",
+        "vatRate",
+        "order",
+        "sourceTimeEntryIds"
+      ]
+    },
+    {
+      "$id": "invoiceSettings",
+      "columns": [
+        "senderName",
+        "senderAddress",
+        "senderPostalCode",
+        "senderCity",
+        "senderCountry",
+        "senderVatNumber",
+        "senderRegistrationNumber",
+        "contactPerson",
+        "contactPhone",
+        "contactEmail",
+        "contactWebsite",
+        "bankName",
+        "bankIban",
+        "bankSwiftBic",
+        "vatEnabled",
+        "vatRateHigh",
+        "vatRateLow",
+        "vatLabel",
+        "paymentTermDays",
+        "currency",
+        "footerText",
+        "defaultInstructionsText"
+      ]
+    }
+  ],
+  "functions": [
+    "cascade-delete-client",
+    "manage-user-role",
+    "assign-project-developer",
+    "assign-task-assignees",
+    "notify-on-events",
+    "add-team-client",
+    "approve-time-entries",
+    "unlock-time-entries",
+    "send-invoice",
+    "create-credit-invoice"
+  ]
+}
