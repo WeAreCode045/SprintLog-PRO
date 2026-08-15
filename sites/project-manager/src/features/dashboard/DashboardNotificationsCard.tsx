@@ -1,9 +1,9 @@
 import { useEffect, useMemo, useState } from 'react';
-import { Bell, ChevronDown, ChevronUp } from 'lucide-react';
+import { Bell, ChevronDown, ChevronUp, Trash2 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import { Trans } from '@lingui/react/macro';
+import { Trans, useLingui } from '@lingui/react/macro';
 import type { NotificationRow } from '../../appwrite/types';
-import { useMarkNotificationRead } from '../notifications/hooks';
+import { useDeleteNotification, useMarkNotificationRead } from '../notifications/hooks';
 import {
   getDashboardNotificationDescription,
   getDashboardNotificationIcon,
@@ -19,11 +19,19 @@ interface DashboardNotificationsCardProps {
 }
 
 export function DashboardNotificationsCard({ notifications, userId }: DashboardNotificationsCardProps) {
+  const { t } = useLingui();
   const navigate = useNavigate();
   const markRead = useMarkNotificationRead(userId);
+  const deleteNotification = useDeleteNotification(userId);
+  const [dismissedIds, setDismissedIds] = useState<Set<string>>(new Set());
   const [startIndex, setStartIndex] = useState(0);
 
-  const maxStartIndex = Math.max(0, notifications.length - VISIBLE_COUNT);
+  const activeNotifications = useMemo(
+    () => notifications.filter((notification) => !dismissedIds.has(notification.$id)),
+    [notifications, dismissedIds],
+  );
+
+  const maxStartIndex = Math.max(0, activeNotifications.length - VISIBLE_COUNT);
   const safeStartIndex = Math.min(startIndex, maxStartIndex);
 
   useEffect(() => {
@@ -31,8 +39,8 @@ export function DashboardNotificationsCard({ notifications, userId }: DashboardN
   }, [maxStartIndex]);
 
   const visibleNotifications = useMemo(
-    () => notifications.slice(safeStartIndex, safeStartIndex + VISIBLE_COUNT),
-    [notifications, safeStartIndex],
+    () => activeNotifications.slice(safeStartIndex, safeStartIndex + VISIBLE_COUNT),
+    [activeNotifications, safeStartIndex],
   );
 
   function goToPrevious() {
@@ -58,12 +66,29 @@ export function DashboardNotificationsCard({ notifications, userId }: DashboardN
     }
   }
 
+  async function handleDelete(e: React.MouseEvent, notification: NotificationRow) {
+    e.stopPropagation();
+    setDismissedIds((prev) => new Set(prev).add(notification.$id));
+
+    if (!isPersistentDashboardNotification(notification)) {
+      try {
+        await deleteNotification.mutateAsync(notification.$id);
+      } catch {
+        try {
+          await markRead.mutateAsync(notification.$id);
+        } catch {
+          // ignore
+        }
+      }
+    }
+  }
+
   return (
     <section className="dashboard-v2-notifications">
       <header className="dashboard-v2-notifications-header">
         <Bell size={16} />
         <Trans>Notificaties</Trans>
-        {notifications.length > VISIBLE_COUNT && (
+        {activeNotifications.length > VISIBLE_COUNT && (
           <div className="dashboard-v2-notifications-nav">
             <button
               type="button"
@@ -90,7 +115,7 @@ export function DashboardNotificationsCard({ notifications, userId }: DashboardN
         <Trans>Meldingen die je actie of aandacht vragen.</Trans>
       </p>
 
-      {notifications.length === 0 ? (
+      {activeNotifications.length === 0 ? (
         <p className="dashboard-v2-notifications-empty">
           <Trans>Geen nieuwe meldingen.</Trans>
         </p>
@@ -104,23 +129,36 @@ export function DashboardNotificationsCard({ notifications, userId }: DashboardN
 
             return (
               <li key={notification.$id} className="dashboard-v2-notifications-item">
-                <button
-                  type="button"
-                  className={`dashboard-v2-notifications-button${isUnread ? ' dashboard-v2-notifications-button--unread' : ''}`}
-                  onClick={() => void handleClick(notification)}
+                <div
+                  className={`dashboard-v2-notifications-card${isUnread ? ' dashboard-v2-notifications-card--unread' : ''}`}
                 >
-                  <span className="dashboard-v2-notifications-line">
-                    <span className="dashboard-v2-notifications-item-icon" aria-hidden>
-                      <Icon size={18} strokeWidth={2} />
+                  <button
+                    type="button"
+                    className="dashboard-v2-notifications-main-btn"
+                    onClick={() => void handleClick(notification)}
+                  >
+                    <span className="dashboard-v2-notifications-line">
+                      <span className="dashboard-v2-notifications-item-icon" aria-hidden>
+                        <Icon size={18} strokeWidth={2} />
+                      </span>
+                      <span className="dashboard-v2-notifications-item-content">
+                        <span className="dashboard-v2-notifications-item-title">{title}</span>
+                        {description && (
+                          <span className="dashboard-v2-notifications-text">{description}</span>
+                        )}
+                      </span>
                     </span>
-                    <span className="dashboard-v2-notifications-item-content">
-                      <span className="dashboard-v2-notifications-item-title">{title}</span>
-                      {description && (
-                        <span className="dashboard-v2-notifications-text">{description}</span>
-                      )}
-                    </span>
-                  </span>
-                </button>
+                  </button>
+                  <button
+                    type="button"
+                    className="dashboard-v2-notifications-delete-btn"
+                    onClick={(e) => void handleDelete(e, notification)}
+                    title={t`Verwijderen`}
+                    aria-label={t`Verwijder notificatie`}
+                  >
+                    <Trash2 size={15} strokeWidth={2} />
+                  </button>
+                </div>
               </li>
             );
           })}

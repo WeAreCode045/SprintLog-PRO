@@ -24,7 +24,8 @@
     "ignoreDeprecations": "6.0",
     "baseUrl": ".",
     "paths": {
-      "@specs/*": ["src/specs/*"]
+      "@specs/*": ["src/specs/*"],
+      "@/*": ["./src/*"]
     }
   },
   "include": ["src"]

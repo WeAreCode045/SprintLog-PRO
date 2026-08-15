@@ -3,11 +3,12 @@ import { useQueries } from '@tanstack/react-query';
 import { useLingui } from '@lingui/react/macro';
 import type { DiscussionCategoryType, ResolvedRole } from '../../appwrite/types';
 import { isStaffRole } from '../../auth/RequireStaff';
+import { extractMentions, formatTaggedNames, type MentionableUser } from '../../lib/mentions';
 import { listDiscussionReplies } from '../discussions/api';
 import { useDiscussionsForCompanies } from '../discussions/hooks';
 import { useProjectsForCompanies } from '../projects/hooks';
 import { useTasksForCompanies } from '../tasks/hooks';
-import { useUserProfiles } from '../profiles/hooks';
+import { useDeveloperProfiles, useUserProfiles } from '../profiles/hooks';
 import { useTimeEntriesForCompanies } from '../timeEntries/hooks';
 import { entryNeedsApproval } from '../timeEntries/timeEntryBilling';
 import { getDateRange } from '../../lib/dateRanges';
@@ -32,6 +33,7 @@ export function useDashboardOverview(enabledCompanyIds: string[], role: Resolved
   const { data: projects = [], isLoading: projectsLoading } =
     useProjectsForCompanies(enabledCompanyIds);
   const { data: profiles = [] } = useUserProfiles(true);
+  const { data: developers = [] } = useDeveloperProfiles(true);
   const { isLoading: openTasksLoading } = useTasksForCompanies(enabledCompanyIds, 'open');
   const { data: allTasks = [], isLoading: allTasksLoading } = useTasksForCompanies(
     enabledCompanyIds,
@@ -49,10 +51,25 @@ export function useDashboardOverview(enabledCompanyIds: string[], role: Resolved
     })),
   });
 
-  const profileNameById = useMemo(
-    () => new Map(profiles.map((p) => [p.userId, p.displayName])),
-    [profiles],
-  );
+  const mentionableUsers = useMemo(() => {
+    const map = new Map<string, MentionableUser>();
+    for (const p of profiles) {
+      map.set(p.userId, { id: p.userId, name: p.displayName, email: p.email });
+    }
+    for (const d of developers) {
+      if (!map.has(d.userId)) {
+        map.set(d.userId, { id: d.userId, name: d.displayName, email: d.email });
+      }
+    }
+    return [...map.values()];
+  }, [profiles, developers]);
+
+  const profileNameById = useMemo(() => {
+    const map = new Map<string, string>();
+    for (const p of profiles) map.set(p.userId, p.displayName);
+    for (const d of developers) map.set(d.userId, d.displayName);
+    return map;
+  }, [profiles, developers]);
 
   const projectNameById = useMemo(
     () => new Map(projects.map((project) => [project.$id, project.name])),
@@ -132,10 +149,14 @@ export function useDashboardOverview(enabledCompanyIds: string[], role: Resolved
     const items: Array<{
       id: string;
       title: string;
+      topicTitle: string;
+      authorName: string;
+      actionText: string;
       createdAt: string;
       href: string;
       kind: 'topic' | 'reply';
       categoryType: DiscussionCategoryType;
+      projectId?: string;
     }> = [];
 
     const allowed = new Set(enabledCompanyIds);
@@ -146,10 +167,14 @@ export function useDashboardOverview(enabledCompanyIds: string[], role: Resolved
       items.push({
         id: `topic-${d.$id}`,
         title: t`${author} startte een nieuw topic: ${d.title}`,
+        topicTitle: d.title,
+        authorName: author,
+        actionText: t`${author} startte een nieuw topic`,
         createdAt: d.$createdAt,
         href: `/app/discussions/${d.$id}`,
         kind: 'topic',
         categoryType: d.categoryType ?? 'project',
+        projectId: d.projectId,
       });
     }
 
@@ -158,20 +183,36 @@ export function useDashboardOverview(enabledCompanyIds: string[], role: Resolved
       if (!discussion || !allowed.has(discussion.companyId)) return;
       for (const r of q.data ?? []) {
         const author = profileNameById.get(r.createdBy) ?? t`Gebruiker`;
+        const tagged = extractMentions(r.body, mentionableUsers);
+        const hasTagged = tagged.length > 0;
+        const taggedNames = formatTaggedNames(tagged);
+
+        const actionText = hasTagged
+          ? t`${author} heeft ${taggedNames} getagd in een reactie`
+          : t`${author} reageerde op topic`;
+
+        const title = hasTagged
+          ? t`${author} heeft ${taggedNames} getagd in een reactie: ${discussion.title}`
+          : t`${author} reageerde op: ${discussion.title}`;
+
         items.push({
           id: `reply-${r.$id}`,
-          title: t`${author} reageerde op: ${discussion.title}`,
+          title,
+          topicTitle: discussion.title,
+          authorName: author,
+          actionText,
           createdAt: r.$createdAt,
           href: `/app/discussions/${discussion.$id}`,
           kind: 'reply',
           categoryType: discussion.categoryType ?? 'project',
+          projectId: discussion.projectId,
         });
       }
     });
 
     items.sort((a, b) => b.createdAt.localeCompare(a.createdAt));
-    return items.slice(0, 5);
-  }, [discussions, replyQueries, recentDiscussions, profileNameById, enabledCompanyIds, t]);
+    return items.slice(0, 20);
+  }, [discussions, replyQueries, recentDiscussions, profileNameById, mentionableUsers, enabledCompanyIds, t]);
 
   const currentStats = useMemo(() => {
     const allowed = new Set(enabledCompanyIds);
@@ -222,6 +263,12 @@ export function useDashboardOverview(enabledCompanyIds: string[], role: Resolved
     hoursToApprove,
     hoursToApproveByCompany,
     pendingRequestedTasks,
+    projects,
+    allTasks,
+    allTimeEntries,
+    discussions,
+    profiles,
+    profileNameById,
   };
 }
 

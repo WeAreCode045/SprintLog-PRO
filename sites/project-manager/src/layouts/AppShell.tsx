@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect, type ReactNode } from 'react';
-import { Menu, PanelLeftClose, PanelLeftOpen, LogOut, X, User, ChevronUp } from 'lucide-react';
+import { Menu, LogOut, X, User, ChevronUp } from 'lucide-react';
 import { NavLink, Outlet, useNavigate } from 'react-router-dom';
 import { Trans, useLingui } from '@lingui/react/macro';
 import { BrandLightbulb } from '../components/BrandLightbulb';
@@ -131,10 +131,37 @@ export function AppShell({
           padding: collapsed ? '1.25rem 0.5rem' : '1.25rem 1rem',
         }}
       >
-        <div className="sidebar-header" style={{ display: 'flex', justifyContent: collapsed ? 'center' : 'space-between', alignItems: 'center', padding: '0 0.4rem 1.25rem' }}>
-          <div className="sidebar-logo" style={{ padding: 0, margin: 0, display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
+        <div
+          className="sidebar-header"
+          style={{
+            display: 'flex',
+            justifyContent: collapsed ? 'center' : 'space-between',
+            alignItems: 'center',
+            padding: '0 0.4rem 1.25rem',
+          }}
+        >
+          <div
+            className="sidebar-logo"
+            style={{
+              padding: 0,
+              margin: 0,
+              display: 'flex',
+              alignItems: 'center',
+              gap: '0.6rem',
+              cursor: 'pointer',
+              userSelect: 'none',
+              width: collapsed ? 'auto' : '100%',
+            }}
+            onClick={() => setCollapsed((v) => !v)}
+            title={collapsed ? t`Zijbalk uitklappen` : t`Zijbalk inklappen`}
+          >
             <span className="sidebar-logo-badge">
-              <BrandLightbulb size={16} />
+              <BrandLightbulb
+                size={18}
+                onClick={() => setCollapsed((v) => !v)}
+                triggerGlow={collapsed}
+                title={collapsed ? t`Zijbalk uitklappen` : t`Zijbalk inklappen`}
+              />
             </span>
             {!collapsed && (
               <div className="sidebar-logo-text-group">
@@ -143,14 +170,6 @@ export function AppShell({
               </div>
             )}
           </div>
-          <button
-            type="button"
-            className="sidebar-collapse-toggle"
-            onClick={() => setCollapsed((v) => !v)}
-            title={collapsed ? t`Zijbalk uitklappen` : t`Zijbalk inklappen`}
-          >
-            {collapsed ? <PanelLeftOpen size={16} /> : <PanelLeftClose size={16} />}
-          </button>
           <button
             type="button"
             className="sidebar-mobile-close"

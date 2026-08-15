@@ -22,15 +22,18 @@ function allTimeRange() {
   return { start, end };
 }
 
-function invoiceAmount(invoice: InvoiceRow): number {
+export function invoiceAmount(invoice: InvoiceRow): number {
   const withVat = invoice.totalWithVat;
+  let amount = 0;
   if (withVat != null && Number(withVat) > 0) {
-    return Number(withVat);
+    amount = Number(withVat);
+  } else {
+    const subtotal = Number(invoice.totalAmount) || 0;
+    const vat = Number(invoice.vatAmount) || 0;
+    const withVatComputed = Math.round((subtotal + vat) * 100) / 100;
+    amount = withVatComputed > 0 ? withVatComputed : subtotal;
   }
-  const subtotal = Number(invoice.totalAmount) || 0;
-  const vat = Number(invoice.vatAmount) || 0;
-  const withVatComputed = Math.round((subtotal + vat) * 100) / 100;
-  return withVatComputed > 0 ? withVatComputed : subtotal;
+  return invoice.creditForInvoiceId ? -Math.abs(amount) : amount;
 }
 
 export interface DashboardTimeEntryListItem {
@@ -115,8 +118,12 @@ export function useDashboardPageData(enabledCompanyIds: string[], role: Resolved
   const financialStats = useMemo((): DashboardFinancialStats => {
     const visibleInvoices =
       role === 'client' ? scopedInvoices.filter((invoice) => invoice.status !== 'draft') : scopedInvoices;
-    const nonVoid = visibleInvoices.filter((invoice) => invoice.status !== 'void');
-    const sent = nonVoid.filter((invoice) => invoice.status === 'sent');
+    const nonVoid = visibleInvoices.filter(
+      (invoice) => invoice.status !== 'void' || Boolean(invoice.creditedByInvoiceId),
+    );
+    const sent = nonVoid.filter(
+      (invoice) => invoice.status === 'sent' || Boolean(invoice.creditedByInvoiceId),
+    );
     const drafts = nonVoid.filter((invoice) => invoice.status === 'draft');
 
     const recentInvoices = [...visibleInvoices]
@@ -204,6 +211,11 @@ export function useDashboardPageData(enabledCompanyIds: string[], role: Resolved
     timeEntryLists,
     financialStats,
     recentNotifications,
+    allTasks,
+    allEntries,
+    scopedInvoices,
+    enabledCompanyIds,
+    companyIdSet,
   };
 }
 

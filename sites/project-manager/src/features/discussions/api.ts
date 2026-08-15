@@ -287,6 +287,21 @@ export async function createDiscussionReply(input: {
   return created;
 }
 
+/** Update an existing discussion reply body. */
+export async function updateDiscussionReply(input: {
+  replyId: string;
+  body: string;
+}) {
+  return tablesDB.updateRow<DiscussionReplyRow>({
+    databaseId: DATABASE_ID,
+    tableId: TABLES.discussionReplies,
+    rowId: input.replyId,
+    data: {
+      body: input.body,
+    },
+  });
+}
+
 /** Delete a discussion topic and cascade-delete its replies. Requires admin table permission. */
 export async function deleteDiscussion(discussionId: string) {
   let cursor: string | undefined;

@@ -2,13 +2,14 @@ import { useMemo, useState } from 'react';
 import { Link, useOutletContext, useSearchParams } from 'react-router-dom';
 import { CheckboxFilterDropdown } from '../components/CheckboxFilterDropdown';
 import dayjs from 'dayjs';
-import { Download, Plus } from 'lucide-react';
+import { Download, Pencil, Plus } from 'lucide-react';
 import { Trans, useLingui } from '@lingui/react/macro';
 import { t as staticT } from '@lingui/core/macro';
 import type { PortalContext } from '../layouts/PortalLayout';
 import type { InvoiceStatus } from '../appwrite/types';
 import { CompanyScopeControl } from '../features/companies/CompanyScopeControl';
 import { getInvoicePdfUrl } from '../features/invoices/api';
+import { canEditInvoice } from '../features/invoices/invoiceAccess';
 import { IconChevronDown } from '../components/icons';
 import { useInvoices } from '../features/invoices/hooks';
 import { formatHours } from '../lib/formatHours';
@@ -80,7 +81,7 @@ function SortableHeader({
 
 export function InvoicesAdminPage() {
   const { t } = useLingui();
-  const { availableCompanies, companyById } = useOutletContext<PortalContext>();
+  const { role, availableCompanies, companyById } = useOutletContext<PortalContext>();
   const [searchParams] = useSearchParams();
 
   const paramCompany = searchParams.get('company');
@@ -145,9 +146,14 @@ export function InvoicesAdminPage() {
         case 'hours':
           cmp = a.totalHours - b.totalHours;
           break;
-        case 'amount':
-          cmp = (a.totalWithVat ?? a.totalAmount) - (b.totalWithVat ?? b.totalAmount);
+        case 'amount': {
+          const aRaw = a.totalWithVat ?? a.totalAmount;
+          const bRaw = b.totalWithVat ?? b.totalAmount;
+          const aAmt = a.creditForInvoiceId ? -Math.abs(aRaw) : aRaw;
+          const bAmt = b.creditForInvoiceId ? -Math.abs(bRaw) : bRaw;
+          cmp = aAmt - bAmt;
           break;
+        }
         case 'dueDate':
           cmp = (a.dueDate ?? '').localeCompare(b.dueDate ?? '');
           break;
@@ -383,8 +389,17 @@ export function InvoicesAdminPage() {
                                 <span className={`badge badge-status--${statusBadgeClass(invoice.status)}`}>
                                   {statusLabel(invoice.status)}
                                 </span>
-                                {invoice.pdfFileId ? (
-                                  <div className="data-table-actions">
+                                <div className="data-table-actions">
+                                  {canEditInvoice(invoice, role) && (
+                                    <Link
+                                      className="icon-button"
+                                      title={t`Bewerken`}
+                                      to={`/app/invoices/${invoice.$id}/edit`}
+                                    >
+                                      <Pencil size={16} />
+                                    </Link>
+                                  )}
+                                  {invoice.pdfFileId ? (
                                     <a
                                       className="icon-button"
                                       title={t`PDF downloaden`}
@@ -394,10 +409,12 @@ export function InvoicesAdminPage() {
                                     >
                                       <Download size={16} />
                                     </a>
-                                  </div>
-                                ) : (
-                                  <span className="data-table-muted"> <Trans>PDF wordt gegenereerd…</Trans></span>
-                                )}
+                                  ) : (
+                                    invoice.status !== 'draft' && (
+                                      <span className="data-table-muted"> <Trans>PDF wordt gegenereerd…</Trans></span>
+                                    )
+                                  )}
+                                </div>
                               </td>
                             </tr>
                           );

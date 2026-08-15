@@ -1,9 +1,14 @@
-import { useState, type FormEvent } from 'react';
+import { useMemo, useState, type FormEvent } from 'react';
 import { ExternalLink, MessageSquare } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { Trans, useLingui } from '@lingui/react/macro';
+import dayjs from 'dayjs';
 import { useAuth } from '../../auth/AuthContext';
-import type { ResolvedRole, TaskRow } from '../../appwrite/types';
+import { IconEdit } from '../../components/icons';
+import { MentionTextarea } from '../../components/MentionTextarea';
+import { extractMentions, renderMentionText, type MentionableUser } from '../../lib/mentions';
+import { useDeveloperProfiles, useUserProfiles } from '../profiles/hooks';
+import type { DiscussionReplyRow, ResolvedRole, TaskRow } from '../../appwrite/types';
 import { authorInitials, formatDiscussionDate } from '../discussions/TopicList';
 import {
   useCreateDiscussion,
@@ -11,6 +16,7 @@ import {
   useDiscussionByTask,
   useDiscussionReplies,
   useSubscribeDiscussionReplies,
+  useUpdateDiscussionReply,
 } from '../discussions/hooks';
 
 interface TaskCommentsSectionProps {
@@ -32,7 +38,34 @@ export function TaskCommentsSection({
   const { user } = useAuth();
   const { data: discussion, isLoading: discussionLoading } = useDiscussionByTask(task.$id);
   const { data: replies = [], isLoading: repliesLoading } = useDiscussionReplies(discussion?.$id);
+  const { data: profiles = [] } = useUserProfiles(true);
+  const { data: developers = [] } = useDeveloperProfiles(true);
   useSubscribeDiscussionReplies(discussion?.$id);
+
+  const mentionableUsers = useMemo(() => {
+    const map = new Map<string, MentionableUser>();
+    for (const p of profiles) {
+      map.set(p.userId, {
+        id: p.userId,
+        name: p.displayName,
+        email: p.email,
+        role: p.globalRole,
+        avatarFileId: p.avatarFileId,
+      });
+    }
+    for (const d of developers) {
+      if (!map.has(d.userId)) {
+        map.set(d.userId, {
+          id: d.userId,
+          name: d.displayName,
+          email: d.email,
+          role: d.globalRole,
+          avatarFileId: d.avatarFileId,
+        });
+      }
+    }
+    return [...map.values()];
+  }, [profiles, developers]);
 
   const createDiscussion = useCreateDiscussion({
     projectId: task.projectId,
@@ -44,9 +77,46 @@ export function TaskCommentsSection({
     projectId: task.projectId,
     companyId,
   });
+  const updateReply = useUpdateDiscussionReply({
+    discussionId: discussion?.$id ?? '',
+  });
 
   const [commentBody, setCommentBody] = useState('');
   const [error, setError] = useState<string | null>(null);
+
+  // Edit reply state
+  const [editingReplyId, setEditingReplyId] = useState<string | null>(null);
+  const [editBody, setEditBody] = useState('');
+  const [editError, setEditError] = useState<string | null>(null);
+
+  function handleStartEdit(reply: DiscussionReplyRow) {
+    setEditingReplyId(reply.$id);
+    setEditBody(reply.body);
+    setEditError(null);
+  }
+
+  function handleCancelEdit() {
+    setEditingReplyId(null);
+    setEditBody('');
+    setEditError(null);
+  }
+
+  async function handleSaveEdit(event: FormEvent, replyId: string) {
+    event.preventDefault();
+    if (!editBody.trim()) return;
+    setEditError(null);
+    try {
+      await updateReply.mutateAsync({
+        replyId,
+        body: editBody.trim(),
+      });
+      setEditingReplyId(null);
+      setEditBody('');
+    } catch (err) {
+      setEditError(err instanceof Error ? err.message : t`Bewerken mislukt.`);
+    }
+  }
+
   const canGrantStaffRoles = role === 'admin' || role === 'developer';
   const isPending = createDiscussion.isPending || createReply.isPending;
 
@@ -55,6 +125,9 @@ export function TaskCommentsSection({
     if (!user || !commentBody.trim()) return;
     setError(null);
     try {
+      const tagged = extractMentions(commentBody, mentionableUsers);
+      const assigneeUserIds = tagged.length > 0 ? tagged.map((u) => u.id) : undefined;
+
       if (discussion) {
         await createReply.mutateAsync({
           discussionId: discussion.$id,
@@ -63,6 +136,7 @@ export function TaskCommentsSection({
           teamId,
           body: commentBody.trim(),
           createdBy: user.$id,
+          assigneeUserIds,
           canGrantStaffRoles,
         });
       } else {
@@ -75,6 +149,7 @@ export function TaskCommentsSection({
           categoryType: 'project',
           projectId: task.projectId,
           taskId: task.$id,
+          assigneeUserIds,
           canGrantStaffRoles,
         });
       }
@@ -116,7 +191,7 @@ export function TaskCommentsSection({
                 {formatDiscussionDate(discussion.$createdAt)}
               </span>
             </header>
-            <div className="forum-message-body">{discussion.body}</div>
+            <div className="forum-message-body">{renderMentionText(discussion.body, mentionableUsers)}</div>
           </article>
 
           <div className="forum-replies-heading task-comments-replies-heading">
@@ -141,6 +216,15 @@ export function TaskCommentsSection({
             <ul className="forum-reply-list">
               {replies.map((reply) => {
                 const author = displayName(reply.createdBy);
+                const canEdit =
+                  user &&
+                  (user.$id === reply.createdBy || role === 'admin' || role === 'developer');
+                const isEditing = editingReplyId === reply.$id;
+                const isEdited =
+                  reply.$updatedAt &&
+                  reply.$createdAt &&
+                  dayjs(reply.$updatedAt).diff(dayjs(reply.$createdAt), 'second') >= 300;
+
                 return (
                   <li key={reply.$id}>
                     <article className="forum-message forum-message--reply">
@@ -152,8 +236,64 @@ export function TaskCommentsSection({
                         <span className="forum-message-meta">
                           {formatDiscussionDate(reply.$createdAt)}
                         </span>
+                        {canEdit && !isEditing && (
+                          <div className="forum-message-actions">
+                            <button
+                              type="button"
+                              className="icon-button forum-message-edit-btn"
+                              title={t`Reactie bewerken`}
+                              onClick={() => handleStartEdit(reply)}
+                            >
+                              <IconEdit />
+                            </button>
+                          </div>
+                        )}
                       </header>
-                      <div className="forum-message-body">{reply.body}</div>
+
+                      {isEditing ? (
+                        <form
+                          className="forum-edit-composer"
+                          onSubmit={(e) => void handleSaveEdit(e, reply.$id)}
+                        >
+                          <MentionTextarea
+                            rows={3}
+                            value={editBody}
+                            onChange={setEditBody}
+                            users={mentionableUsers}
+                            autoFocus
+                          />
+                          {editError && <p className="form-error">{editError}</p>}
+                          <div className="forum-edit-actions">
+                            <button
+                              type="button"
+                              className="btn-secondary"
+                              onClick={handleCancelEdit}
+                            >
+                              <Trans>Annuleren</Trans>
+                            </button>
+                            <button
+                              type="submit"
+                              className="btn-accent"
+                              disabled={updateReply.isPending || !editBody.trim()}
+                            >
+                              <Trans>Opslaan</Trans>
+                            </button>
+                          </div>
+                        </form>
+                      ) : (
+                        <>
+                          <div className="forum-message-body">
+                            {renderMentionText(reply.body, mentionableUsers)}
+                          </div>
+                          {isEdited && (
+                            <div className="forum-message-footer">
+                              <span className="forum-message-edited">
+                                <Trans>bewerkt door {author}</Trans>
+                              </span>
+                            </div>
+                          )}
+                        </>
+                      )}
                     </article>
                   </li>
                 );
@@ -177,12 +317,13 @@ export function TaskCommentsSection({
               {discussion ? <Trans>Plaats reactie</Trans> : <Trans>Plaats opmerking</Trans>}
             </label>
           </div>
-          <textarea
+          <MentionTextarea
             id={`task-comment-${task.$id}`}
             rows={4}
-            placeholder={discussion ? t`Schrijf een reactie…` : t`Schrijf een opmerking…`}
+            placeholder={discussion ? t`Schrijf een reactie… Type @ om een collega te taggen` : t`Schrijf een opmerking… Type @ om een collega te taggen`}
             value={commentBody}
-            onChange={(event) => setCommentBody(event.target.value)}
+            onChange={setCommentBody}
+            users={mentionableUsers}
           />
           {error ? <p className="form-error">{error}</p> : null}
           <div className="form-actions">
@@ -199,3 +340,4 @@ export function TaskCommentsSection({
     </section>
   );
 }
+

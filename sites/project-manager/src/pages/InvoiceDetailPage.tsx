@@ -1,13 +1,14 @@
 import { lazy, Suspense, useMemo } from 'react';
 import { Link, Navigate, useNavigate, useOutletContext, useParams } from 'react-router-dom';
 import dayjs from 'dayjs';
-import { Download, RefreshCw, Undo2 } from 'lucide-react';
+import { Download, Pencil, RefreshCw, Undo2 } from 'lucide-react';
 import { Trans, useLingui } from '@lingui/react/macro';
 import { t as staticT } from '@lingui/core/macro';
 import type { PortalContext } from '../layouts/PortalLayout';
 import { PageBreadcrumb } from '../components/PageBreadcrumb';
 import { PageHeader } from '../components/PageHeader';
 import { getInvoicePdfUrl } from '../features/invoices/api';
+import { canEditInvoice } from '../features/invoices/invoiceAccess';
 import {
   useCreateCreditInvoice,
   useInvoice,
@@ -100,6 +101,7 @@ export function InvoiceDetailPage() {
   const company = companyById(invoice.companyId);
   const subtotal = invoice.totalAmount;
   const total = invoice.totalWithVat ?? invoice.totalAmount;
+  const canEdit = canEditInvoice(invoice, role);
   const canCreateCredit =
     role === 'admin' && !invoice.creditForInvoiceId && !invoice.creditedByInvoiceId && invoice.status === 'sent';
   const canRegenerate = role === 'admin' && !invoice.creditForInvoiceId && invoice.status === 'sent';
@@ -253,8 +255,16 @@ export function InvoiceDetailPage() {
                   <Download size={16} /> <Trans>PDF downloaden</Trans>
                 </a>
               )}
-              {(canRegenerate || canCreateCredit) && (
+              {(canEdit || canRegenerate || canCreateCredit) && (
                 <div className="form-row" style={{ width: '100%' }}>
+                  {canEdit && (
+                    <button
+                      type="button"
+                      onClick={() => navigate(`/app/invoices/${invoice.$id}/edit`)}
+                    >
+                      <Pencil size={16} /> <Trans>Bewerken</Trans>
+                    </button>
+                  )}
                   {canRegenerate && (
                     <button
                       type="button"

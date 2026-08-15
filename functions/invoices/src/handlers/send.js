@@ -210,8 +210,32 @@ async function sendInvoice({ tablesDB, storage, teams, invoiceId, log, error }) 
     rowId: invoiceId,
   });
 
-  if (invoice.status !== 'draft') {
-    const err = new Error('Only draft invoices can be sent');
+  if (invoice.creditForInvoiceId) {
+    const err = new Error('Credit notes cannot be sent');
+    err.status = 400;
+    throw err;
+  }
+
+  if (invoice.creditedByInvoiceId) {
+    const err = new Error('Invoices that have been credited cannot be sent');
+    err.status = 400;
+    throw err;
+  }
+
+  if (invoice.status === 'void') {
+    const err = new Error('Void invoices cannot be sent');
+    err.status = 400;
+    throw err;
+  }
+
+  if (invoice.status === 'paid') {
+    const err = new Error('Paid invoices cannot be sent');
+    err.status = 400;
+    throw err;
+  }
+
+  if (invoice.status !== 'draft' && invoice.status !== 'sent') {
+    const err = new Error('Only draft or sent invoices can be sent');
     err.status = 400;
     throw err;
   }
@@ -245,11 +269,15 @@ async function sendInvoice({ tablesDB, storage, teams, invoiceId, log, error }) 
   const periodEnd = workedDates[workedDates.length - 1] ?? null;
 
   const { totalAmount, totalHours, vatAmount, totalWithVat } = computeTotals(items);
-  const issueDate = new Date();
+  const isResend = invoice.status === 'sent';
+  const issueDate = isResend && invoice.issueDate ? new Date(invoice.issueDate) : new Date();
   const paymentTermDays = invoice.paymentTermDays ?? settings?.paymentTermDays ?? 30;
   const dueDate = new Date(issueDate);
   dueDate.setUTCDate(dueDate.getUTCDate() + paymentTermDays);
-  const invoiceNumber = await nextInvoiceNumber(tablesDB, issueDate.getUTCFullYear());
+  const invoiceNumber =
+    isResend && invoice.invoiceNumber
+      ? invoice.invoiceNumber
+      : await nextInvoiceNumber(tablesDB, issueDate.getUTCFullYear());
 
   const updatedInvoice = {
     ...invoice,
@@ -271,13 +299,15 @@ async function sendInvoice({ tablesDB, storage, teams, invoiceId, log, error }) 
     companyTeamId: company.teamId,
   });
 
+  const previousPdfFileId = invoice.pdfFileId;
+
   await tablesDB.updateRow({
     databaseId: DATABASE_ID,
     tableId: TABLES.invoices,
     rowId: invoice.$id,
     data: {
       status: 'sent',
-      sentAt: issueDate.toISOString(),
+      sentAt: new Date().toISOString(),
       invoiceNumber,
       issueDate: issueDate.toISOString(),
       dueDate: dueDate.toISOString(),
@@ -292,6 +322,17 @@ async function sendInvoice({ tablesDB, storage, teams, invoiceId, log, error }) 
     },
     permissions: sentInvoicePermissions(company.teamId),
   });
+
+  if (previousPdfFileId && previousPdfFileId !== uploadedFile.$id) {
+    try {
+      await storage.deleteFile({
+        bucketId: INVOICE_PDF_BUCKET,
+        fileId: previousPdfFileId,
+      });
+    } catch (deleteErr) {
+      error(`Could not delete previous PDF ${previousPdfFileId}: ${deleteErr.message}`);
+    }
+  }
 
   for (const item of items) {
     await tablesDB.updateRow({
@@ -321,7 +362,7 @@ async function sendInvoice({ tablesDB, storage, teams, invoiceId, log, error }) 
         userId,
         companyId: company.$id,
         type: 'invoice_sent',
-        title: `Nieuwe factuur ${invoiceNumber}`,
+        title: isResend ? `Gewijzigde factuur ${invoiceNumber}` : `Nieuwe factuur ${invoiceNumber}`,
         body: `${currency} ${totalWithVat.toFixed(2)}`,
         href: `/app/my-invoices/${invoice.$id}`,
       },
@@ -329,7 +370,7 @@ async function sendInvoice({ tablesDB, storage, teams, invoiceId, log, error }) 
     );
   }
 
-  log(`Sent invoice ${invoiceNumber} (${invoice.$id}) for company ${company.$id}`);
+  log(`${isResend ? 'Resent' : 'Sent'} invoice ${invoiceNumber} (${invoice.$id}) for company ${company.$id}`);
   return { invoiceId: invoice.$id, invoiceNumber, pdfFileId: uploadedFile.$id };
 }
 

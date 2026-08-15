@@ -35,7 +35,7 @@ export function DashboardDiscussionsCard({ discussionFeed }: DashboardDiscussion
               <span><Trans>Datum</Trans></span>
             </div>
             <ul className="dashboard-v2-discussions-list">
-              {discussionFeed.map((item) => (
+              {discussionFeed.slice(0, 6).map((item) => (
                 <li key={item.id} className="dashboard-v2-discussions-item">
                   <span className="dashboard-v2-discussions-title-cell">
                     <span className="dashboard-v2-discussions-icon" aria-hidden>

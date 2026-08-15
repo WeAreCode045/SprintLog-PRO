@@ -20,3 +20,11 @@ export async function markNotificationRead(notificationId: string) {
     data: { readAt: new Date().toISOString() },
   });
 }
+
+export async function deleteNotification(notificationId: string) {
+  return tablesDB.deleteRow({
+    databaseId: DATABASE_ID,
+    tableId: TABLES.notifications,
+    rowId: notificationId,
+  });
+}

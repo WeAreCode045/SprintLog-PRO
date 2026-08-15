@@ -135,6 +135,9 @@ export function ClientInvoicesPage() {
                           <Link className="data-table-title-button" to={`/app/my-invoices/${invoice.$id}`}>
                             {invoice.invoiceNumber}
                           </Link>
+                          {invoice.creditForInvoiceId && (
+                            <span className="badge badge-credit-note"><Trans>Creditnota</Trans></span>
+                          )}
                           <button
                             type="button"
                             className="data-table-expand-toggle"
@@ -156,8 +159,12 @@ export function ClientInvoicesPage() {
                           '—'
                         )}
                       </td>
-                      <td className="data-table-num" data-label={t`Uren`}>{formatHours(invoice.totalHours)}</td>
+                      <td className="data-table-num" data-label={t`Uren`}>
+                        {invoice.creditForInvoiceId ? '-' : ''}
+                        {formatHours(invoice.totalHours)}
+                      </td>
                       <td className="data-table-num" data-label={t`Bedrag`}>
+                        {invoice.creditForInvoiceId ? '-' : ''}
                         {formatAmount(invoice.totalWithVat ?? invoice.totalAmount, invoice.currency)}
                       </td>
                       <td data-label={t`Status`}>

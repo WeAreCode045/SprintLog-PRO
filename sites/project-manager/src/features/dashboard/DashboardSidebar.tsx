@@ -166,7 +166,7 @@ export function DashboardSidebar({
           <p className="empty-state" style={{ color: '#fff', padding: '1rem', fontSize: '0.75rem' }}><Trans>Geen discussies.</Trans></p>
         ) : (
           <ul className="dashboard-list" style={{ listStyle: 'none', margin: 0, padding: '0.5rem 1rem' }}>
-            {discussionFeed.map((item) => (
+            {discussionFeed.slice(0, 6).map((item) => (
               <li key={item.id} className="dashboard-list-item" style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: '0.75rem', textAlign: 'left', padding: '0.5rem 0', borderTop: 'none' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', flex: 1, minWidth: 0 }}>
                   <span style={{ color: 'var(--accent)', display: 'inline-flex', alignItems: 'center', flexShrink: 0 }}>

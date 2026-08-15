@@ -15,7 +15,7 @@ function formatAmount(amount: number, currency: string) {
 export function ClientsListPage() {
   const { t } = useLingui();
   const { data: clients = [], isLoading } = useAllCompanies(true);
-  const { data: openInvoices = [] } = useInvoices({ status: 'sent' });
+  const { data: allInvoices = [] } = useInvoices();
   const deleteClient = useDeleteCompany();
   const [showNewClient, setShowNewClient] = useState(false);
   const [expandedRowIds, setExpandedRowIds] = useState<Set<string>>(new Set());
@@ -32,18 +32,21 @@ export function ClientsListPage() {
 
   const openInvoicesByCompany = useMemo(() => {
     const map = new Map<string, { count: number; total: number; currency: string }>();
+    const openInvoices = allInvoices.filter(
+      (invoice) => invoice.status === 'sent' && !invoice.creditForInvoiceId && !invoice.creditedByInvoiceId,
+    );
     for (const invoice of openInvoices) {
-      const amount = invoice.totalWithVat ?? invoice.totalAmount;
+      const rawAmount = invoice.totalWithVat ?? invoice.totalAmount;
       const existing = map.get(invoice.companyId);
       if (existing) {
         existing.count += 1;
-        existing.total += amount;
+        existing.total += rawAmount;
       } else {
-        map.set(invoice.companyId, { count: 1, total: amount, currency: invoice.currency });
+        map.set(invoice.companyId, { count: 1, total: rawAmount, currency: invoice.currency });
       }
     }
     return map;
-  }, [openInvoices]);
+  }, [allInvoices]);
 
   return (
     <div className="content-card">

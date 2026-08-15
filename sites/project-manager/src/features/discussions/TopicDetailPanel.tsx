@@ -1,11 +1,16 @@
 import { useMemo, useState, type FormEvent } from 'react';
 import { ArrowLeft, MessageSquare } from 'lucide-react';
 import { Trans, useLingui } from '@lingui/react/macro';
+import dayjs from 'dayjs';
 import { useAuth } from '../../auth/AuthContext';
-import { IconTrash } from '../../components/icons';
+import { IconEdit, IconTrash } from '../../components/icons';
+import { MentionTextarea } from '../../components/MentionTextarea';
+import { extractMentions, renderMentionText, type MentionableUser } from '../../lib/mentions';
+import { useDeveloperProfiles, useUserProfiles } from '../profiles/hooks';
 import {
   DISCUSSION_CATEGORY_LABELS,
   DISCUSSION_NO_PROJECT_ID,
+  type DiscussionReplyRow,
   type ResolvedRole,
 } from '../../appwrite/types';
 import { authorInitials, formatDiscussionDate } from './TopicList';
@@ -15,6 +20,7 @@ import {
   useDiscussion,
   useDiscussionReplies,
   useSubscribeDiscussionReplies,
+  useUpdateDiscussionReply,
 } from './hooks';
 
 interface TopicDetailPanelProps {
@@ -39,16 +45,80 @@ export function TopicDetailPanel({
   const { user } = useAuth();
   const { data: discussion, isLoading } = useDiscussion(discussionId);
   const { data: replies = [], isLoading: repliesLoading } = useDiscussionReplies(discussionId);
+  const { data: profiles = [] } = useUserProfiles(true);
+  const { data: developers = [] } = useDeveloperProfiles(true);
   useSubscribeDiscussionReplies(discussionId);
+
+  const mentionableUsers = useMemo(() => {
+    const map = new Map<string, MentionableUser>();
+    for (const p of profiles) {
+      map.set(p.userId, {
+        id: p.userId,
+        name: p.displayName,
+        email: p.email,
+        role: p.globalRole,
+        avatarFileId: p.avatarFileId,
+      });
+    }
+    for (const d of developers) {
+      if (!map.has(d.userId)) {
+        map.set(d.userId, {
+          id: d.userId,
+          name: d.displayName,
+          email: d.email,
+          role: d.globalRole,
+          avatarFileId: d.avatarFileId,
+        });
+      }
+    }
+    return [...map.values()];
+  }, [profiles, developers]);
 
   const createReply = useCreateDiscussionReply({
     discussionId,
     companyId,
     projectId: discussion?.projectId,
   });
+  const updateReply = useUpdateDiscussionReply({
+    discussionId,
+  });
   const deleteDiscussion = useDeleteDiscussion();
+
   const [replyBody, setReplyBody] = useState('');
   const [error, setError] = useState<string | null>(null);
+
+  // Edit reply state
+  const [editingReplyId, setEditingReplyId] = useState<string | null>(null);
+  const [editBody, setEditBody] = useState('');
+  const [editError, setEditError] = useState<string | null>(null);
+
+  function handleStartEdit(reply: DiscussionReplyRow) {
+    setEditingReplyId(reply.$id);
+    setEditBody(reply.body);
+    setEditError(null);
+  }
+
+  function handleCancelEdit() {
+    setEditingReplyId(null);
+    setEditBody('');
+    setEditError(null);
+  }
+
+  async function handleSaveEdit(event: FormEvent, replyId: string) {
+    event.preventDefault();
+    if (!editBody.trim()) return;
+    setEditError(null);
+    try {
+      await updateReply.mutateAsync({
+        replyId,
+        body: editBody.trim(),
+      });
+      setEditingReplyId(null);
+      setEditBody('');
+    } catch (err) {
+      setEditError(err instanceof Error ? err.message : t`Bewerken mislukt.`);
+    }
+  }
 
   async function handleDelete() {
     if (!discussion) return;
@@ -67,6 +137,9 @@ export function TopicDetailPanel({
     if (!user || !discussion || !replyBody.trim()) return;
     setError(null);
     try {
+      const tagged = extractMentions(replyBody, mentionableUsers);
+      const assigneeUserIds = tagged.length > 0 ? tagged.map((u) => u.id) : undefined;
+
       await createReply.mutateAsync({
         discussionId: discussion.$id,
         companyId,
@@ -77,6 +150,7 @@ export function TopicDetailPanel({
         teamId,
         body: replyBody.trim(),
         createdBy: user.$id,
+        assigneeUserIds,
         canGrantStaffRoles: role === 'admin' || role === 'developer',
       });
       setReplyBody('');
@@ -130,7 +204,7 @@ export function TopicDetailPanel({
           <strong className="forum-message-author">{displayName(discussion.createdBy)}</strong>
           <span className="forum-message-meta">{formatDiscussionDate(discussion.$createdAt)}</span>
         </header>
-        <div className="forum-message-body">{discussion.body}</div>
+        <div className="forum-message-body">{renderMentionText(discussion.body, mentionableUsers)}</div>
       </article>
 
       <section className="forum-replies" aria-label={t`Reacties`}>
@@ -157,6 +231,15 @@ export function TopicDetailPanel({
           <ul className="forum-reply-list">
             {replies.map((reply) => {
               const author = displayName(reply.createdBy);
+              const canEdit =
+                user &&
+                (user.$id === reply.createdBy || role === 'admin' || role === 'developer');
+              const isEditing = editingReplyId === reply.$id;
+              const isEdited =
+                reply.$updatedAt &&
+                reply.$createdAt &&
+                dayjs(reply.$updatedAt).diff(dayjs(reply.$createdAt), 'second') >= 300;
+
               return (
                 <li key={reply.$id}>
                   <article className="forum-message forum-message--reply">
@@ -168,8 +251,64 @@ export function TopicDetailPanel({
                       <span className="forum-message-meta">
                         {formatDiscussionDate(reply.$createdAt)}
                       </span>
+                      {canEdit && !isEditing && (
+                        <div className="forum-message-actions">
+                          <button
+                            type="button"
+                            className="icon-button forum-message-edit-btn"
+                            title={t`Reactie bewerken`}
+                            onClick={() => handleStartEdit(reply)}
+                          >
+                            <IconEdit />
+                          </button>
+                        </div>
+                      )}
                     </header>
-                    <div className="forum-message-body">{reply.body}</div>
+
+                    {isEditing ? (
+                      <form
+                        className="forum-edit-composer"
+                        onSubmit={(e) => void handleSaveEdit(e, reply.$id)}
+                      >
+                        <MentionTextarea
+                          rows={3}
+                          value={editBody}
+                          onChange={setEditBody}
+                          users={mentionableUsers}
+                          autoFocus
+                        />
+                        {editError && <p className="form-error">{editError}</p>}
+                        <div className="forum-edit-actions">
+                          <button
+                            type="button"
+                            className="btn-secondary"
+                            onClick={handleCancelEdit}
+                          >
+                            <Trans>Annuleren</Trans>
+                          </button>
+                          <button
+                            type="submit"
+                            className="btn-accent"
+                            disabled={updateReply.isPending || !editBody.trim()}
+                          >
+                            <Trans>Opslaan</Trans>
+                          </button>
+                        </div>
+                      </form>
+                    ) : (
+                      <>
+                        <div className="forum-message-body">
+                          {renderMentionText(reply.body, mentionableUsers)}
+                        </div>
+                        {isEdited && (
+                          <div className="forum-message-footer">
+                            <span className="forum-message-edited">
+                              <Trans>bewerkt door {author}</Trans>
+                            </span>
+                          </div>
+                        )}
+                      </>
+                    )}
                   </article>
                 </li>
               );
@@ -186,12 +325,13 @@ export function TopicDetailPanel({
             </span>
             <label htmlFor={`forum-reply-${discussionId}`}><Trans>Plaats reactie</Trans></label>
           </div>
-          <textarea
+          <MentionTextarea
             id={`forum-reply-${discussionId}`}
             rows={4}
-            placeholder={t`Schrijf een reactie…`}
+            placeholder={t`Schrijf een reactie… Type @ om een collega te taggen`}
             value={replyBody}
-            onChange={(event) => setReplyBody(event.target.value)}
+            onChange={setReplyBody}
+            users={mentionableUsers}
           />
           {error && <p className="form-error">{error}</p>}
           <div className="form-actions">
@@ -208,3 +348,4 @@ export function TopicDetailPanel({
     </div>
   );
 }
+

@@ -8,6 +8,7 @@ import { PageHeader } from '../../components/PageHeader';
 import { PageBreadcrumb } from '../../components/PageBreadcrumb';
 import { IconTrash } from '../../components/icons';
 import { useInvoiceSettings } from '../invoiceSettings/hooks';
+import { canEditInvoice } from './invoiceAccess';
 import { InvoiceItemRows } from './InvoiceItemRows';
 import { AddApprovedHoursModal } from './AddApprovedHoursModal';
 import {
@@ -61,7 +62,7 @@ interface InvoiceFormProps {
 export function InvoiceForm({ invoiceId: routeInvoiceId }: InvoiceFormProps) {
   const { t } = useLingui();
   const navigate = useNavigate();
-  const { availableCompanies, companyById } = useOutletContext<PortalContext>();
+  const { role, availableCompanies, companyById } = useOutletContext<PortalContext>();
   const { data: settings, isLoading: settingsLoading } = useInvoiceSettings();
   const { data: existingInvoice, isLoading: invoiceLoading } = useInvoice(routeInvoiceId);
   const { data: existingItems = [], isLoading: itemsLoading } = useInvoiceItems(routeInvoiceId);
@@ -214,7 +215,7 @@ export function InvoiceForm({ invoiceId: routeInvoiceId }: InvoiceFormProps) {
 
   const isBusy = isSubmitting || createDraft.isPending || updateDraft.isPending || replaceItems.isPending || sendInvoiceMutation.isPending;
 
-  if (routeInvoiceId && !invoiceLoading && existingInvoice && existingInvoice.status !== 'draft') {
+  if (routeInvoiceId && !invoiceLoading && existingInvoice && !canEditInvoice(existingInvoice, role)) {
     return <Navigate to={`/app/invoices/${routeInvoiceId}`} replace />;
   }
 
@@ -228,17 +229,34 @@ export function InvoiceForm({ invoiceId: routeInvoiceId }: InvoiceFormProps) {
     );
   }
 
+  const isExistingSent = existingInvoice?.status === 'sent';
+  const pageTitle = routeInvoiceId
+    ? isExistingSent
+      ? existingInvoice?.invoiceNumber
+        ? t`Factuur ${existingInvoice.invoiceNumber} bewerken`
+        : t`Factuur bewerken`
+      : existingInvoice?.invoiceNumber ?? t`Conceptfactuur`
+    : t`Nieuwe factuur`;
+
   return (
     <div className="content-card">
       <div className="content-inner">
         <PageHeader
-          title={routeInvoiceId ? (existingInvoice?.invoiceNumber ?? t`Conceptfactuur`) : t`Nieuwe factuur`}
+          title={pageTitle}
           breadcrumb={
             <PageBreadcrumb
               items={[
                 { label: t`Dashboard`, to: '/app/dashboard' },
                 { label: t`Facturen`, to: '/app/invoices' },
-                { label: routeInvoiceId ? t`Bewerken` : t`Nieuw` },
+                ...(isExistingSent && existingInvoice
+                  ? [
+                      {
+                        label: existingInvoice.invoiceNumber ?? t`Factuur`,
+                        to: `/app/invoices/${existingInvoice.$id}`,
+                      },
+                      { label: t`Bewerken` },
+                    ]
+                  : [{ label: routeInvoiceId ? t`Bewerken` : t`Nieuw` }]),
               ]}
             />
           }
@@ -360,18 +378,24 @@ export function InvoiceForm({ invoiceId: routeInvoiceId }: InvoiceFormProps) {
 
             <div className="form-actions">
               <button type="button" onClick={() => void handleSaveDraft()} disabled={isBusy}>
-                <Trans>Save as Draft</Trans>
+                {isExistingSent ? <Trans>Wijzigingen opslaan</Trans> : <Trans>Save as Draft</Trans>}
               </button>
               <button type="submit" className="btn-accent" disabled={isBusy}>
-                <Trans>Send to Client</Trans>
+                {isExistingSent ? <Trans>Opslaan en opnieuw verzenden</Trans> : <Trans>Send to Client</Trans>}
               </button>
               {saved && <span className="save-confirmation"><Trans>Opgeslagen</Trans></span>}
-              {invoiceId && (
+              {invoiceId && existingInvoice?.status === 'draft' && (
                 <button type="button" onClick={() => void handleDeleteDraft()} disabled={isBusy}>
                   <IconTrash /> <Trans>Concept verwijderen</Trans>
                 </button>
               )}
-              <button type="button" onClick={() => navigate('/app/invoices')} disabled={isBusy}>
+              <button
+                type="button"
+                onClick={() =>
+                  navigate(isExistingSent && routeInvoiceId ? `/app/invoices/${routeInvoiceId}` : '/app/invoices')
+                }
+                disabled={isBusy}
+              >
                 <Trans>Annuleren</Trans>
               </button>
             </div>

@@ -1,45 +1,72 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { Lightbulb } from 'lucide-react';
 import { useLingui } from '@lingui/react/macro';
 
-/** The brand bulb: stays dim/off until the page has fully finished loading (window `load`,
- * not just the initial script), then flicks on with a quick flicker and settles into a
- * gentle glow. Click toggles it on/off — same flicker plays each time it switches back on. */
-export function BrandLightbulb({ size }: { size: number }) {
+export interface BrandLightbulbProps {
+  size: number;
+  onClick?: () => void;
+  title?: string;
+  triggerGlow?: boolean | number | string;
+}
+
+/** The brand bulb: flicks on with a glowing ignite animation.
+ * Click toggles or executes custom action (such as toggling the sidebar),
+ * and triggers a glowing ignite/burst animation each time the state changes. */
+export function BrandLightbulb({
+  size,
+  onClick,
+  title,
+  triggerGlow,
+}: BrandLightbulbProps) {
   const { t } = useLingui();
-  const [on, setOn] = useState(false);
-  const [switchingOn, setSwitchingOn] = useState(false);
+  const [on, setOn] = useState(true);
+  const [switchingOn, setSwitchingOn] = useState(true);
+  const [animKey, setAnimKey] = useState(0);
+  const isInitialMount = useRef(true);
 
   useEffect(() => {
-    if (document.readyState === 'complete') {
-      setOn(true);
-      setSwitchingOn(true);
-      return;
-    }
-    function handleLoad() {
-      setOn(true);
-      setSwitchingOn(true);
-    }
-    window.addEventListener('load', handleLoad);
-    return () => window.removeEventListener('load', handleLoad);
+    setOn(true);
+    setSwitchingOn(true);
   }, []);
 
-  function toggle() {
-    setOn((prev) => {
-      const next = !prev;
-      setSwitchingOn(next);
-      return next;
-    });
+  useEffect(() => {
+    if (isInitialMount.current) {
+      isInitialMount.current = false;
+      return;
+    }
+    setOn(true);
+    setSwitchingOn(false);
+    const timer = setTimeout(() => {
+      setAnimKey((prev) => prev + 1);
+      setSwitchingOn(true);
+    }, 20);
+    return () => clearTimeout(timer);
+  }, [triggerGlow]);
+
+  function handleClick(e: React.MouseEvent) {
+    e.stopPropagation();
+    setOn(true);
+    setSwitchingOn(false);
+    setTimeout(() => {
+      setAnimKey((prev) => prev + 1);
+      setSwitchingOn(true);
+    }, 20);
+
+    if (onClick) {
+      onClick();
+    }
   }
 
   return (
     <button
+      key={animKey}
       type="button"
       className={`brand-lightbulb ${on ? 'brand-lightbulb--on' : ''} ${switchingOn ? 'brand-lightbulb--switching-on' : ''}`}
-      onClick={toggle}
+      onClick={handleClick}
       onAnimationEnd={() => setSwitchingOn(false)}
-      title={on ? t`Lamp uitzetten` : t`Lamp aanzetten`}
+      title={title ?? (on ? t`Lamp uitzetten` : t`Lamp aanzetten`)}
       aria-pressed={on}
+      aria-label={title ?? t`Lightbulb`}
     >
       <Lightbulb size={size} strokeWidth={2.5} aria-hidden />
     </button>

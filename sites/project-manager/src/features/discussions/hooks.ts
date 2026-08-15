@@ -13,6 +13,7 @@ import {
   listDiscussionsForCompanies,
   listDiscussionsByProject,
   subscribeToReplies,
+  updateDiscussionReply,
   type DiscussionListFilter,
 } from './api';
 
@@ -167,6 +168,24 @@ export function useCreateDiscussionReply(opts: {
           queryKey: ['discussions', 'company', opts.companyId],
         });
       }
+    },
+  });
+}
+
+export function useUpdateDiscussionReply(opts: {
+  discussionId: string;
+}) {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: updateDiscussionReply,
+    onSuccess: (updatedRow) => {
+      queryClient.setQueryData<DiscussionReplyRow[]>(
+        queryKeys.discussionReplies(opts.discussionId),
+        (current) => (current ?? []).map((r) => (r.$id === updatedRow.$id ? updatedRow : r)),
+      );
+      void queryClient.invalidateQueries({
+        queryKey: queryKeys.discussionReplies(opts.discussionId),
+      });
     },
   });
 }

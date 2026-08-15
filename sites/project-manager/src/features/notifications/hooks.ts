@@ -1,6 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { queryKeys } from '../../lib/queryKeys';
-import { listNotifications, markNotificationRead } from './api';
+import { deleteNotification, listNotifications, markNotificationRead } from './api';
 
 export function useNotifications(userId: string | undefined) {
   return useQuery({
@@ -15,6 +15,16 @@ export function useMarkNotificationRead(userId: string) {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: markNotificationRead,
+    onSuccess: () => {
+      void queryClient.invalidateQueries({ queryKey: queryKeys.notifications(userId) });
+    },
+  });
+}
+
+export function useDeleteNotification(userId: string) {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: deleteNotification,
     onSuccess: () => {
       void queryClient.invalidateQueries({ queryKey: queryKeys.notifications(userId) });
     },
