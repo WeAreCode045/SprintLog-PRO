@@ -132,10 +132,10 @@ export function AppShell({
       >
         <div className="sidebar-header" style={{ display: 'flex', justifyContent: collapsed ? 'center' : 'space-between', alignItems: 'center', padding: '0 0.4rem 1.25rem' }}>
           <div className="sidebar-logo" style={{ padding: 0, margin: 0, display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
-            <span className="sidebar-logo-badge">S</span>
+            <span className="sidebar-logo-badge">P!</span>
             {!collapsed && (
               <div className="sidebar-logo-text-group">
-                <span className="sidebar-logo-text">Scopera</span>
+                <span className="sidebar-logo-text">PROGRZZ!</span>
                 <span className="sidebar-logo-tagline">Stay in scope, stay informed.</span>
               </div>
             )}
@@ -327,7 +327,7 @@ export function AppShell({
           >
             <Menu size={20} />
           </button>
-          <span className="sidebar-logo-badge">S</span>
+          <span className="sidebar-logo-badge">P</span>
         </div>
         <div className="page">
           {children ?? <Outlet />}

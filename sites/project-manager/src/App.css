@@ -650,11 +650,11 @@
 
 .sidebar-logo-text {
   color: var(--sidebar-text-strong);
-  font-weight: 600;
+  font-weight: 700;
 }
 
 .sidebar-logo-tagline {
-  font-size: 0.62rem;
+  font-size: 0.67rem;
   font-weight: 500;
   color: var(--sidebar-text);
   opacity: 0.75;
