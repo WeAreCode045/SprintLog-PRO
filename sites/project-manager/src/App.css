@@ -624,8 +624,86 @@
 .sidebar-logo {
   display: flex;
   align-items: center;
-  gap: 0.6rem;
-  padding: 0 0.4rem 1.25rem;
+  gap: 0.2rem;
+  padding: 0 0.1rem 0.25rem;
+}
+
+/* "Switching on": a couple of flickers, then the bulb settles into a warm glow that keeps
+   gently pulsing. Plays whenever .brand-lightbulb--switching-on is applied — on the initial
+   page load (once everything has finished loading, not just the first script) and again
+   every time it's clicked back on after being switched off. */
+@keyframes bulb-switch-on {
+  0% {
+    color: inherit;
+    opacity: 0.45;
+    filter: drop-shadow(0 0 0 rgba(250, 204, 21, 0));
+  }
+  8% {
+    opacity: 1;
+  }
+  16% {
+    opacity: 0.4;
+  }
+  24% {
+    opacity: 1;
+    color: inherit;
+  }
+  36% {
+    opacity: 0.55;
+  }
+  48% {
+    opacity: 1;
+    color: #facc15;
+    filter: drop-shadow(0 0 3px rgba(250, 204, 21, 0.65));
+  }
+  100% {
+    color: #facc15;
+    filter: drop-shadow(0 0 6px rgba(250, 204, 21, 0.85)) drop-shadow(0 0 14px rgba(250, 204, 21, 0.5));
+  }
+}
+
+@keyframes bulb-glow-pulse {
+  0%,
+  100% {
+    filter: drop-shadow(0 0 6px rgba(250, 204, 21, 0.75)) drop-shadow(0 0 14px rgba(250, 204, 21, 0.45));
+  }
+  50% {
+    filter: drop-shadow(0 0 9px rgba(250, 204, 21, 0.95)) drop-shadow(0 0 20px rgba(250, 204, 21, 0.6));
+  }
+}
+
+.brand-lightbulb {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  border: none;
+  background: none;
+  box-shadow: none;
+  cursor: pointer;
+  color: var(--text-muted);
+  opacity: 0.5;
+  transition: color 0.3s ease, opacity 0.3s ease, filter 0.3s ease;
+}
+
+.brand-lightbulb--on {
+  color: #facc15;
+  opacity: 1;
+  animation: bulb-glow-pulse 2.6s ease-in-out infinite;
+}
+
+.brand-lightbulb--switching-on {
+  animation: bulb-switch-on 1.4s ease-out forwards;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .brand-lightbulb--switching-on,
+  .brand-lightbulb--on {
+    animation: none;
+    color: #facc15;
+    opacity: 1;
+    filter: drop-shadow(0 0 6px rgba(250, 204, 21, 0.85)) drop-shadow(0 0 14px rgba(250, 204, 21, 0.5));
+  }
 }
 
 .sidebar-logo-badge {
@@ -634,11 +712,6 @@
   justify-content: center;
   width: 32px;
   height: 32px;
-  border-radius: var(--radius);
-  background: linear-gradient(135deg, var(--accent), var(--accent-2));
-  color: #fff;
-  font-weight: 700;
-  font-size: 0.75rem;
 }
 
 .sidebar-logo-text-group {
@@ -1513,9 +1586,14 @@ a.user-teams-panel-item-name:hover {
 }
 
 .auth-brand-name {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
   margin: 0;
   font-size: 1.75rem;
   font-weight: 700;
+  color: var(--accent);
 }
 
 .auth-brand-tagline {

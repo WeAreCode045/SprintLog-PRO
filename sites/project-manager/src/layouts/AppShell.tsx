@@ -2,6 +2,7 @@ import { useState, useRef, useEffect, type ReactNode } from 'react';
 import { Menu, PanelLeftClose, PanelLeftOpen, LogOut, X, User, ChevronUp } from 'lucide-react';
 import { NavLink, Outlet, useNavigate } from 'react-router-dom';
 import { Trans, useLingui } from '@lingui/react/macro';
+import { BrandLightbulb } from '../components/BrandLightbulb';
 import { LanguageSwitcher } from '../components/LanguageSwitcher';
 
 /** @deprecated Legacy workspace switcher sentinel — kept for import compatibility. */
@@ -132,11 +133,13 @@ export function AppShell({
       >
         <div className="sidebar-header" style={{ display: 'flex', justifyContent: collapsed ? 'center' : 'space-between', alignItems: 'center', padding: '0 0.4rem 1.25rem' }}>
           <div className="sidebar-logo" style={{ padding: 0, margin: 0, display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
-            <span className="sidebar-logo-badge">P!</span>
+            <span className="sidebar-logo-badge">
+              <BrandLightbulb size={16} />
+            </span>
             {!collapsed && (
               <div className="sidebar-logo-text-group">
-                <span className="sidebar-logo-text">PROGRZZ!</span>
-                <span className="sidebar-logo-tagline">Stay in scope, stay informed.</span>
+                <span className="sidebar-logo-text">Lightbulb</span>
+                <span className="sidebar-logo-tagline">Your projects, brought to light.</span>
               </div>
             )}
           </div>
@@ -327,7 +330,9 @@ export function AppShell({
           >
             <Menu size={20} />
           </button>
-          <span className="sidebar-logo-badge">P</span>
+          <span className="sidebar-logo-badge">
+            <BrandLightbulb size={16} />
+          </span>
         </div>
         <div className="page">
           {children ?? <Outlet />}

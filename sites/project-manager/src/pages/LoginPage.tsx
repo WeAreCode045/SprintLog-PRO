@@ -3,6 +3,7 @@ import { Navigate } from 'react-router-dom';
 import { Trans, useLingui } from '@lingui/react/macro';
 import { account } from '../appwrite/client';
 import { useAuth } from '../auth/AuthContext';
+import { BrandLightbulb } from '../components/BrandLightbulb';
 
 export function LoginPage() {
   const { t } = useLingui();
@@ -33,8 +34,10 @@ export function LoginPage() {
   return (
     <div className="auth-page">
       <div className="auth-brand">
-        <h1 className="auth-brand-name">PROGRZZ</h1>
-        <p className="auth-brand-tagline">Stay in scope, stay informed.</p>
+        <h1 className="auth-brand-name">
+          <BrandLightbulb size={24} /> Lightbulb
+        </h1>
+        <p className="auth-brand-tagline">Your projects, brought to light.</p>
       </div>
       <form className="form auth-form" onSubmit={handleSubmit}>
         <h2><Trans>Inloggen</Trans></h2>

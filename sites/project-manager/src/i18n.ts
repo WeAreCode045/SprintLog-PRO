@@ -3,7 +3,7 @@ import { i18n } from '@lingui/core';
 export const SUPPORTED_LOCALES = ['nl', 'en'] as const;
 export type SupportedLocale = (typeof SUPPORTED_LOCALES)[number];
 
-const LOCALE_STORAGE_KEY = 'progrzz-locale';
+const LOCALE_STORAGE_KEY = 'lightbulb-locale';
 
 export function getStoredLocale(): SupportedLocale {
   const stored = localStorage.getItem(LOCALE_STORAGE_KEY);
