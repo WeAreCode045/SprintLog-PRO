@@ -124,35 +124,22 @@ export function AppShell({
       )}
       <aside
         className={`sidebar${collapsed ? ' sidebar--collapsed' : ''}${mobileOpen ? ' sidebar--mobile-open' : ''}`}
-        style={{ width: collapsed ? '70px' : '260px', transition: 'width 0.2s ease', padding: collapsed ? '1.25rem 0.5rem' : '1.25rem 1rem', position: 'relative', overflow: 'visible' }}
+        style={{
+          width: collapsed ? '70px' : '260px',
+          transition: 'width 0.2s ease',
+          padding: collapsed ? '1.25rem 0.5rem' : '1.25rem 1rem',
+        }}
       >
-        <div className="sidebar-header" style={{ display: 'flex', justifyContent: collapsed ? 'center' : 'space-between', alignItems: 'center', padding: '0 0.4rem 1.25rem', position: 'relative' }}>
+        <div className="sidebar-header" style={{ display: 'flex', justifyContent: collapsed ? 'center' : 'space-between', alignItems: 'center', padding: '0 0.4rem 1.25rem' }}>
           <div className="sidebar-logo" style={{ padding: 0, margin: 0, display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
-            <span className="sidebar-logo-badge">SL</span>
-            {!collapsed && <span className="sidebar-logo-text">SprintLog Pro</span>}
+            <span className="sidebar-logo-badge">ID</span>
+            {!collapsed && <span className="sidebar-logo-text">iDev PRO</span>}
           </div>
           <button
             type="button"
+            className="sidebar-collapse-toggle"
             onClick={() => setCollapsed((v) => !v)}
             title={collapsed ? t`Zijbalk uitklappen` : t`Zijbalk inklappen`}
-            style={collapsed ? {
-              position: 'absolute',
-              top: '0.75rem',
-              right: '-32px',
-              background: 'transparent',
-              border: 'none',
-              borderRadius: 0,
-              width: 'auto',
-              height: 'auto',
-              display: 'flex',
-              justifyContent: 'center',
-              alignItems: 'center',
-              color: 'var(--sidebar-bg)',
-              cursor: 'pointer',
-              zIndex: 50,
-              boxShadow: 'none',
-              padding: '0.2rem'
-            } : { display: 'flex', justifyContent: 'center', alignItems: 'center', background: 'transparent', color: 'var(--sidebar-text)', border: 'none', cursor: 'pointer', padding: '0.4rem' }}
           >
             {collapsed ? <PanelLeftOpen size={16} /> : <PanelLeftClose size={16} />}
           </button>

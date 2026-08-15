@@ -1,6 +1,6 @@
-import { useMemo, useState, type ReactNode } from 'react';
+import { useMemo, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Trans, useLingui } from '@lingui/react/macro';
-import { IconCheck, IconChevronDown, IconChevronRight, IconLockOpen } from '../../components/icons';
 import { CheckboxFilterDropdown } from '../../components/CheckboxFilterDropdown';
 import { ProjectFilterDropdown } from '../../components/ProjectFilterDropdown';
 import { PageHeader } from '../../components/PageHeader';
@@ -14,12 +14,10 @@ import {
   useTasksForCompanies,
 } from './hooks';
 import { TaskFormDialog } from './TaskFormDialog';
-import { TaskDetailView } from './TaskDetailView';
 import { TaskEditView } from './TaskEditView';
 import { MarkFinishedDialog } from './MarkFinishedDialog';
 import { DeveloperTasksTable } from './DeveloperTasksTable';
 import { TaskViewTabs } from './TaskViewTabs';
-import { SortableTodoList } from './SortableTodoList';
 import type { CompanyRow, TaskRow, ResolvedRole, TaskStatus } from '../../appwrite/types';
 import { hasOpenSubtasks, includeTaskAncestors } from './api';
 import {
@@ -28,7 +26,8 @@ import {
   splitTasksByViewTab,
   type TaskViewTab,
 } from './taskViewTabUtils';
-import { formatHours } from '../../lib/formatHours';
+import { canDeleteTaskRow } from './taskDeleteAccess';
+import { useTaskIdsWithInvoicedHours } from '../timeEntries/hooks';
 
 interface TaskListProps {
   companyIds: string[];
@@ -47,104 +46,11 @@ function byOrder(a: { order?: number | null; $createdAt: string }, b: { order?: 
 
 interface TaskRowActions {
   projectName: (projectId: string) => string;
-  companyName?: (companyId: string) => string;
-  showCompany?: boolean;
-  isDescriptionOpen: (taskId: string) => boolean;
-  onToggleDescription: (taskId: string) => void;
-  canFinish: (task: TaskRow) => boolean;
   onFinish: (task: TaskRow) => void;
-  canReopen: (task: TaskRow) => boolean;
   onReopen: (task: TaskRow) => void;
-  canAccept: (task: TaskRow) => boolean;
   onAccept: (task: TaskRow) => void;
   onView: (task: TaskRow) => void;
-  canEdit: (task: TaskRow) => boolean;
   onAddSubtask: (task: TaskRow) => void;
-  canAddSubtask: (task: TaskRow) => boolean;
-}
-
-function TaskRowContent({
-  task,
-  actions,
-  dragHandle,
-}: {
-  task: TaskRow;
-  actions: TaskRowActions;
-  dragHandle?: ReactNode;
-}) {
-  const { t } = useLingui();
-  const hasDescription = Boolean(task.description);
-  const descriptionOpen = hasDescription && actions.isDescriptionOpen(task.$id);
-  return (
-    <>
-      <div
-        className={`todo-item-header ${hasDescription ? 'todo-item-header--clickable' : ''}`}
-        onClick={hasDescription ? () => actions.onToggleDescription(task.$id) : undefined}
-      >
-        {dragHandle}
-        {hasDescription && (
-          <span className="todo-item-toggle">{descriptionOpen ? <IconChevronDown /> : <IconChevronRight />}</span>
-        )}
-        <button
-          type="button"
-          className="todo-item-title-button"
-          onClick={(e) => {
-            e.stopPropagation();
-            actions.onView(task);
-          }}
-        >
-          {task.title}
-        </button>
-        {task.status === 'requested' && <span className="badge badge-requested"><Trans>Aangevraagd</Trans></span>}
-        {task.audience === 'client' && <span className="badge badge-client"><Trans>Klanttaak</Trans></span>}
-        {task.parentTaskId && <span className="badge badge-subtask"><Trans>Subtaak</Trans></span>}
-        <span className="todo-item-project">{actions.projectName(task.projectId)}</span>
-        {actions.showCompany && actions.companyName && (
-          <span className="todo-item-project">{actions.companyName(task.companyId)}</span>
-        )}
-        {task.status === 'finished' && (
-          <span className="todo-item-finished-meta">
-            {task.hours != null && formatHours(task.hours)}
-            {task.completedDate && ` · ${new Date(task.completedDate).toLocaleDateString('nl-NL')}`}
-          </span>
-        )}
-        <div className="todo-item-actions" onClick={(e) => e.stopPropagation()}>
-          {actions.canAccept(task) && (
-            <button type="button" className="btn-link" title={t`Accepteren`} onClick={() => actions.onAccept(task)}>
-              <Trans>Accepteren</Trans>
-            </button>
-          )}
-          {actions.canAddSubtask(task) && (
-            <button type="button" className="btn-link" title={t`Subtaak toevoegen`} onClick={() => actions.onAddSubtask(task)}>
-              <Trans>+ Sub</Trans>
-            </button>
-          )}
-          {task.status === 'open' && actions.canFinish(task) && (
-            <button type="button" className="icon-button" title={t`Afronden`} onClick={() => actions.onFinish(task)}>
-              <IconCheck />
-            </button>
-          )}
-          {task.status === 'finished' && actions.canReopen(task) && (
-            <button
-              type="button"
-              className="icon-button"
-              title={t`Heropenen`}
-              onClick={() => actions.onReopen(task)}
-            >
-              <IconLockOpen />
-            </button>
-          )}
-        </div>
-      </div>
-      {descriptionOpen && (
-        <div className="todo-item-body">
-          <div className="todo-item-main">
-            <div className="todo-item-description">{task.description}</div>
-          </div>
-        </div>
-      )}
-    </>
-  );
 }
 
 export function TaskList({
@@ -155,6 +61,7 @@ export function TaskList({
   role,
 }: TaskListProps) {
   const { t } = useLingui();
+  const navigate = useNavigate();
   const primaryCompanyId = companyIds[0] ?? '';
   const primaryCompany = companyById(primaryCompanyId);
   const { data: allTasks = [], isLoading } = useTasksForCompanies(companyIds, 'all');
@@ -162,13 +69,13 @@ export function TaskList({
   const deleteTask = useDeleteTask(primaryCompanyId);
   const reopenTask = useReopenTask(primaryCompanyId);
   const acceptRequested = useAcceptRequestedTask(primaryCompanyId);
+  const taskIds = useMemo(() => allTasks.map((task) => task.$id), [allTasks]);
+  const { data: invoicedTaskIds = new Set<string>() } = useTaskIdsWithInvoicedHours(taskIds);
 
   const [showAddDialog, setShowAddDialog] = useState(false);
   const [editingTask, setEditingTask] = useState<TaskRow | null>(null);
-  const [viewingTask, setViewingTask] = useState<TaskRow | null>(null);
   const [parentForSubtask, setParentForSubtask] = useState<TaskRow | null>(null);
   const [finishingTask, setFinishingTask] = useState<TaskRow | null>(null);
-  const [collapsedTasks, setCollapsedTasks] = useState<Set<string>>(new Set());
 
   const taskCompanyIds = useMemo(() => new Set(allTasks.map((t) => t.companyId)), [allTasks]);
   const companyFilterOptions = useMemo(
@@ -187,7 +94,7 @@ export function TaskList({
   const [excludedProjectIds, setExcludedProjectIds] = useState<Set<string>>(new Set());
   const [excludedCompanyIds, setExcludedCompanyIds] = useState<Set<string>>(new Set());
   const [excludedStatuses, setExcludedStatuses] = useState<Set<TaskStatus>>(
-    new Set<TaskStatus>(['finished', 'requested', 'archived']),
+    new Set<TaskStatus>(['requested', 'archived']),
   );
   const [groupByProject, setGroupByProject] = useState(false);
   const [activeTab, setActiveTab] = useState<TaskViewTab>(() => defaultTaskViewTab(role));
@@ -290,9 +197,12 @@ export function TaskList({
   }
 
   function canDeleteTask(task: TaskRow) {
-    if (staff) return true;
-    if (role === 'client' && task.status === 'requested' && task.createdBy === userId) return true;
-    return false;
+    return canDeleteTaskRow(task, role, userId, invoicedTaskIds);
+  }
+
+  async function handleDeleteTask(task: TaskRow) {
+    if (!confirm(t`Taak verwijderen?`)) return;
+    await deleteTask.mutateAsync(task.$id);
   }
 
   function canAddSubtask(task: TaskRow) {
@@ -304,22 +214,8 @@ export function TaskList({
 
   const clientCreatesRequested = role === 'client' && activeTab === 'requested';
 
-  function toggleTaskDescription(taskId: string) {
-    setCollapsedTasks((prev) => {
-      const next = new Set(prev);
-      if (next.has(taskId)) next.delete(taskId);
-      else next.add(taskId);
-      return next;
-    });
-  }
-
   const actions: TaskRowActions = {
     projectName: (projectId) => projects.find((p) => p.$id === projectId)?.name ?? '—',
-    companyName,
-    showCompany: isMultiCompany,
-    isDescriptionOpen: (taskId) => !collapsedTasks.has(taskId),
-    onToggleDescription: toggleTaskDescription,
-    canFinish: canFinishTask,
     onFinish: (task) => {
       if (hasOpenSubtasks(task.$id, tasks)) {
         alert(t`Rond eerst alle open subtaken af.`);
@@ -327,7 +223,6 @@ export function TaskList({
       }
       setFinishingTask(task);
     },
-    canReopen: (task) => staff && task.status === 'finished',
     onReopen: (task) => {
       void reopenTask.mutateAsync({
         taskId: task.$id,
@@ -338,7 +233,6 @@ export function TaskList({
         assigneeIds: task.assigneeIds,
       });
     },
-    canAccept: canAcceptTask,
     onAccept: (task) => {
       void acceptRequested.mutateAsync({
         taskId: task.$id,
@@ -348,10 +242,8 @@ export function TaskList({
         assigneeIds: task.assigneeIds,
       });
     },
-    onView: setViewingTask,
-    canEdit: canEditTask,
+    onView: (task) => navigate(`/app/tasks/${task.$id}`),
     onAddSubtask: setParentForSubtask,
-    canAddSubtask,
   };
 
   const pageTitle = role === 'client' ? t`Jouw taken` : t`Taken`;
@@ -360,16 +252,6 @@ export function TaskList({
     (activeTab === 'client' ||
       (activeTab === 'developer' && role !== 'client') ||
       (activeTab === 'requested' && role === 'client'));
-
-  function canReorderTask(task: TaskRow) {
-    if (task.status === 'finished') return false;
-    if (role === 'client') return task.status === 'open' || task.status === 'requested';
-    return canEditTask(task);
-  }
-
-  function renderListTaskRow(task: TaskRow, dragHandle?: ReactNode) {
-    return <TaskRowContent task={task} actions={actions} dragHandle={dragHandle} />;
-  }
 
   return (
     <div className="open-todo-list content-card">
@@ -388,26 +270,7 @@ export function TaskList({
         }
       />
 
-      {viewingTask ? (
-        <TaskDetailView
-          companyId={viewingTask.companyId}
-          task={viewingTask}
-          canEdit={canEditTask(viewingTask)}
-          canDelete={canDeleteTask(viewingTask)}
-          onEdit={() => {
-            const task = viewingTask;
-            setViewingTask(null);
-            setEditingTask(task);
-          }}
-          onDelete={() => {
-            if (confirm(t`Taak "${viewingTask.title}" verwijderen?`)) {
-              void deleteTask.mutateAsync(viewingTask.$id);
-              setViewingTask(null);
-            }
-          }}
-          onBack={() => setViewingTask(null)}
-        />
-      ) : editingTask ? (
+      {editingTask ? (
         <TaskEditView
           companyId={editingTask.companyId}
           teamId={resolveTeamId(editingTask.companyId)}
@@ -518,11 +381,29 @@ export function TaskList({
             {role === 'client' ? t`Nog geen aanvragen. Dien een nieuwe taak in.` : t`Geen openstaande aanvragen.`}
           </p>
         ) : (
-          <SortableTodoList
+          <DeveloperTasksTable
             companyId={primaryCompanyId}
+            teamId={primaryCompany?.teamId ?? ''}
+            resolveTeamId={resolveTeamId}
+            userId={userId}
+            role={role}
             tasks={requestedTasks}
-            canDrag={canReorderTask}
-            renderItem={renderListTaskRow}
+            showProjectColumn
+            projectName={actions.projectName}
+            companyName={isMultiCompany ? companyName : undefined}
+            showCompanyColumn={isMultiCompany}
+            canFinish={canFinishTask}
+            canAccept={canAcceptTask}
+            canEdit={canEditTask}
+            canAddSubtask={canAddSubtask}
+            onFinish={actions.onFinish}
+            onReopen={actions.onReopen}
+            onAccept={actions.onAccept}
+            onView={actions.onView}
+            onAddSubtask={actions.onAddSubtask}
+            canDelete={canDeleteTask}
+            onDelete={(task) => void handleDeleteTask(task)}
+            statusFilter="requested"
           />
         )
       )}
@@ -542,21 +423,55 @@ export function TaskList({
                     {project.name}
                     {isMultiCompany ? ` · ${companyName(project.companyId)}` : ''}
                   </h3>
-                  <SortableTodoList
+                  <DeveloperTasksTable
                     companyId={project.companyId}
+                    teamId={resolveTeamId(project.companyId)}
+                    resolveTeamId={resolveTeamId}
+                    userId={userId}
+                    role={role}
                     tasks={clientTasks.filter((task) => task.projectId === project.$id)}
-                    canDrag={canReorderTask}
-                    renderItem={renderListTaskRow}
+                    companyName={isMultiCompany ? companyName : undefined}
+                    showCompanyColumn={isMultiCompany}
+                    canFinish={canFinishTask}
+                    canAccept={canAcceptTask}
+                    canEdit={canEditTask}
+                    canAddSubtask={canAddSubtask}
+                    onFinish={actions.onFinish}
+                    onReopen={actions.onReopen}
+                    onAccept={actions.onAccept}
+                    onView={actions.onView}
+                    onAddSubtask={actions.onAddSubtask}
+                    canDelete={canDeleteTask}
+                    onDelete={(task) => void handleDeleteTask(task)}
+                    excludedStatuses={excludedStatuses}
                   />
                 </div>
               ))}
           </div>
         ) : (
-          <SortableTodoList
+          <DeveloperTasksTable
             companyId={primaryCompanyId}
+            teamId={primaryCompany?.teamId ?? ''}
+            resolveTeamId={resolveTeamId}
+            userId={userId}
+            role={role}
             tasks={clientTasks}
-            canDrag={canReorderTask}
-            renderItem={renderListTaskRow}
+            showProjectColumn
+            projectName={actions.projectName}
+            companyName={isMultiCompany ? companyName : undefined}
+            showCompanyColumn={isMultiCompany}
+            canFinish={canFinishTask}
+            canAccept={canAcceptTask}
+            canEdit={canEditTask}
+            canAddSubtask={canAddSubtask}
+            onFinish={actions.onFinish}
+            onReopen={actions.onReopen}
+            onAccept={actions.onAccept}
+            onView={actions.onView}
+            onAddSubtask={actions.onAddSubtask}
+            canDelete={canDeleteTask}
+            onDelete={(task) => void handleDeleteTask(task)}
+            excludedStatuses={excludedStatuses}
           />
         )
       )}
@@ -579,6 +494,7 @@ export function TaskList({
                   <DeveloperTasksTable
                     companyId={project.companyId}
                     teamId={resolveTeamId(project.companyId)}
+                    resolveTeamId={resolveTeamId}
                     userId={userId}
                     role={role}
                     tasks={tasksByProject.get(project.$id) ?? []}
@@ -593,6 +509,8 @@ export function TaskList({
                     onAccept={actions.onAccept}
                     onView={actions.onView}
                     onAddSubtask={actions.onAddSubtask}
+                    canDelete={canDeleteTask}
+                    onDelete={(task) => void handleDeleteTask(task)}
                     excludedStatuses={excludedStatuses}
                   />
                 </div>
@@ -602,6 +520,7 @@ export function TaskList({
           <DeveloperTasksTable
             companyId={primaryCompanyId}
             teamId={primaryCompany?.teamId ?? ''}
+            resolveTeamId={resolveTeamId}
             userId={userId}
             role={role}
             tasks={developerTasks}
@@ -618,6 +537,8 @@ export function TaskList({
             onAccept={actions.onAccept}
             onView={actions.onView}
             onAddSubtask={actions.onAddSubtask}
+            canDelete={canDeleteTask}
+            onDelete={(task) => void handleDeleteTask(task)}
             excludedStatuses={excludedStatuses}
           />
         )

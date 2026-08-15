@@ -1,14 +1,15 @@
 import { useMemo } from 'react';
 import { useQueries } from '@tanstack/react-query';
 import { useLingui } from '@lingui/react/macro';
+import type { DiscussionCategoryType, ResolvedRole } from '../../appwrite/types';
 import { isStaffRole } from '../../auth/RequireStaff';
-import type { ResolvedRole } from '../../appwrite/types';
 import { listDiscussionReplies } from '../discussions/api';
 import { useDiscussionsForCompanies } from '../discussions/hooks';
 import { useProjectsForCompanies } from '../projects/hooks';
 import { useTasksForCompanies } from '../tasks/hooks';
 import { useUserProfiles } from '../profiles/hooks';
 import { useTimeEntriesForCompanies } from '../timeEntries/hooks';
+import { entryNeedsApproval } from '../timeEntries/timeEntryBilling';
 import { getDateRange } from '../../lib/dateRanges';
 import { queryKeys } from '../../lib/queryKeys';
 
@@ -60,6 +61,7 @@ export function useDashboardOverview(enabledCompanyIds: string[], role: Resolved
 
   const weekRange = getDateRange('thisWeek');
   const monthRange = getDateRange('thisMonth');
+  const allTime = useMemo(allTimeRange, []);
 
   const { data: weekEntries = [] } = useTimeEntriesForCompanies(enabledCompanyIds, {
     start: weekRange.start,
@@ -69,6 +71,8 @@ export function useDashboardOverview(enabledCompanyIds: string[], role: Resolved
     start: monthRange.start,
     end: monthRange.end,
   });
+  const { data: allTimeEntries = [], isLoading: allTimeEntriesLoading } =
+    useTimeEntriesForCompanies(enabledCompanyIds, allTime);
 
   const staff = isStaffRole(role);
   const approvalsRange = useMemo(allTimeRange, []);
@@ -84,7 +88,7 @@ export function useDashboardOverview(enabledCompanyIds: string[], role: Resolved
     const map = new Map<string, number>();
     if (role !== 'client') return map;
     for (const entry of approvalsRangeEntries) {
-      if (entry.approved) continue;
+      if (!entryNeedsApproval(entry)) continue;
       if ((taskById.get(entry.taskId)?.audience ?? 'internal') === 'client') continue;
       map.set(entry.companyId, (map.get(entry.companyId) ?? 0) + (entry.hours ?? 0));
     }
@@ -131,6 +135,7 @@ export function useDashboardOverview(enabledCompanyIds: string[], role: Resolved
       createdAt: string;
       href: string;
       kind: 'topic' | 'reply';
+      categoryType: DiscussionCategoryType;
     }> = [];
 
     const allowed = new Set(enabledCompanyIds);
@@ -144,6 +149,7 @@ export function useDashboardOverview(enabledCompanyIds: string[], role: Resolved
         createdAt: d.$createdAt,
         href: `/app/discussions/${d.$id}`,
         kind: 'topic',
+        categoryType: d.categoryType ?? 'project',
       });
     }
 
@@ -158,6 +164,7 @@ export function useDashboardOverview(enabledCompanyIds: string[], role: Resolved
           createdAt: r.$createdAt,
           href: `/app/discussions/${discussion.$id}`,
           kind: 'reply',
+          categoryType: discussion.categoryType ?? 'project',
         });
       }
     });
@@ -166,72 +173,42 @@ export function useDashboardOverview(enabledCompanyIds: string[], role: Resolved
     return items.slice(0, 5);
   }, [discussions, replyQueries, recentDiscussions, profileNameById, enabledCompanyIds, t]);
 
-  const statsForRange = (start: Date, end: Date) => {
-    const startIso = start.toISOString();
-    const endIso = end.toISOString();
-    const startKey = start.toISOString().slice(0, 10);
-    const endKey = end.toISOString().slice(0, 10);
-
+  const currentStats = useMemo(() => {
     const allowed = new Set(enabledCompanyIds);
-    const scopedProjects = projects.filter((p) => allowed.has(p.companyId));
-    const scopedTasks = allTasks.filter((t) => allowed.has(t.companyId));
-    const scopedDiscussions = discussions.filter((d) => allowed.has(d.companyId));
+    const scopedProjects = projects.filter((project) => allowed.has(project.companyId));
+    const scopedTasks = allTasks.filter((task) => allowed.has(task.companyId));
+    const scopedDiscussions = discussions.filter((discussion) => allowed.has(discussion.companyId));
+    const isClient = role === 'client';
 
-    const newProjects = scopedProjects.filter(
-      (p) => p.$createdAt >= startIso && p.$createdAt <= endIso,
-    ).length;
-    const newTasks = scopedTasks.filter(
-      (t) => t.$createdAt >= startIso && t.$createdAt <= endIso,
-    ).length;
-    const tasksCompleted = scopedTasks.filter(
-      (t) =>
-        t.status === 'finished' &&
-        t.completedDate &&
-        t.completedDate >= startKey &&
-        t.completedDate <= endKey,
-    ).length;
-    const taskRequests = scopedTasks.filter(
-      (t) => t.status === 'requested' && t.$createdAt >= startIso && t.$createdAt <= endIso,
-    ).length;
+    const projectTasksForStats = isClient
+      ? scopedTasks.filter((task) => (task.audience ?? 'internal') === 'internal')
+      : scopedTasks;
 
-    const entriesInRange = (start === weekRange.start ? weekEntries : monthEntries).filter((e) =>
-      allowed.has(e.companyId),
-    );
-    const totalHours = entriesInRange.reduce((sum, e) => sum + (e.hours ?? 0), 0);
-    const avgHoursPerTask = newTasks > 0 ? totalHours / newTasks : 0;
-    const avgHoursPerProject = scopedProjects.length > 0 ? totalHours / scopedProjects.length : 0;
+    const scopedEntries = allTimeEntries.filter((entry) => allowed.has(entry.companyId));
+    const entriesForStats = isClient
+      ? scopedEntries.filter(
+          (entry) => (taskById.get(entry.taskId)?.audience ?? 'internal') !== 'client',
+        )
+      : scopedEntries;
 
-    const totalNewTopics = scopedDiscussions.filter(
-      (d) => d.$createdAt >= startIso && d.$createdAt <= endIso,
-    ).length;
-
-    let totalReplies = 0;
-    replyQueries.forEach((q, index) => {
-      const discussion = recentDiscussions[index];
-      if (!discussion || !allowed.has(discussion.companyId)) return;
-      for (const r of q.data ?? []) {
-        if (r.$createdAt >= startIso && r.$createdAt <= endIso) {
-          totalReplies += 1;
-        }
-      }
-    });
+    const totalHours = entriesForStats.reduce((sum, entry) => sum + (entry.hours ?? 0), 0);
 
     return {
       totalProjects: scopedProjects.length,
-      newProjects,
-      newTasks,
-      tasksCompleted,
-      taskRequests,
+      newProjects: scopedProjects.filter((project) => (project.status ?? 'active') === 'active').length,
+      newTasks: projectTasksForStats.length,
+      tasksCompleted: projectTasksForStats.filter((task) => task.status === 'finished').length,
+      taskRequests: projectTasksForStats.filter((task) => task.status === 'requested').length,
       totalHours,
-      avgHoursPerTask,
-      avgHoursPerProject,
-      totalNewTopics,
-      totalReplies,
+      avgHoursPerTask:
+        projectTasksForStats.length > 0 ? totalHours / projectTasksForStats.length : 0,
+      avgHoursPerProject: scopedProjects.length > 0 ? totalHours / scopedProjects.length : 0,
+      totalNewTopics: scopedDiscussions.length,
+      totalReplies: scopedDiscussions.reduce((sum, discussion) => sum + (discussion.totalReplies ?? 0), 0),
     };
-  };
+  }, [enabledCompanyIds, projects, allTasks, discussions, allTimeEntries, taskById, role]);
 
-  const currentStats = statsForRange(weekRange.start, weekRange.end);
-  const loading = projectsLoading || openTasksLoading || allTasksLoading;
+  const loading = projectsLoading || openTasksLoading || allTasksLoading || allTimeEntriesLoading;
 
   return {
     loading,

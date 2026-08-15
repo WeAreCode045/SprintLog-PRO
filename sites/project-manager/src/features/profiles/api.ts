@@ -1,12 +1,19 @@
 import { Query } from 'appwrite';
 import { tablesDB } from '../../appwrite/client';
 import { DATABASE_ID, TABLES } from '../../appwrite/constants';
-import type { AdminUser, AdminUserCompany, GlobalRole, UserProfileRow } from '../../appwrite/types';
+import type {
+  AdminUser,
+  AdminUserCompany,
+  AdminUserMembership,
+  GlobalRole,
+  UserProfileRow,
+} from '../../appwrite/types';
 import {
   deleteAdminUser,
   getAdminUser,
   listAdminUsers,
   manageUserRole,
+  revokeTeamMember,
   updateAdminUser,
 } from '../../lib/functions';
 
@@ -50,26 +57,27 @@ export async function setUserRole(input: {
   return manageUserRole({ action: 'setRole', ...input });
 }
 
-function profileToAdminUser(profile: UserProfileRow, companies: AdminUserCompany[] = []): AdminUser {
+function profileToAdminUser(
+  profile: UserProfileRow,
+  companies: AdminUserCompany[] = [],
+  memberships: AdminUserMembership[] = [],
+): AdminUser {
   return {
     userId: profile.userId,
     email: profile.email,
     displayName: profile.displayName,
     role: profile.globalRole,
     companies,
+    memberships,
     profileId: profile.$id,
   };
 }
 
 /**
- * Prefer fast TablesDB profiles. If empty, bootstrap once from Auth via function
- * (also seeds missing profiles).
+ * Goes through the server function (not the fast TablesDB profiles path) because account
+ * status and last-login only live on the Auth user record, not in our profile rows.
  */
 export async function fetchAdminUsers(): Promise<AdminUser[]> {
-  const profiles = await listUserProfiles();
-  if (profiles.length > 0) {
-    return profiles.map((profile) => profileToAdminUser(profile));
-  }
   return listAdminUsers();
 }
 
@@ -78,85 +86,15 @@ export async function fetchAdminUsers(): Promise<AdminUser[]> {
  * Client teams.listMemberships 404s when admin is not a team member.
  */
 export async function fetchAdminUser(userId: string): Promise<AdminUser> {
-  const startedAt = Date.now();
-  // #region agent log
-  fetch('http://127.0.0.1:7737/ingest/b4987c15-427e-45cf-9088-9b18f5a7c074', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json', 'X-Debug-Session-Id': '40eb62' },
-    body: JSON.stringify({
-      sessionId: '40eb62',
-      runId: 'post-fix',
-      hypothesisId: 'B',
-      location: 'profiles/api.ts:fetchAdminUser:start',
-      message: 'fetchAdminUser start',
-      data: { userId },
-      timestamp: Date.now(),
-    }),
-  }).catch(() => {});
-  // #endregion
-
   const profile = await getUserProfile(userId);
-  // #region agent log
-  fetch('http://127.0.0.1:7737/ingest/b4987c15-427e-45cf-9088-9b18f5a7c074', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json', 'X-Debug-Session-Id': '40eb62' },
-    body: JSON.stringify({
-      sessionId: '40eb62',
-      runId: 'post-fix',
-      hypothesisId: 'B',
-      location: 'profiles/api.ts:fetchAdminUser:mid',
-      message: 'profile loaded',
-      data: { hasProfile: Boolean(profile), elapsedMs: Date.now() - startedAt },
-      timestamp: Date.now(),
-    }),
-  }).catch(() => {});
-  // #endregion
-
   if (!profile) {
     throw new Error('User profile not found');
   }
 
   try {
     const remote = await getAdminUser(userId);
-    // #region agent log
-    fetch('http://127.0.0.1:7737/ingest/b4987c15-427e-45cf-9088-9b18f5a7c074', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'X-Debug-Session-Id': '40eb62' },
-      body: JSON.stringify({
-        sessionId: '40eb62',
-        runId: 'post-fix',
-        hypothesisId: 'B',
-        location: 'profiles/api.ts:fetchAdminUser:end',
-        message: 'fetchAdminUser success via function get',
-        data: {
-          linkedCount: remote.companies.length,
-          source: 'function',
-          elapsedMs: Date.now() - startedAt,
-        },
-        timestamp: Date.now(),
-      }),
-    }).catch(() => {});
-    // #endregion
-    return profileToAdminUser(profile, remote.companies);
-  } catch (error) {
-    // #region agent log
-    fetch('http://127.0.0.1:7737/ingest/b4987c15-427e-45cf-9088-9b18f5a7c074', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'X-Debug-Session-Id': '40eb62' },
-      body: JSON.stringify({
-        sessionId: '40eb62',
-        runId: 'post-fix',
-        hypothesisId: 'B',
-        location: 'profiles/api.ts:fetchAdminUser:fallback',
-        message: 'function get failed; profile-only fallback',
-        data: {
-          error: error instanceof Error ? error.message : 'unknown',
-          elapsedMs: Date.now() - startedAt,
-        },
-        timestamp: Date.now(),
-      }),
-    }).catch(() => {});
-    // #endregion
+    return profileToAdminUser(profile, remote.companies, remote.memberships);
+  } catch {
     return profileToAdminUser(profile, []);
   }
 }
@@ -181,4 +119,8 @@ export async function saveAdminUser(input: {
 
 export async function removeAdminUser(userId: string) {
   return deleteAdminUser(userId);
+}
+
+export async function removeUserTeamMembership(teamId: string, membershipId: string) {
+  return revokeTeamMember(teamId, membershipId);
 }

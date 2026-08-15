@@ -10,6 +10,7 @@ interface TimeEntryFormProps {
   teamId: string;
   task: TaskRow;
   entry?: TimeEntryRow;
+  allowFreeOfCharge?: boolean;
   onSaved: () => void;
   onCancel: () => void;
 }
@@ -18,17 +19,27 @@ function todayIsoDate() {
   return new Date().toISOString().slice(0, 10);
 }
 
-export function TimeEntryForm({ companyId, teamId, task, entry, onSaved, onCancel }: TimeEntryFormProps) {
+export function TimeEntryForm({
+  companyId,
+  teamId,
+  task,
+  entry,
+  allowFreeOfCharge = false,
+  onSaved,
+  onCancel,
+}: TimeEntryFormProps) {
   const { t } = useLingui();
   const { user } = useAuth();
   const [hours, setHours] = useState(entry ? String(entry.hours) : '');
   const [date, setDate] = useState(entry ? entry.workedDate.slice(0, 10) : todayIsoDate());
   const [comment, setComment] = useState(entry?.comment ?? '');
+  const [freeOfCharge, setFreeOfCharge] = useState(Boolean(entry?.freeOfCharge));
   const [error, setError] = useState<string | null>(null);
   const createEntry = useCreateTimeEntry(companyId);
   const updateEntry = useUpdateTimeEntry();
   const markFinished = useMarkTaskFinished(companyId);
   const isPending = (entry ? updateEntry.isPending : createEntry.isPending) || markFinished.isPending;
+  const canSetFreeOfCharge = allowFreeOfCharge && !entry?.approved && !entry?.invoiced;
 
   async function handleSubmit(e: React.FormEvent, completeTask = false) {
     e.preventDefault();
@@ -50,6 +61,7 @@ export function TimeEntryForm({ companyId, teamId, task, entry, onSaved, onCance
           hours: hoursValue,
           workedDate: new Date(`${date}T12:00:00`),
           comment: comment.trim() || null,
+          ...(canSetFreeOfCharge ? { freeOfCharge } : {}),
         });
       } else {
         await createEntry.mutateAsync({
@@ -61,6 +73,7 @@ export function TimeEntryForm({ companyId, teamId, task, entry, onSaved, onCance
           hours: hoursValue,
           workedDate: new Date(`${date}T12:00:00`),
           comment: comment.trim() || null,
+          ...(canSetFreeOfCharge && freeOfCharge ? { freeOfCharge: true } : {}),
         });
       }
       if (completeTask && task.status !== 'finished') {
@@ -105,6 +118,18 @@ export function TimeEntryForm({ companyId, teamId, task, entry, onSaved, onCance
           placeholder={t`Optioneel`}
         />
       </label>
+      {canSetFreeOfCharge && (
+        <label className="checkbox-label">
+          <input
+            type="checkbox"
+            checked={freeOfCharge}
+            onChange={(e) => setFreeOfCharge(e.target.checked)}
+          />
+          <span>
+            <Trans>Gratis / niet factureren</Trans>
+          </span>
+        </label>
+      )}
       {error && <p className="form-error">{error}</p>}
       <div className="form-actions">
         <button type="submit" className="btn-accent" disabled={isPending || !hours}>

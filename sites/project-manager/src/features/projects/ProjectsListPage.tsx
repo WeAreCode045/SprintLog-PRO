@@ -4,15 +4,12 @@ import { Trans, useLingui } from '@lingui/react/macro';
 import dayjs from 'dayjs';
 import { isStaffRole } from '../../auth/RequireStaff';
 import { ClockCheck, Plus } from 'lucide-react';
-import { IconCheck, IconLockOpen } from '../../components/icons';
+import { IconChevronDown, IconCheck, IconLockOpen } from '../../components/icons';
 import { PageHeader } from '../../components/PageHeader';
 import { PageBreadcrumb } from '../../components/PageBreadcrumb';
 import type { PortalContext } from '../../layouts/PortalLayout';
 import type { ProjectStatus } from '../../appwrite/types';
 import { CompanyScopeControl } from '../companies/CompanyScopeControl';
-import { DashboardStatsCards } from '../dashboard/DashboardStatsCards';
-import { DashboardSidebar } from '../dashboard/DashboardSidebar';
-import { useDashboardOverview } from '../dashboard/useDashboardOverview';
 import { useTasksForCompanies } from '../tasks/hooks';
 import { useTimeEntriesForCompanies } from '../timeEntries/hooks';
 import { formatHours } from '../../lib/formatHours';
@@ -75,14 +72,23 @@ export function ProjectsListPage() {
   const range = useMemo(allTimeRange, []);
   const { data: tasks = [] } = useTasksForCompanies(enabledCompanyIds, 'all');
   const { data: timeEntries = [] } = useTimeEntriesForCompanies(enabledCompanyIds, range);
-  const overview = useDashboardOverview(enabledCompanyIds, role);
   const [excludedCompanyIds, setExcludedCompanyIds] = useState<Set<string>>(new Set());
   const [excludedStatuses, setExcludedStatuses] = useState<Set<ProjectStatus>>(
-    new Set<ProjectStatus>(['on_hold', 'completed', 'archived']),
+    new Set<ProjectStatus>(['on_hold', 'archived']),
   );
   const [sortKey, setSortKey] = useState<ProjectSortKey>('name');
   const [sortDir, setSortDir] = useState<SortDir>('asc');
   const [showNewProjectModal, setShowNewProjectModal] = useState(false);
+  const [expandedRowIds, setExpandedRowIds] = useState<Set<string>>(new Set());
+
+  function toggleRowExpanded(projectId: string) {
+    setExpandedRowIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(projectId)) next.delete(projectId);
+      else next.add(projectId);
+      return next;
+    });
+  }
 
   const setProjectStatus = useSetProjectStatus();
 
@@ -127,6 +133,7 @@ export function ProjectsListPage() {
     }
     for (const entry of timeEntries) {
       const stat = statFor(entry.projectId);
+      if (entry.freeOfCharge) continue;
       if (entry.approved) stat.approvedHours += entry.hours ?? 0;
       else stat.pendingHours += entry.hours ?? 0;
     }
@@ -248,10 +255,6 @@ export function ProjectsListPage() {
           }
         />
 
-        <div className="developer-tasks-with-companion client-dashboard-tasks">
-        <div className="developer-tasks-with-companion-main">
-        <DashboardStatsCards stats={overview.currentStats} />
-
         <div className="filter-bar">
           <div className="filter-group">
             {companyFilterOptions.length > 1 && (
@@ -302,7 +305,7 @@ export function ProjectsListPage() {
 
         {!isLoading && sortedProjects.length > 0 && (
           <div className="data-table-wrap">
-            <table className="data-table projects-list-table">
+            <table className="data-table projects-list-table data-table--collapsible">
               <thead>
                 <tr>
                   <SortableHeader
@@ -358,22 +361,34 @@ export function ProjectsListPage() {
                 {sortedProjects.map((project) => {
                   const status = project.status ?? 'active';
                   const stats = statsFor(project.$id);
+                  const expanded = expandedRowIds.has(project.$id);
                   return (
-                    <tr key={project.$id}>
+                    <tr key={project.$id} className={expanded ? 'data-table-row--expanded' : ''}>
                       <td>
-                        <Link className="data-table-title-button" to={`/app/projects/${project.$id}`}>
-                          {project.name}
-                        </Link>
+                        <div className="data-table-title-cell">
+                          <Link className="data-table-title-button" to={`/app/projects/${project.$id}`}>
+                            {project.name}
+                          </Link>
+                          <button
+                            type="button"
+                            className="data-table-expand-toggle"
+                            title={expanded ? t`Minder tonen` : t`Meer tonen`}
+                            aria-label={expanded ? t`Minder tonen` : t`Meer tonen`}
+                            onClick={() => toggleRowExpanded(project.$id)}
+                          >
+                            <IconChevronDown />
+                          </button>
+                        </div>
                       </td>
                       {isMultiCompany && (
-                        <td className="data-table-muted">{companyById(project.companyId)?.name ?? '—'}</td>
+                        <td className="data-table-muted" data-label={t`Bedrijf`}>{companyById(project.companyId)?.name ?? '—'}</td>
                       )}
-                      <td>
+                      <td data-label={t`Status`}>
                         <span className={`badge badge-status badge-status--${status}`}>
                           {statusLabel(status)}
                         </span>
                       </td>
-                      <td className="data-table-muted">
+                      <td className="data-table-muted" data-label={t`Taken`}>
                         <Link className="project-stat-link" to={`/app/projects/${project.$id}`}>
                           <Trans>
                             <span className="project-stat-figure">{stats.openTasks}</span> open ·{' '}
@@ -381,14 +396,14 @@ export function ProjectsListPage() {
                           </Trans>
                         </Link>
                       </td>
-                      <td className="data-table-muted data-table-col-hours">
+                      <td className="data-table-muted data-table-col-hours" data-label={t`Uren`}>
                         <Link className="project-stat-link" to="/app/reports">
                           <span className="project-stat-figure">
                             {formatHours(stats.approvedHours + stats.pendingHours)}
                           </span>
                         </Link>
                       </td>
-                      <td className="data-table-muted">
+                      <td className="data-table-muted" data-label={t`Startdatum`}>
                         {dayjs(project.$createdAt).format('D MMM YYYY')}
                         {(staff || stats.pendingHours > 0) && (
                           <div className="data-table-actions">
@@ -435,14 +450,6 @@ export function ProjectsListPage() {
             </table>
           </div>
         )}
-        </div>
-        <DashboardSidebar
-          role={role}
-          overview={overview}
-          isMultiCompany={isMultiCompany}
-          companyById={companyById}
-        />
-        </div>
       </div>
 
       {showNewProjectModal && (

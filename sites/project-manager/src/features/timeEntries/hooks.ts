@@ -8,6 +8,7 @@ import {
   listTimeEntriesForCompanies,
   listTimeEntriesByProject,
   listTimeEntriesByTask,
+  listTaskIdsWithInvoicedHours,
   unlockTimeEntries,
   updateTimeEntry,
 } from './api';
@@ -90,6 +91,15 @@ export function useUpdateTimeEntry() {
 export function useDeleteTimeEntry() {
   const invalidate = useInvalidateTimeEntries();
   return useMutation({ mutationFn: deleteTimeEntry, onSuccess: invalidate });
+}
+
+export function useTaskIdsWithInvoicedHours(taskIds: string[]) {
+  const sortedIds = taskIds.slice().sort();
+  return useQuery({
+    queryKey: ['timeEntries', 'invoicedTasks', ...sortedIds] as const,
+    queryFn: () => listTaskIdsWithInvoicedHours(sortedIds),
+    enabled: sortedIds.length > 0,
+  });
 }
 
 export function useApproveTimeEntries() {

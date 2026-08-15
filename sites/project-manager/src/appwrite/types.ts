@@ -1,8 +1,10 @@
 export type {
   AccessibleCompany,
   AccessibleProject,
+  AdminSettingsRawRow,
   AdminUser,
   AdminUserCompany,
+  AdminUserMembership,
   CompanyRow,
   DiscussionCategoryType,
   DiscussionReplyRow,

@@ -7,6 +7,7 @@ import {
   Building2,
   FolderKanban,
   LayoutDashboard,
+  ListTodo,
   MessageSquare,
   Receipt,
   Settings,
@@ -42,9 +43,13 @@ function PortalShell() {
   const coreSection: AppShellNavSection = {
     items: [
       { to: '/app/dashboard', label: t`Dashboard`, icon: <LayoutDashboard size={18} /> },
+      { to: '/app/tasks', label: t`Taken`, icon: <ListTodo size={18} /> },
       { to: '/app/projects', label: t`Projecten`, icon: <FolderKanban size={18} /> },
       { to: '/app/discussions', label: t`Discussies`, icon: <MessageSquare size={18} /> },
       { to: '/app/reports', label: t`Urenregistratie`, icon: <BarChart3 size={18} /> },
+      ...(scope.role === 'admin'
+        ? [{ to: '/app/invoices', label: t`Facturen`, icon: <Receipt size={18} /> }]
+        : []),
     ],
   };
 
@@ -56,7 +61,7 @@ function PortalShell() {
         { to: '/clients', label: t`Klanten`, icon: <Building2 size={18} />, end: true },
         { to: '/clients/users', label: t`Gebruikers`, icon: <Users size={18} /> },
         ...(scope.role === 'admin'
-          ? [{ to: '/app/invoices', label: t`Facturen`, icon: <Receipt size={18} /> }]
+          ? [{ to: '/app/settings', label: t`Instellingen`, icon: <Settings size={18} /> }]
           : []),
       ],
     });

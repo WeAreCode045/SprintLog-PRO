@@ -5,7 +5,9 @@ import type { DiscussionCategoryType, DiscussionReplyRow } from '../../appwrite/
 import {
   createDiscussion,
   createDiscussionReply,
+  deleteDiscussion,
   getDiscussion,
+  getDiscussionByTaskId,
   listDiscussionReplies,
   listDiscussionsByCompany,
   listDiscussionsForCompanies,
@@ -61,6 +63,14 @@ export function useDiscussion(discussionId: string | undefined) {
   });
 }
 
+export function useDiscussionByTask(taskId: string | undefined) {
+  return useQuery({
+    queryKey: queryKeys.discussionByTask(taskId ?? ''),
+    queryFn: () => getDiscussionByTaskId(taskId!),
+    enabled: Boolean(taskId),
+  });
+}
+
 export function useDiscussionReplies(discussionId: string | undefined) {
   return useQuery({
     queryKey: queryKeys.discussionReplies(discussionId ?? ''),
@@ -95,6 +105,7 @@ export function useCreateDiscussion(invalidateKey: {
   projectId?: string;
   companyId?: string;
   categoryType?: DiscussionCategoryType | 'all';
+  taskId?: string;
 }) {
   const queryClient = useQueryClient();
   return useMutation({
@@ -110,7 +121,23 @@ export function useCreateDiscussion(invalidateKey: {
           queryKey: ['discussions', 'company', invalidateKey.companyId],
         });
       }
+      if (invalidateKey.taskId) {
+        void queryClient.invalidateQueries({
+          queryKey: queryKeys.discussionByTask(invalidateKey.taskId),
+        });
+      }
       void queryClient.invalidateQueries({ queryKey: ['discussions'] });
+    },
+  });
+}
+
+export function useDeleteDiscussion() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: deleteDiscussion,
+    onSuccess: () => {
+      void queryClient.invalidateQueries({ queryKey: ['discussions'] });
+      void queryClient.invalidateQueries({ queryKey: ['discussionReplies'] });
     },
   });
 }

@@ -8,9 +8,6 @@ import { PageBreadcrumb } from '../../components/PageBreadcrumb';
 import { PageHeader } from '../../components/PageHeader';
 import type { PortalContext } from '../../layouts/PortalLayout';
 import { CompanyScopeControl } from '../companies/CompanyScopeControl';
-import { DashboardStatsCards } from '../dashboard/DashboardStatsCards';
-import { DashboardSidebar } from '../dashboard/DashboardSidebar';
-import { useDashboardOverview } from '../dashboard/useDashboardOverview';
 import { useProjectsForCompanies } from '../projects/hooks';
 import { useDeveloperProfiles, useUserProfiles } from '../profiles/hooks';
 import { DiscussionCategorySidebar } from './DiscussionCategorySidebar';
@@ -39,7 +36,6 @@ export function DiscussionsPage() {
   const { data: projects = [] } = useProjectsForCompanies(enabledCompanyIds);
   const { data: profiles = [] } = useUserProfiles(true);
   const { data: developers = [] } = useDeveloperProfiles(true);
-  const overview = useDashboardOverview(enabledCompanyIds, role);
 
   const primaryCompanyId = formCompanyId || enabledCompanyIds[0] || '';
   const primaryCompany = companyById(primaryCompanyId);
@@ -123,54 +119,42 @@ export function DiscussionsPage() {
           actions={<CompanyScopeControl />}
         />
 
-        <div className="developer-tasks-with-companion client-dashboard-tasks">
-          <div className="developer-tasks-with-companion-main">
-            <DashboardStatsCards stats={overview.currentStats} />
-
-            <div className="forum-layout">
-              <DiscussionCategorySidebar
-                active={filter}
-                onChange={handleCategoryChange}
-                counts={sidebarCounts}
-              />
-              <div className={`forum-main ${discussionId ? 'forum-main--detail' : ''}`}>
-                {discussionId ? (
-                  <TopicDetailPanel
-                    discussionId={discussionId}
-                    companyId={detailCompany.$id}
-                    teamId={detailCompany.teamId}
-                    role={role}
-                    displayName={displayName}
-                    onBack={handleBackToList}
-                  />
-                ) : (
-                  <>
-                    <div className="pane-header pane-header--actions-only">
-                      <button type="button" className="btn-accent" onClick={() => setShowNew(true)}>
-                        <MessageSquarePlus size={16} /> <Trans>Nieuw topic</Trans>
-                      </button>
-                    </div>
-                    <TopicList
-                      companyId={primaryCompany.$id}
-                      discussions={filter === 'all' ? allDiscussions : discussions}
-                      filter={filter}
-                      isLoading={isLoading}
-                      displayName={displayName}
-                      projectName={projectNameById}
-                      grouped={filter === 'all'}
-                      detailPath={(id) => `/app/discussions/${id}`}
-                    />
-                  </>
-                )}
-              </div>
-            </div>
-          </div>
-          <DashboardSidebar
-            role={role}
-            overview={overview}
-            isMultiCompany={isMultiCompany}
-            companyById={companyById}
+        <div className="forum-layout">
+          <DiscussionCategorySidebar
+            active={filter}
+            onChange={handleCategoryChange}
+            counts={sidebarCounts}
           />
+          <div className={`forum-main ${discussionId ? 'forum-main--detail' : ''}`}>
+            {discussionId ? (
+              <TopicDetailPanel
+                discussionId={discussionId}
+                companyId={detailCompany.$id}
+                teamId={detailCompany.teamId}
+                role={role}
+                displayName={displayName}
+                onBack={handleBackToList}
+              />
+            ) : (
+              <>
+                <div className="pane-header pane-header--actions-only">
+                  <button type="button" className="btn-accent" onClick={() => setShowNew(true)}>
+                    <MessageSquarePlus size={16} /> <Trans>Nieuw topic</Trans>
+                  </button>
+                </div>
+                <TopicList
+                  companyId={primaryCompany.$id}
+                  discussions={filter === 'all' ? allDiscussions : discussions}
+                  filter={filter}
+                  isLoading={isLoading}
+                  displayName={displayName}
+                  projectName={projectNameById}
+                  grouped={filter === 'all'}
+                  detailPath={(id) => `/app/discussions/${id}`}
+                />
+              </>
+            )}
+          </div>
         </div>
       </div>
 

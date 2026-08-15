@@ -8,10 +8,18 @@ interface LogHoursDialogProps {
   teamId: string;
   task: TaskRow;
   entry?: TimeEntryRow;
+  allowFreeOfCharge?: boolean;
   onClose: () => void;
 }
 
-export function LogHoursDialog({ companyId, teamId, task, entry, onClose }: LogHoursDialogProps) {
+export function LogHoursDialog({
+  companyId,
+  teamId,
+  task,
+  entry,
+  allowFreeOfCharge = false,
+  onClose,
+}: LogHoursDialogProps) {
   const { t } = useLingui();
   const dialogTitle = entry ? t`Uren bewerken` : t`Uren boeken`;
   return (
@@ -21,6 +29,7 @@ export function LogHoursDialog({ companyId, teamId, task, entry, onClose }: LogH
         teamId={teamId}
         task={task}
         entry={entry}
+        allowFreeOfCharge={allowFreeOfCharge}
         onSaved={onClose}
         onCancel={onClose}
       />

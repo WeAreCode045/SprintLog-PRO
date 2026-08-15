@@ -2,6 +2,7 @@ import { useMemo, useState, type FormEvent } from 'react';
 import { ArrowLeft, MessageSquare } from 'lucide-react';
 import { Trans, useLingui } from '@lingui/react/macro';
 import { useAuth } from '../../auth/AuthContext';
+import { IconTrash } from '../../components/icons';
 import {
   DISCUSSION_CATEGORY_LABELS,
   DISCUSSION_NO_PROJECT_ID,
@@ -10,6 +11,7 @@ import {
 import { authorInitials, formatDiscussionDate } from './TopicList';
 import {
   useCreateDiscussionReply,
+  useDeleteDiscussion,
   useDiscussion,
   useDiscussionReplies,
   useSubscribeDiscussionReplies,
@@ -44,8 +46,16 @@ export function TopicDetailPanel({
     companyId,
     projectId: discussion?.projectId,
   });
+  const deleteDiscussion = useDeleteDiscussion();
   const [replyBody, setReplyBody] = useState('');
   const [error, setError] = useState<string | null>(null);
+
+  async function handleDelete() {
+    if (!discussion) return;
+    if (!confirm(t`Topic "${discussion.title}" en alle reacties verwijderen?`)) return;
+    await deleteDiscussion.mutateAsync(discussion.$id);
+    onBack();
+  }
 
   const categoryLabel = useMemo(() => {
     if (!discussion) return '';
@@ -97,6 +107,17 @@ export function TopicDetailPanel({
           <ArrowLeft size={16} aria-hidden /> <Trans>Overzicht</Trans>
         </button>
         <span className="forum-detail-category">{categoryLabel}</span>
+        {role === 'admin' && (
+          <button
+            type="button"
+            className="icon-button forum-detail-delete"
+            title={t`Topic verwijderen`}
+            disabled={deleteDiscussion.isPending}
+            onClick={() => void handleDelete()}
+          >
+            <IconTrash />
+          </button>
+        )}
       </div>
 
       <h2 className="forum-detail-title">{discussion.title}</h2>

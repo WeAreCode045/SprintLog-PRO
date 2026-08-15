@@ -1,4 +1,4 @@
-import { lazy, Suspense } from 'react';
+import { lazy, Suspense, useMemo } from 'react';
 import { Link, Navigate, useNavigate, useOutletContext, useParams } from 'react-router-dom';
 import dayjs from 'dayjs';
 import { Download, RefreshCw, Undo2 } from 'lucide-react';
@@ -8,7 +8,12 @@ import type { PortalContext } from '../layouts/PortalLayout';
 import { PageBreadcrumb } from '../components/PageBreadcrumb';
 import { PageHeader } from '../components/PageHeader';
 import { getInvoicePdfUrl } from '../features/invoices/api';
-import { useCreateCreditInvoice, useInvoice, useRegenerateInvoice } from '../features/invoices/hooks';
+import {
+  useCreateCreditInvoice,
+  useInvoice,
+  useInvoiceItems,
+  useRegenerateInvoice,
+} from '../features/invoices/hooks';
 import { formatHours } from '../lib/formatHours';
 
 // react-pdf (pdf.js) is a large dependency — keep it out of the main bundle so only
@@ -22,7 +27,26 @@ function formatAmount(amount: number, currency: string) {
 }
 
 function statusLabel(status: string) {
-  return status === 'generated' ? staticT`Gegenereerd` : staticT`Vervallen`;
+  switch (status) {
+    case 'draft':
+      return staticT`Concept`;
+    case 'sent':
+      return staticT`Verzonden`;
+    default:
+      return staticT`Vervallen`;
+  }
+}
+
+/** Mirrors InvoicesAdminPage#statusBadgeClass. */
+function statusBadgeClass(status: string) {
+  switch (status) {
+    case 'draft':
+      return 'on_hold';
+    case 'sent':
+      return 'open';
+    default:
+      return 'finished';
+  }
 }
 
 export function InvoiceDetailPage() {
@@ -33,8 +57,23 @@ export function InvoiceDetailPage() {
   const { data: invoice, isLoading } = useInvoice(invoiceId);
   const { data: originalInvoice } = useInvoice(invoice?.creditForInvoiceId ?? undefined);
   const { data: creditInvoice } = useInvoice(invoice?.creditedByInvoiceId ?? undefined);
+  const { data: items = [] } = useInvoiceItems(invoiceId);
   const createCreditInvoice = useCreateCreditInvoice();
   const regenerateInvoice = useRegenerateInvoice();
+
+  /** Grouped by rate — mirrors send-invoice/src/invoiceDocument.js#groupVat so the summary
+   * matches what the PDF shows. Hooks must run unconditionally, so this sits above the
+   * early-return guards below (items defaults to [] while the invoice is still loading). */
+  const vatBreakdown = useMemo(() => {
+    const groups = new Map<number, number>();
+    for (const item of items) {
+      const rate = item.vatRate ?? 0;
+      groups.set(rate, (groups.get(rate) ?? 0) + item.quantity * item.unitPrice);
+    }
+    return [...groups.entries()]
+      .sort((a, b) => b[0] - a[0])
+      .map(([rate, base]) => ({ rate, amount: Math.round(base * rate) / 100 }));
+  }, [items]);
 
   const listPath = role === 'admin' ? '/app/invoices' : '/app/my-invoices';
 
@@ -54,14 +93,16 @@ export function InvoiceDetailPage() {
     return <Navigate to={listPath} replace />;
   }
 
+  if (role === 'admin' && invoice.status === 'draft') {
+    return <Navigate to={`/app/invoices/${invoice.$id}/edit`} replace />;
+  }
+
   const company = companyById(invoice.companyId);
   const subtotal = invoice.totalAmount;
-  const vatAmount = invoice.vatAmount ?? null;
   const total = invoice.totalWithVat ?? invoice.totalAmount;
   const canCreateCredit =
-    role === 'admin' && !invoice.creditForInvoiceId && !invoice.creditedByInvoiceId && invoice.status !== 'void';
-  const canRegenerate =
-    role === 'admin' && !invoice.creditForInvoiceId && invoice.status !== 'void';
+    role === 'admin' && !invoice.creditForInvoiceId && !invoice.creditedByInvoiceId && invoice.status === 'sent';
+  const canRegenerate = role === 'admin' && !invoice.creditForInvoiceId && invoice.status === 'sent';
 
   async function handleCreateCredit() {
     if (!invoice) return;
@@ -100,14 +141,14 @@ export function InvoiceDetailPage() {
     <div className="content-card">
       <div className="content-inner">
         <PageHeader
-          title={invoice.invoiceNumber}
+          title={invoice.invoiceNumber ?? t`Conceptfactuur`}
           description={company?.name}
           breadcrumb={
             <PageBreadcrumb
               items={[
                 { label: t`Dashboard`, to: '/app/dashboard' },
                 { label: t`Facturen`, to: listPath },
-                { label: invoice.invoiceNumber },
+                { label: invoice.invoiceNumber ?? t`Conceptfactuur` },
               ]}
             />
           }
@@ -117,7 +158,7 @@ export function InvoiceDetailPage() {
           <section className="report-card invoice-detail-summary">
             <div className="report-card-header">
               <h3><Trans>Factuurgegevens</Trans></h3>
-              <span className={`badge badge-status--${invoice.status === 'generated' ? 'open' : 'finished'}`}>
+              <span className={`badge badge-status--${statusBadgeClass(invoice.status)}`}>
                 {statusLabel(invoice.status)}
               </span>
             </div>
@@ -152,13 +193,23 @@ export function InvoiceDetailPage() {
                 <dt><Trans>Bedrijf</Trans></dt>
                 <dd>{company?.name ?? invoice.companyId}</dd>
               </div>
-              <div>
-                <dt><Trans>Periode</Trans></dt>
-                <dd>
-                  {dayjs(invoice.periodStart).format('D MMM')} –{' '}
-                  {dayjs(invoice.periodEnd).subtract(1, 'day').format('D MMM YYYY')}
-                </dd>
-              </div>
+              {invoice.periodStart && invoice.periodEnd && (
+                <div>
+                  <dt><Trans>Periode</Trans></dt>
+                  <dd>
+                    {dayjs(invoice.periodStart).format('D MMM')} –{' '}
+                    {dayjs(invoice.periodEnd).subtract(1, 'day').format('D MMM YYYY')}
+                  </dd>
+                </div>
+              )}
+              {invoice.paymentTermDays != null && (
+                <div>
+                  <dt><Trans>Betalingstermijn</Trans></dt>
+                  <dd>
+                    {invoice.paymentTermDays === 0 ? t`Direct` : `Net ${invoice.paymentTermDays}`}
+                  </dd>
+                </div>
+              )}
               {invoice.issueDate && (
                 <div>
                   <dt><Trans>Factuurdatum</Trans></dt>
@@ -176,19 +227,15 @@ export function InvoiceDetailPage() {
                 <dd>{formatHours(invoice.totalHours)}</dd>
               </div>
               <div>
-                <dt><Trans>Uurtarief</Trans></dt>
-                <dd>{formatAmount(invoice.hourlyRate, invoice.currency)}</dd>
-              </div>
-              <div>
                 <dt><Trans>Subtotaal</Trans></dt>
                 <dd>{formatAmount(subtotal, invoice.currency)}</dd>
               </div>
-              {vatAmount != null && (
-                <div>
-                  <dt>{t`BTW`}{invoice.vatRate != null ? ` (${invoice.vatRate}%)` : ''}</dt>
-                  <dd>{formatAmount(vatAmount, invoice.currency)}</dd>
+              {vatBreakdown.map((row) => (
+                <div key={row.rate}>
+                  <dt>{t`BTW`} ({row.rate}%)</dt>
+                  <dd>{formatAmount(row.amount, invoice.currency)}</dd>
                 </div>
-              )}
+              ))}
               <div className="invoice-detail-total">
                 <dt><Trans>Totaal</Trans></dt>
                 <dd>{formatAmount(total, invoice.currency)}</dd>

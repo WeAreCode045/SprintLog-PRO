@@ -11,7 +11,7 @@ import { useOutletContext, useParams } from 'react-router-dom';
 import { Trans, useLingui } from '@lingui/react/macro';
 import type { PortalContext } from '../../layouts/PortalLayout';
 import type { TimeEntryRow } from '../../appwrite/types';
-import { IconEdit } from '../../components/icons';
+import { IconChevronDown, IconEdit } from '../../components/icons';
 import { PageBreadcrumb } from '../../components/PageBreadcrumb';
 import { PageHeader } from '../../components/PageHeader';
 import { useAuth } from '../../auth/AuthContext';
@@ -26,6 +26,7 @@ import { useTasksByProject } from '../tasks/hooks';
 import { LogHoursDialog } from '../timeEntries/LogHoursDialog';
 import { useTimeEntriesByProject } from '../timeEntries/hooks';
 import { useDeveloperProfiles } from '../profiles/hooks';
+import { isFreeOfChargeEntry } from '../timeEntries/timeEntryBilling';
 import { ProjectSidebar } from './ProjectSidebar';
 import { markProjectLastVisit } from './projectLastVisit';
 import { useCompany } from '../companies/hooks';
@@ -60,6 +61,16 @@ export function ProjectDetailPage() {
   const { data: assignments = [] } = useProjectAssignments(projectId);
   const [activeTab, setActiveTab] = useState<DetailTab>('overview');
   const [editingEntry, setEditingEntry] = useState<TimeEntryRow | null>(null);
+  const [expandedRowIds, setExpandedRowIds] = useState<Set<string>>(new Set());
+
+  function toggleRowExpanded(entryId: string) {
+    setExpandedRowIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(entryId)) next.delete(entryId);
+      else next.add(entryId);
+      return next;
+    });
+  }
 
   const assigneeUserIds = useMemo(() => assignments.map((row) => row.userId), [assignments]);
   const taskTitleById = useMemo(() => new Map(tasks.map((task) => [task.$id, task.title])), [tasks]);
@@ -246,7 +257,7 @@ export function ProjectDetailPage() {
                   </p>
                 ) : (
                   <div className="data-table-wrap">
-                    <table className="data-table project-hours-table">
+                    <table className="data-table project-hours-table data-table--collapsible">
                       <thead>
                         <tr>
                           <th className="data-table-col-date"><Trans>Datum</Trans></th>
@@ -257,32 +268,58 @@ export function ProjectDetailPage() {
                         </tr>
                       </thead>
                       <tbody>
-                        {timeEntries.map((entry) => (
-                          <tr key={entry.$id}>
-                            <td>{entry.workedDate.slice(0, 10)}</td>
-                            <td>{taskTitleById.get(entry.taskId) ?? entry.taskId}</td>
-                            <td className="data-table-muted">{entry.comment?.trim() || '—'}</td>
-                            <td>{developerById.get(entry.userId)?.displayName ?? entry.userId}</td>
-                            <td className="data-table-num">
-                              {(entry.hours ?? 0) % 1 === 0
-                                ? entry.hours
-                                : (entry.hours ?? 0).toFixed(2)}{' '}
-                              u
-                              {canEditEntry(entry) && (
-                                <div className="data-table-actions">
+                        {timeEntries.map((entry) => {
+                          const expanded = expandedRowIds.has(entry.$id);
+                          return (
+                            <tr key={entry.$id} className={expanded ? 'data-table-row--expanded' : ''}>
+                              <td>
+                                <div className="data-table-title-cell">
+                                  <div className="data-table-title-row">
+                                    <span className="data-table-title-button">{entry.workedDate.slice(0, 10)}</span>
+                                    <span className="data-table-muted">
+                                      {taskTitleById.get(entry.taskId) ?? entry.taskId}
+                                    </span>
+                                  </div>
                                   <button
                                     type="button"
-                                    className="icon-button"
-                                    title={t`Uren bewerken`}
-                                    onClick={() => setEditingEntry(entry)}
+                                    className="data-table-expand-toggle"
+                                    title={expanded ? t`Minder tonen` : t`Meer tonen`}
+                                    aria-label={expanded ? t`Minder tonen` : t`Meer tonen`}
+                                    onClick={() => toggleRowExpanded(entry.$id)}
                                   >
-                                    <IconEdit />
+                                    <IconChevronDown />
                                   </button>
                                 </div>
-                              )}
-                            </td>
-                          </tr>
-                        ))}
+                              </td>
+                              <td data-label={t`Taak`}>{taskTitleById.get(entry.taskId) ?? entry.taskId}</td>
+                              <td className="data-table-muted" data-label={t`Toelichting`}>{entry.comment?.trim() || '—'}</td>
+                              <td data-label={t`Developer`}>{developerById.get(entry.userId)?.displayName ?? entry.userId}</td>
+                              <td className="data-table-num" data-label={t`Uren`}>
+                                {(entry.hours ?? 0) % 1 === 0
+                                  ? entry.hours
+                                  : (entry.hours ?? 0).toFixed(2)}{' '}
+                                u
+                                {isFreeOfChargeEntry(entry) && (
+                                  <span className="badge badge-status--requested" style={{ marginLeft: '0.5rem' }}>
+                                    <Trans>Gratis</Trans>
+                                  </span>
+                                )}
+                                {canEditEntry(entry) && (
+                                  <div className="data-table-actions">
+                                    <button
+                                      type="button"
+                                      className="icon-button"
+                                      title={t`Uren bewerken`}
+                                      onClick={() => setEditingEntry(entry)}
+                                    >
+                                      <IconEdit />
+                                    </button>
+                                  </div>
+                                )}
+                              </td>
+                            </tr>
+                          );
+                        })}
                       </tbody>
                       <tfoot>
                         <tr className="data-table-total">
@@ -336,6 +373,7 @@ export function ProjectDetailPage() {
           teamId={company.teamId}
           task={taskById.get(editingEntry.taskId)!}
           entry={editingEntry}
+          allowFreeOfCharge={isStaffRole(role)}
           onClose={() => setEditingEntry(null)}
         />
       )}

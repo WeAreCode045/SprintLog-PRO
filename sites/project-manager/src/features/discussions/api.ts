@@ -125,6 +125,19 @@ export async function listDiscussionsByProject(projectId: string) {
   return result.rows;
 }
 
+export async function getDiscussionByTaskId(taskId: string) {
+  const result = await tablesDB.listRows<DiscussionRow>({
+    databaseId: DATABASE_ID,
+    tableId: TABLES.discussions,
+    queries: [
+      Query.equal('taskId', taskId),
+      Query.orderDesc('$createdAt'),
+      Query.limit(1),
+    ],
+  });
+  return result.rows[0] ?? null;
+}
+
 export async function getDiscussion(discussionId: string) {
   return tablesDB.getRow<DiscussionRow>({
     databaseId: DATABASE_ID,
@@ -154,11 +167,13 @@ export async function createDiscussion(input: {
   createdBy: string;
   categoryType: DiscussionCategoryType;
   projectId?: string | null;
+  taskId?: string | null;
   assigneeUserIds?: string[];
   canGrantStaffRoles?: boolean;
 }) {
   const categories = categoryFields(input);
   const rowId = ID.unique();
+  const taskId = input.taskId?.trim();
   const data = {
     companyId: input.companyId,
     title: input.title,
@@ -166,6 +181,7 @@ export async function createDiscussion(input: {
     createdBy: input.createdBy,
     totalReplies: 0,
     ...categories,
+    ...(taskId ? { taskId } : {}),
   };
 
   try {
@@ -269,6 +285,38 @@ export async function createDiscussionReply(input: {
     });
   }
   return created;
+}
+
+/** Delete a discussion topic and cascade-delete its replies. Requires admin table permission. */
+export async function deleteDiscussion(discussionId: string) {
+  let cursor: string | undefined;
+  for (;;) {
+    const queries = [Query.equal('discussionId', discussionId), Query.limit(100)];
+    if (cursor) queries.push(Query.cursorAfter(cursor));
+    const page = await tablesDB.listRows<DiscussionReplyRow>({
+      databaseId: DATABASE_ID,
+      tableId: TABLES.discussionReplies,
+      queries,
+    });
+    if (page.rows.length === 0) break;
+    await Promise.all(
+      page.rows.map((reply) =>
+        tablesDB.deleteRow({
+          databaseId: DATABASE_ID,
+          tableId: TABLES.discussionReplies,
+          rowId: reply.$id,
+        }),
+      ),
+    );
+    if (page.rows.length < 100) break;
+    cursor = page.rows[page.rows.length - 1].$id;
+  }
+
+  await tablesDB.deleteRow({
+    databaseId: DATABASE_ID,
+    tableId: TABLES.discussions,
+    rowId: discussionId,
+  });
 }
 
 /** Subscribe to reply creates/updates for a discussion. Returns an unsubscribe fn. */

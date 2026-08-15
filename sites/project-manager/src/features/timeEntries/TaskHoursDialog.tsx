@@ -8,6 +8,7 @@ import { TimeEntryForm } from './TimeEntryForm';
 import { UnlockTimeEntriesDialog } from './UnlockTimeEntriesDialog';
 import { useDeleteTimeEntry, useTimeEntriesByTask } from './hooks';
 import { formatHours } from '../../lib/formatHours';
+import { isFreeOfChargeEntry } from './timeEntryBilling';
 
 interface TaskHoursDialogProps {
   companyId: string;
@@ -38,9 +39,15 @@ export function TaskHoursDialog({ companyId, teamId, task, userId: _userId, role
 
   const total = entries.reduce((sum, entry) => sum + (entry.hours ?? 0), 0);
 
-  function canManage(entry: TimeEntryRow) {
+  function canEditEntry(entry: TimeEntryRow) {
     if (entry.approved) return false;
     return role === 'admin' || role === 'developer';
+  }
+
+  function canDeleteEntry(entry: TimeEntryRow) {
+    if (entry.invoiced) return false;
+    if (role === 'admin') return true;
+    return !entry.approved && role === 'developer';
   }
 
   function canUnlock(entry: TimeEntryRow) {
@@ -63,6 +70,7 @@ export function TaskHoursDialog({ companyId, teamId, task, userId: _userId, role
           teamId={teamId}
           task={task}
           entry={formEntry === 'new' ? undefined : formEntry}
+          allowFreeOfCharge={role === 'admin' || role === 'developer'}
           onSaved={() => setFormEntry(null)}
           onCancel={() => setFormEntry(null)}
         />
@@ -105,32 +113,37 @@ export function TaskHoursDialog({ companyId, teamId, task, userId: _userId, role
                   <td className="data-table-muted">{entry.comment?.trim() || '—'}</td>
                   <td className="data-table-num">
                     {formatHours(entry.hours)}
+                    {isFreeOfChargeEntry(entry) && (
+                      <span className="badge badge-status--requested" style={{ marginLeft: '0.5rem' }}>
+                        <Trans>Gratis</Trans>
+                      </span>
+                    )}
                     {entry.approved && (
                       <span className="badge badge-status--finished" style={{ marginLeft: '0.5rem' }}>
                         {entry.invoiced ? <Trans>Gefactureerd</Trans> : <Trans>Goedgekeurd</Trans>}
                       </span>
                     )}
-                    {(canManage(entry) || canUnlock(entry)) && (
+                    {(canEditEntry(entry) || canDeleteEntry(entry) || canUnlock(entry)) && (
                       <div className="data-table-actions">
-                        {canManage(entry) && (
-                          <>
-                            <button
-                              type="button"
-                              className="icon-button"
-                              title={t`Bewerken`}
-                              onClick={() => setFormEntry(entry)}
-                            >
-                              <IconEdit />
-                            </button>
-                            <button
-                              type="button"
-                              className="icon-button"
-                              title={t`Verwijderen`}
-                              onClick={() => void handleDelete(entry)}
-                            >
-                              <IconTrash />
-                            </button>
-                          </>
+                        {canEditEntry(entry) && (
+                          <button
+                            type="button"
+                            className="icon-button"
+                            title={t`Bewerken`}
+                            onClick={() => setFormEntry(entry)}
+                          >
+                            <IconEdit />
+                          </button>
+                        )}
+                        {canDeleteEntry(entry) && (
+                          <button
+                            type="button"
+                            className="icon-button"
+                            title={t`Verwijderen`}
+                            onClick={() => void handleDelete(entry)}
+                          >
+                            <IconTrash />
+                          </button>
                         )}
                         {canUnlock(entry) && (
                           <button

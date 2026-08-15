@@ -3,7 +3,12 @@ import { tablesDB } from '../../appwrite/client';
 import { DATABASE_ID, TABLES } from '../../appwrite/constants';
 import { clientSafeTimeEntryPermissions, timeEntryPermissions } from '../../appwrite/permissions';
 import type { TaskRow, TimeEntryRow } from '../../appwrite/types';
-import { approveTimeEntries as approveTimeEntriesFn, assignProjectDeveloper, unlockTimeEntries as unlockTimeEntriesFn } from '../../lib/functions';
+import {
+  approveTimeEntries as approveTimeEntriesFn,
+  assignProjectDeveloper,
+  autoApproveTimeEntry,
+  unlockTimeEntries as unlockTimeEntriesFn,
+} from '../../lib/functions';
 
 function isPermissionGrantError(err: unknown) {
   const message = err instanceof Error ? err.message : String(err);
@@ -98,22 +103,26 @@ export async function createTimeEntry(input: {
   hours: number;
   workedDate: Date;
   comment?: string | null;
+  freeOfCharge?: boolean;
 }) {
+  const freeOfCharge = Boolean(input.freeOfCharge);
+  const rowData = {
+    companyId: input.companyId,
+    projectId: input.projectId,
+    taskId: input.taskId,
+    userId: input.userId,
+    hours: input.hours,
+    workedDate: input.workedDate.toISOString(),
+    comment: input.comment?.trim() ? input.comment.trim() : null,
+    freeOfCharge,
+  };
   let entry: TimeEntryRow;
   try {
     entry = await tablesDB.createRow<TimeEntryRow>({
       databaseId: DATABASE_ID,
       tableId: TABLES.timeEntries,
       rowId: ID.unique(),
-      data: {
-        companyId: input.companyId,
-        projectId: input.projectId,
-        taskId: input.taskId,
-        userId: input.userId,
-        hours: input.hours,
-        workedDate: input.workedDate.toISOString(),
-        comment: input.comment?.trim() ? input.comment.trim() : null,
-      },
+      data: rowData,
       // Prefer team ACL when the actor is a company team member.
       permissions: timeEntryPermissions(input.teamId, input.userId, {
         canGrantStaffRoles: false,
@@ -126,15 +135,7 @@ export async function createTimeEntry(input: {
       databaseId: DATABASE_ID,
       tableId: TABLES.timeEntries,
       rowId: ID.unique(),
-      data: {
-        companyId: input.companyId,
-        projectId: input.projectId,
-        taskId: input.taskId,
-        userId: input.userId,
-        hours: input.hours,
-        workedDate: input.workedDate.toISOString(),
-        comment: input.comment?.trim() ? input.comment.trim() : null,
-      },
+      data: rowData,
       permissions: clientSafeTimeEntryPermissions(input.userId),
     });
     await syncTimeEntryAcl({
@@ -143,6 +144,20 @@ export async function createTimeEntry(input: {
       projectId: input.projectId,
     });
   }
+
+  if (!freeOfCharge) {
+    // No-op unless the company has autoApproveHours enabled — see autoApprove.js for why
+    // this has to run server-side (granting the admin-label lock permission requires it).
+    try {
+      const result = await autoApproveTimeEntry(entry.$id);
+      if (result.approved) {
+        entry = { ...entry, approved: true };
+      }
+    } catch {
+      // Best-effort — the entry still exists and can be approved later via approve-time-entries.
+    }
+  }
+
   await syncTaskHoursTotal(input.taskId);
   return entry;
 }
@@ -153,6 +168,7 @@ export async function updateTimeEntry(input: {
   hours: number;
   workedDate: Date;
   comment?: string | null;
+  freeOfCharge?: boolean;
 }) {
   const entry = await tablesDB.updateRow<TimeEntryRow>({
     databaseId: DATABASE_ID,
@@ -162,6 +178,7 @@ export async function updateTimeEntry(input: {
       hours: input.hours,
       workedDate: input.workedDate.toISOString(),
       comment: input.comment?.trim() ? input.comment.trim() : null,
+      ...(input.freeOfCharge !== undefined ? { freeOfCharge: input.freeOfCharge } : {}),
     },
   });
   await syncTaskHoursTotal(input.taskId);
@@ -184,6 +201,20 @@ export async function hasInvoicedTimeEntries(taskId: string) {
     queries: [Query.equal('taskId', taskId), Query.equal('invoiced', true), Query.limit(1)],
   });
   return result.rows.length > 0;
+}
+
+export async function listTaskIdsWithInvoicedHours(taskIds: string[]) {
+  if (taskIds.length === 0) return new Set<string>();
+  const result = await tablesDB.listRows<TimeEntryRow>({
+    databaseId: DATABASE_ID,
+    tableId: TABLES.timeEntries,
+    queries: [
+      Query.equal('taskId', taskIds),
+      Query.equal('invoiced', true),
+      Query.limit(500),
+    ],
+  });
+  return new Set(result.rows.map((row) => row.taskId));
 }
 
 export async function approveTimeEntries(input: { entryIds: string[]; teamId: string }) {

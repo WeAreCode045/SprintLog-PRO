@@ -10,6 +10,7 @@ export const queryKeys = {
   tasksByCompanies: (companyIds: string[], filter: string) =>
     ['tasks', 'byCompanies', filter, ...companyIds.slice().sort()] as const,
   tasksByProject: (projectId: string) => ['tasks', 'project', projectId] as const,
+  task: (taskId: string) => ['tasks', 'detail', taskId] as const,
   completedTasks: (companyId: string) => ['tasks', companyId, 'completed-range'] as const,
   timeEntriesByTask: (taskId: string) => ['timeEntries', 'task', taskId] as const,
   timeEntriesByProject: (projectId: string) => ['timeEntries', 'project', projectId] as const,
@@ -53,6 +54,7 @@ export const queryKeys = {
   ) =>
     ['discussions', 'byCompanies', categoryType, projectId, ...companyIds.slice().sort()] as const,
   discussion: (discussionId: string) => ['discussions', 'detail', discussionId] as const,
+  discussionByTask: (taskId: string) => ['discussions', 'byTask', taskId] as const,
   discussionReplies: (discussionId: string) => ['discussionReplies', discussionId] as const,
   projectFiles: (projectId: string) => ['projectFiles', projectId] as const,
   notifications: (userId: string) => ['notifications', userId] as const,
@@ -64,4 +66,7 @@ export const queryKeys = {
   invoices: (companyId?: string, status?: string) =>
     ['invoices', companyId ?? 'all', status ?? 'all'] as const,
   invoice: (invoiceId: string) => ['invoices', 'detail', invoiceId] as const,
+  invoiceItems: (invoiceId: string) => ['invoiceItems', invoiceId] as const,
+  approvedUnbilledEntries: (companyId: string, invoiceId?: string) =>
+    ['timeEntries', 'approvedUnbilled', companyId, invoiceId ?? 'none'] as const,
 };

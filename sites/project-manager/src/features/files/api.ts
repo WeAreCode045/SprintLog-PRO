@@ -97,3 +97,10 @@ export function getFileViewUrl(bucketFileId: string): string {
     fileId: bucketFileId,
   });
 }
+
+export function getFileDownloadUrl(bucketFileId: string): string {
+  return storage.getFileDownload({
+    bucketId: BUCKETS.projectFiles,
+    fileId: bucketFileId,
+  });
+}

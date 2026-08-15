@@ -83,6 +83,8 @@ function notificationMeta(notification: NotificationRow) {
       return staticT`Uren goedgekeurd`;
     case 'hours_unlocked':
       return staticT`Uren gedeblokkeerd`;
+    case 'invoice_sent':
+      return staticT`Nieuwe factuur`;
     default: {
       const _exhaustive: never = notification.type;
       return _exhaustive;

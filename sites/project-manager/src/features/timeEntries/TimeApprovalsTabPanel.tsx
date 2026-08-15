@@ -1,12 +1,13 @@
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 import { useOutletContext } from 'react-router-dom';
 import { Trans, useLingui } from '@lingui/react/macro';
 import type { PortalContext } from '../../layouts/PortalLayout';
 import type { TaskRow, TimeEntryRow } from '../../appwrite/types';
-import { IconCheck } from '../../components/icons';
+import { IconChevronDown, IconCheck } from '../../components/icons';
 import { useDeveloperProfiles } from '../profiles/hooks';
 import { useTasksForCompanies } from '../tasks/hooks';
 import { useApproveTimeEntries, useTimeEntriesForCompanies } from './hooks';
+import { entryNeedsApproval } from './timeEntryBilling';
 import { formatHours } from '../../lib/formatHours';
 
 /** No upper bound on how far back approvable hours can go — a task can run for months
@@ -28,6 +29,16 @@ export function TimeApprovalsTabPanel() {
   const { data: entries = [], isLoading } = useTimeEntriesForCompanies(enabledCompanyIds, range);
   const { data: developers = [] } = useDeveloperProfiles(true);
   const approveEntries = useApproveTimeEntries();
+  const [expandedRowIds, setExpandedRowIds] = useState<Set<string>>(new Set());
+
+  function toggleRowExpanded(entryId: string) {
+    setExpandedRowIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(entryId)) next.delete(entryId);
+      else next.add(entryId);
+      return next;
+    });
+  }
 
   const taskById = useMemo(() => new Map(tasks.map((task) => [task.$id, task])), [tasks]);
   const developerById = useMemo(
@@ -47,7 +58,7 @@ export function TimeApprovalsTabPanel() {
     () =>
       entries
         .filter((entry) => {
-          if (entry.approved) return false;
+          if (!entryNeedsApproval(entry)) return false;
           const task = taskById.get(entry.taskId);
           return (task?.audience ?? 'internal') !== 'client';
         })
@@ -106,7 +117,7 @@ export function TimeApprovalsTabPanel() {
               )}
             </div>
             <div className="data-table-wrap">
-              <table className="data-table report-hours-table">
+              <table className="data-table report-hours-table data-table--collapsible">
                 <thead>
                   <tr>
                     <th className="data-table-col-date"><Trans>Datum</Trans></th>
@@ -119,13 +130,30 @@ export function TimeApprovalsTabPanel() {
                 <tbody>
                   {companyPending.map((entry) => {
                     const task = taskById.get(entry.taskId);
+                    const expanded = expandedRowIds.has(entry.$id);
                     return (
-                      <tr key={entry.$id}>
-                        <td>{entry.workedDate.slice(0, 10)}</td>
-                        <td>{taskTitle(task, entry.taskId)}</td>
-                        <td className="data-table-muted">{entry.comment?.trim() || '—'}</td>
-                        <td>{developerName(entry.userId)}</td>
-                        <td className="data-table-num">
+                      <tr key={entry.$id} className={expanded ? 'data-table-row--expanded' : ''}>
+                        <td>
+                          <div className="data-table-title-cell">
+                            <div className="data-table-title-row">
+                              <span className="data-table-title-button">{entry.workedDate.slice(0, 10)}</span>
+                              <span className="data-table-muted">{taskTitle(task, entry.taskId)}</span>
+                            </div>
+                            <button
+                              type="button"
+                              className="data-table-expand-toggle"
+                              title={expanded ? t`Minder tonen` : t`Meer tonen`}
+                              aria-label={expanded ? t`Minder tonen` : t`Meer tonen`}
+                              onClick={() => toggleRowExpanded(entry.$id)}
+                            >
+                              <IconChevronDown />
+                            </button>
+                          </div>
+                        </td>
+                        <td data-label={t`Taak`}>{taskTitle(task, entry.taskId)}</td>
+                        <td className="data-table-muted" data-label={t`Toelichting`}>{entry.comment?.trim() || '—'}</td>
+                        <td data-label={t`Developer`}>{developerName(entry.userId)}</td>
+                        <td className="data-table-num" data-label={t`Uren`}>
                           {formatHours(entry.hours ?? 0)}
                           {canApprove && (
                             <div className="data-table-actions">

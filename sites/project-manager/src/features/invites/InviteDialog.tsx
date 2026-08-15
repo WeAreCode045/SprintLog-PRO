@@ -9,13 +9,15 @@ type AddMode = 'direct' | 'invite';
 interface InviteDialogProps {
   teamId: string;
   onClose: () => void;
+  /** Clients may only invite by email — direct (password-set) creation stays staff-only. */
+  allowDirectAdd?: boolean;
 }
 
 const MIN_PASSWORD_LENGTH = 8;
 
-export function InviteDialog({ teamId, onClose }: InviteDialogProps) {
+export function InviteDialog({ teamId, onClose, allowDirectAdd = true }: InviteDialogProps) {
   const { t } = useLingui();
-  const [mode, setMode] = useState<AddMode>('direct');
+  const [mode, setMode] = useState<AddMode>(allowDirectAdd ? 'direct' : 'invite');
   const [email, setEmail] = useState('');
   const [displayName, setDisplayName] = useState('');
   const [password, setPassword] = useState('');
@@ -53,22 +55,24 @@ export function InviteDialog({ teamId, onClose }: InviteDialogProps) {
   return (
     <Modal title={t`Klant toevoegen`} onClose={onClose}>
       <form className="form" onSubmit={handleSubmit}>
-        <div className="form-actions" style={{ justifyContent: 'flex-start', gap: '0.5rem' }}>
-          <button
-            type="button"
-            className={mode === 'direct' ? 'btn-accent' : undefined}
-            onClick={() => setMode('direct')}
-          >
-            <Trans>Direct toevoegen</Trans>
-          </button>
-          <button
-            type="button"
-            className={mode === 'invite' ? 'btn-accent' : undefined}
-            onClick={() => setMode('invite')}
-          >
-            <Trans>Uitnodigen per e-mail</Trans>
-          </button>
-        </div>
+        {allowDirectAdd && (
+          <div className="form-actions" style={{ justifyContent: 'flex-start', gap: '0.5rem' }}>
+            <button
+              type="button"
+              className={mode === 'direct' ? 'btn-accent' : undefined}
+              onClick={() => setMode('direct')}
+            >
+              <Trans>Direct toevoegen</Trans>
+            </button>
+            <button
+              type="button"
+              className={mode === 'invite' ? 'btn-accent' : undefined}
+              onClick={() => setMode('invite')}
+            >
+              <Trans>Uitnodigen per e-mail</Trans>
+            </button>
+          </div>
+        )}
 
         <label>
           <Trans>E-mailadres</Trans>

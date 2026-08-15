@@ -3,11 +3,22 @@ import { Trans } from '@lingui/react/macro';
 import type { DashboardOverview } from './useDashboardOverview';
 import { formatHours } from '../../lib/formatHours';
 
-export function DashboardStatsCards({ stats }: { stats: DashboardOverview['currentStats'] }) {
+export function DashboardStatsCards({
+  stats,
+  columns = 4,
+}: {
+  stats: DashboardOverview['currentStats'];
+  columns?: 2 | 4;
+}) {
   return (
-    <div style={{ marginBottom: '1.5rem' }}>
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '1rem' }}>
-        <div style={{ background: 'var(--sidebar-bg)', padding: '1rem', borderRadius: '0.625rem', border: '1px solid color-mix(in srgb, var(--accent, #f4622c) 35%, #333)', boxShadow: '0 4px 12px rgba(0,0,0,0.25)' }}>
+    <div className="dashboard-stats-cards">
+      <div
+        className="dashboard-stats-cards-grid"
+        style={{
+          gridTemplateColumns: `repeat(${columns}, minmax(0, 1fr))`,
+        }}
+      >
+        <div style={{ background: 'var(--sidebar-bg)', padding: '1rem 1.5rem', borderRadius: '0.625rem', border: '1px solid color-mix(in srgb, var(--accent, #f4622c) 35%, #333)', boxShadow: '0 4px 12px rgba(0,0,0,0.25)' }}>
           <div style={{ fontSize: '0.75rem', textTransform: 'uppercase', color: 'var(--accent, #f4622c)', fontWeight: 700, marginBottom: '0.5rem', display: 'flex', alignItems: 'center', gap: '0.35rem' }}>
             <ListTodo size={14} style={{ color: 'var(--accent)' }} /> <Trans>Taken</Trans>
           </div>
@@ -18,7 +29,7 @@ export function DashboardStatsCards({ stats }: { stats: DashboardOverview['curre
           </div>
         </div>
 
-        <div style={{ background: 'var(--sidebar-bg)', padding: '1rem', borderRadius: '0.625rem', border: '1px solid color-mix(in srgb, var(--accent, #f4622c) 35%, #333)', boxShadow: '0 4px 12px rgba(0,0,0,0.25)' }}>
+        <div style={{ background: 'var(--sidebar-bg)', padding: '1rem 1.5rem', borderRadius: '0.625rem', border: '1px solid color-mix(in srgb, var(--accent, #f4622c) 35%, #333)', boxShadow: '0 4px 12px rgba(0,0,0,0.25)' }}>
           <div style={{ fontSize: '0.75rem', textTransform: 'uppercase', color: 'var(--accent, #f4622c)', fontWeight: 700, marginBottom: '0.5rem', display: 'flex', alignItems: 'center', gap: '0.35rem' }}>
             <Timer size={14} style={{ color: 'var(--accent)' }} /> <Trans>Uren</Trans>
           </div>
@@ -29,7 +40,7 @@ export function DashboardStatsCards({ stats }: { stats: DashboardOverview['curre
           </div>
         </div>
 
-        <div style={{ background: 'var(--sidebar-bg)', padding: '1rem', borderRadius: '0.625rem', border: '1px solid color-mix(in srgb, var(--accent, #f4622c) 35%, #333)', boxShadow: '0 4px 12px rgba(0,0,0,0.25)' }}>
+        <div style={{ background: 'var(--sidebar-bg)', padding: '1rem 1.5rem', borderRadius: '0.625rem', border: '1px solid color-mix(in srgb, var(--accent, #f4622c) 35%, #333)', boxShadow: '0 4px 12px rgba(0,0,0,0.25)' }}>
           <div style={{ fontSize: '0.75rem', textTransform: 'uppercase', color: 'var(--accent, #f4622c)', fontWeight: 700, marginBottom: '0.5rem', display: 'flex', alignItems: 'center', gap: '0.35rem' }}>
             <MessagesSquare size={14} style={{ color: 'var(--accent)' }} /> <Trans>Discussies</Trans>
           </div>
@@ -39,7 +50,7 @@ export function DashboardStatsCards({ stats }: { stats: DashboardOverview['curre
           </div>
         </div>
 
-        <div style={{ background: 'var(--sidebar-bg)', padding: '1rem', borderRadius: '0.625rem', border: '1px solid color-mix(in srgb, var(--accent, #f4622c) 35%, #333)', boxShadow: '0 4px 12px rgba(0,0,0,0.25)' }}>
+        <div style={{ background: 'var(--sidebar-bg)', padding: '1rem 1.5rem', borderRadius: '0.625rem', border: '1px solid color-mix(in srgb, var(--accent, #f4622c) 35%, #333)', boxShadow: '0 4px 12px rgba(0,0,0,0.25)' }}>
           <div style={{ fontSize: '0.75rem', textTransform: 'uppercase', color: 'var(--accent, #f4622c)', fontWeight: 700, marginBottom: '0.5rem', display: 'flex', alignItems: 'center', gap: '0.35rem' }}>
             <FolderPlus size={14} style={{ color: 'var(--accent)' }} /> <Trans>Projecten</Trans>
           </div>

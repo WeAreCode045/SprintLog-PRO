@@ -1,4 +1,4 @@
-g import dayjs from 'dayjs';
+import dayjs from 'dayjs';
 import { Link } from 'react-router-dom';
 import { AlertCircle, CalendarDays, Clock3, FolderKanban, ListTodo, MessageSquarePlus, MessagesSquare } from 'lucide-react';
 import { Trans, useLingui } from '@lingui/react/macro';

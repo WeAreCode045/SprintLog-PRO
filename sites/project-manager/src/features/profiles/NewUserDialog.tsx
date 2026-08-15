@@ -1,4 +1,4 @@
-simport { useState, type FormEvent } from 'react';
+import { useState, type FormEvent } from 'react';
 import { Trans, useLingui } from '@lingui/react/macro';
 import { useQueryClient } from '@tanstack/react-query';
 import type { GlobalRole } from '../../appwrite/types';

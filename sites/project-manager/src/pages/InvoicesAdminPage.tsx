@@ -1,28 +1,20 @@
-import { lazy, Suspense, useMemo, useState } from 'react';
+import { useMemo, useState } from 'react';
 import { Link, useOutletContext, useSearchParams } from 'react-router-dom';
 import { CheckboxFilterDropdown } from '../components/CheckboxFilterDropdown';
 import dayjs from 'dayjs';
-import { Download, RefreshCw } from 'lucide-react';
+import { Download, Plus } from 'lucide-react';
 import { Trans, useLingui } from '@lingui/react/macro';
 import { t as staticT } from '@lingui/core/macro';
 import type { PortalContext } from '../layouts/PortalLayout';
 import type { InvoiceStatus } from '../appwrite/types';
 import { CompanyScopeControl } from '../features/companies/CompanyScopeControl';
 import { getInvoicePdfUrl } from '../features/invoices/api';
-import { useInvoices, useRunInvoiceGeneration } from '../features/invoices/hooks';
+import { IconChevronDown } from '../components/icons';
+import { useInvoices } from '../features/invoices/hooks';
 import { formatHours } from '../lib/formatHours';
 import { PageHeader } from '../components/PageHeader';
 import { PageBreadcrumb } from '../components/PageBreadcrumb';
 
-// @react-pdf/renderer is a large dependency (live PDF preview) — keep it out of the main
-// bundle so only admins who open this tab pay for it.
-const InvoiceSettingsPanel = lazy(() =>
-  import('../features/invoiceSettings/InvoiceSettingsPanel').then((m) => ({
-    default: m.InvoiceSettingsPanel,
-  })),
-);
-
-type InvoicesTab = 'invoices' | 'settings';
 type InvoiceSortKey = 'issueDate' | 'invoiceNumber' | 'company' | 'period' | 'hours' | 'amount' | 'dueDate' | 'status';
 type SortDir = 'asc' | 'desc';
 
@@ -31,7 +23,27 @@ function formatAmount(amount: number, currency: string) {
 }
 
 function statusLabel(status: string) {
-  return status === 'generated' ? staticT`Gegenereerd` : staticT`Vervallen`;
+  switch (status) {
+    case 'draft':
+      return staticT`Concept`;
+    case 'sent':
+      return staticT`Verzonden`;
+    default:
+      return staticT`Vervallen`;
+  }
+}
+
+/** draft mirrors the "in progress" amber used for on_hold projects; sent reuses the accent
+ * "open" look invoices previously used for their normal (generated) state; void stays muted. */
+function statusBadgeClass(status: string) {
+  switch (status) {
+    case 'draft':
+      return 'on_hold';
+    case 'sent':
+      return 'open';
+    default:
+      return 'finished';
+  }
 }
 
 function SortableHeader({
@@ -70,7 +82,6 @@ export function InvoicesAdminPage() {
   const { t } = useLingui();
   const { availableCompanies, companyById } = useOutletContext<PortalContext>();
   const [searchParams] = useSearchParams();
-  const [tab, setTab] = useState<InvoicesTab>('invoices');
 
   const paramCompany = searchParams.get('company');
   const [excludedCompanyIds, setExcludedCompanyIds] = useState<Set<string>>(() => {
@@ -80,6 +91,16 @@ export function InvoicesAdminPage() {
   const [excludedStatuses, setExcludedStatuses] = useState<Set<InvoiceStatus>>(new Set());
   const [sortKey, setSortKey] = useState<InvoiceSortKey>('period');
   const [sortDir, setSortDir] = useState<SortDir>('desc');
+  const [expandedRowIds, setExpandedRowIds] = useState<Set<string>>(new Set());
+
+  function toggleRowExpanded(invoiceId: string) {
+    setExpandedRowIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(invoiceId)) next.delete(invoiceId);
+      else next.add(invoiceId);
+      return next;
+    });
+  }
 
   const { data: rawInvoices = [], isLoading } = useInvoices();
 
@@ -110,7 +131,7 @@ export function InvoicesAdminPage() {
           cmp = (a.issueDate ?? a.$createdAt).localeCompare(b.issueDate ?? b.$createdAt);
           break;
         case 'invoiceNumber':
-          cmp = a.invoiceNumber.localeCompare(b.invoiceNumber, 'nl');
+          cmp = (a.invoiceNumber ?? '').localeCompare(b.invoiceNumber ?? '', 'nl');
           break;
         case 'company':
           cmp = (companyById(a.companyId)?.name ?? a.companyId).localeCompare(
@@ -119,7 +140,7 @@ export function InvoicesAdminPage() {
           );
           break;
         case 'period':
-          cmp = a.periodStart.localeCompare(b.periodStart);
+          cmp = (a.periodStart ?? '').localeCompare(b.periodStart ?? '');
           break;
         case 'hours':
           cmp = a.totalHours - b.totalHours;
@@ -138,11 +159,10 @@ export function InvoicesAdminPage() {
     });
   }, [invoices, sortKey, sortDir, companyById]);
 
-  const runGeneration = useRunInvoiceGeneration();
-
   const INVOICE_STATUS_OPTIONS: { id: InvoiceStatus; label: string }[] = useMemo(
     () => [
-      { id: 'generated', label: t`Gegenereerd` },
+      { id: 'draft', label: t`Concept` },
+      { id: 'sent', label: t`Verzonden` },
       { id: 'void', label: t`Vervallen` },
     ],
     [t],
@@ -163,53 +183,21 @@ export function InvoicesAdminPage() {
     [INVOICE_STATUS_OPTIONS, invoiceStatuses],
   );
 
-  async function handleRunNow() {
-    await runGeneration.mutateAsync(paramCompany ?? undefined);
-  }
-
   return (
     <div className="content-card">
       <div className="content-inner">
         <PageHeader
           title={<Trans>Facturen</Trans>}
-          description={<Trans>Alle facturen en factuurinstellingen.</Trans>}
+          description={<Trans>Alle facturen.</Trans>}
           breadcrumb={
             <PageBreadcrumb
               items={[{ label: t`Dashboard`, to: '/app/dashboard' }, { label: t`Facturen` }]}
             />
           }
           actions={<CompanyScopeControl />}
-          tabs={
-            <div className="task-view-tabs" role="tablist">
-              <button
-                type="button"
-                role="tab"
-                aria-selected={tab === 'invoices'}
-                className={`task-view-tab${tab === 'invoices' ? ' active' : ''}`}
-                onClick={() => setTab('invoices')}
-              >
-                <span><Trans>Facturen</Trans></span>
-              </button>
-              <button
-                type="button"
-                role="tab"
-                aria-selected={tab === 'settings'}
-                className={`task-view-tab${tab === 'settings' ? ' active' : ''}`}
-                onClick={() => setTab('settings')}
-              >
-                <span><Trans>Instellingen</Trans></span>
-              </button>
-            </div>
-          }
         />
 
         <div className="tab-panel-body">
-          {tab === 'settings' ? (
-              <Suspense fallback={<p><Trans>Laden…</Trans></p>}>
-                <InvoiceSettingsPanel />
-              </Suspense>
-            ) : (
-              <>
                 <div className="filter-bar">
                   <div className="filter-group">
                     {companyFilterOptions.length > 1 && (
@@ -254,14 +242,9 @@ export function InvoicesAdminPage() {
                     )}
                   </div>
                   <div className="filter-group filter-group--end">
-                    <button
-                      type="button"
-                      className="btn-accent"
-                      onClick={() => void handleRunNow()}
-                      disabled={runGeneration.isPending}
-                    >
-                      <RefreshCw size={16} /> {runGeneration.isPending ? t`Bezig…` : t`Nu uitvoeren`}
-                    </button>
+                    <Link className="btn-accent" to="/app/invoices/new">
+                      <Plus size={16} /> <Trans>Add New Invoice</Trans>
+                    </Link>
                   </div>
                 </div>
 
@@ -271,7 +254,7 @@ export function InvoicesAdminPage() {
                   <p className="empty-state"><Trans>Nog geen facturen.</Trans></p>
                 ) : (
                   <div className="data-table-wrap">
-                    <table className="data-table invoices-table">
+                    <table className="data-table invoices-table data-table--collapsible">
                       <thead>
                         <tr>
                           <SortableHeader
@@ -336,65 +319,93 @@ export function InvoicesAdminPage() {
                         </tr>
                       </thead>
                       <tbody>
-                        {sortedInvoices.map((invoice) => (
-                          <tr key={invoice.$id}>
-                            <td className="data-table-muted">
-                              {dayjs(invoice.issueDate ?? invoice.$createdAt).format('D MMM YYYY')}
-                            </td>
-                            <td>
-                              <Link className="data-table-title-button" to={`/app/invoices/${invoice.$id}`}>
-                                {invoice.invoiceNumber}
-                              </Link>
-                              {invoice.creditForInvoiceId && (
-                                <span className="badge badge-credit-note"><Trans>Creditnota</Trans></span>
-                              )}
-                            </td>
-                            <td>{companyById(invoice.companyId)?.name ?? invoice.companyId}</td>
-                            <td>
-                              {dayjs(invoice.periodStart).format('D MMM')} –{' '}
-                              {dayjs(invoice.periodEnd).subtract(1, 'day').format('D MMM YYYY')}
-                            </td>
-                            <td className="data-table-num">
-                              {invoice.creditForInvoiceId ? '-' : ''}
-                              {formatHours(invoice.totalHours)}
-                            </td>
-                            <td className="data-table-num">
-                              {invoice.creditForInvoiceId ? '-' : ''}
-                              {formatAmount(invoice.totalWithVat ?? invoice.totalAmount, invoice.currency)}
-                            </td>
-                            <td className="data-table-muted">
-                              {invoice.dueDate ? dayjs(invoice.dueDate).format('D MMM YYYY') : '—'}
-                            </td>
-                            <td>
-                              <span
-                                className={`badge badge-status--${invoice.status === 'generated' ? 'open' : 'finished'}`}
-                              >
-                                {statusLabel(invoice.status)}
-                              </span>
-                              {invoice.pdfFileId ? (
-                                <div className="data-table-actions">
-                                  <a
-                                    className="icon-button"
-                                    title={t`PDF downloaden`}
-                                    href={getInvoicePdfUrl(invoice.pdfFileId)}
-                                    target="_blank"
-                                    rel="noreferrer"
+                        {sortedInvoices.map((invoice) => {
+                          const expanded = expandedRowIds.has(invoice.$id);
+                          return (
+                            <tr key={invoice.$id} className={expanded ? 'data-table-row--expanded' : ''}>
+                              <td>
+                                <div className="data-table-title-cell">
+                                  <div className="data-table-title-row">
+                                    <Link
+                                      className="data-table-title-button"
+                                      to={
+                                        invoice.status === 'draft'
+                                          ? `/app/invoices/${invoice.$id}/edit`
+                                          : `/app/invoices/${invoice.$id}`
+                                      }
+                                    >
+                                      {invoice.invoiceNumber ?? t`Concept`}
+                                    </Link>
+                                    {invoice.creditForInvoiceId && (
+                                      <span className="badge badge-credit-note"><Trans>Creditnota</Trans></span>
+                                    )}
+                                    <span className="data-table-muted">
+                                      {dayjs(invoice.issueDate ?? invoice.$createdAt).format('D MMM YYYY')}
+                                    </span>
+                                  </div>
+                                  <button
+                                    type="button"
+                                    className="data-table-expand-toggle"
+                                    title={expanded ? t`Minder tonen` : t`Meer tonen`}
+                                    aria-label={expanded ? t`Minder tonen` : t`Meer tonen`}
+                                    onClick={() => toggleRowExpanded(invoice.$id)}
                                   >
-                                    <Download size={16} />
-                                  </a>
+                                    <IconChevronDown />
+                                  </button>
                                 </div>
-                              ) : (
-                                <span className="data-table-muted"> <Trans>PDF wordt gegenereerd…</Trans></span>
-                              )}
-                            </td>
-                          </tr>
-                        ))}
+                              </td>
+                              <td data-label={t`Aangemaakt`} className="data-table-muted">
+                                {dayjs(invoice.issueDate ?? invoice.$createdAt).format('D MMM YYYY')}
+                              </td>
+                              <td data-label={t`Bedrijf`}>{companyById(invoice.companyId)?.name ?? invoice.companyId}</td>
+                              <td data-label={t`Periode`}>
+                                {invoice.periodStart && invoice.periodEnd ? (
+                                  <>
+                                    {dayjs(invoice.periodStart).format('D MMM')} –{' '}
+                                    {dayjs(invoice.periodEnd).subtract(1, 'day').format('D MMM YYYY')}
+                                  </>
+                                ) : (
+                                  '—'
+                                )}
+                              </td>
+                              <td className="data-table-num" data-label={t`Uren`}>
+                                {invoice.creditForInvoiceId ? '-' : ''}
+                                {formatHours(invoice.totalHours)}
+                              </td>
+                              <td className="data-table-num" data-label={t`Bedrag`}>
+                                {invoice.creditForInvoiceId ? '-' : ''}
+                                {formatAmount(invoice.totalWithVat ?? invoice.totalAmount, invoice.currency)}
+                              </td>
+                              <td className="data-table-muted" data-label={t`Vervaldag`}>
+                                {invoice.dueDate ? dayjs(invoice.dueDate).format('D MMM YYYY') : '—'}
+                              </td>
+                              <td data-label={t`Status`}>
+                                <span className={`badge badge-status--${statusBadgeClass(invoice.status)}`}>
+                                  {statusLabel(invoice.status)}
+                                </span>
+                                {invoice.pdfFileId ? (
+                                  <div className="data-table-actions">
+                                    <a
+                                      className="icon-button"
+                                      title={t`PDF downloaden`}
+                                      href={getInvoicePdfUrl(invoice.pdfFileId)}
+                                      target="_blank"
+                                      rel="noreferrer"
+                                    >
+                                      <Download size={16} />
+                                    </a>
+                                  </div>
+                                ) : (
+                                  <span className="data-table-muted"> <Trans>PDF wordt gegenereerd…</Trans></span>
+                                )}
+                              </td>
+                            </tr>
+                          );
+                        })}
                       </tbody>
                     </table>
                   </div>
                 )}
-              </>
-            )}
         </div>
       </div>
     </div>

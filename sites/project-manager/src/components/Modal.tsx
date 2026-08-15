@@ -5,13 +5,14 @@ interface ModalProps {
   title: string;
   onClose: () => void;
   children: ReactNode;
+  className?: string;
 }
 
-export function Modal({ title, onClose, children }: ModalProps) {
+export function Modal({ title, onClose, children, className }: ModalProps) {
   const { t } = useLingui();
   return (
     <div className="app-modal-overlay" onClick={onClose}>
-      <div className="app-modal" onClick={(e) => e.stopPropagation()}>
+      <div className={`app-modal${className ? ` ${className}` : ''}`} onClick={(e) => e.stopPropagation()}>
         <div className="app-modal-header">
           <h3>{title}</h3>
           <button type="button" className="icon-button" onClick={onClose} aria-label={t`Sluiten`}>

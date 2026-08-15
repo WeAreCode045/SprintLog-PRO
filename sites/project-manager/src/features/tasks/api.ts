@@ -67,6 +67,14 @@ export async function listTasksByProject(projectId: string) {
   return result.rows;
 }
 
+export async function getTask(taskId: string) {
+  return tablesDB.getRow<TaskRow>({
+    databaseId: DATABASE_ID,
+    tableId: TABLES.tasks,
+    rowId: taskId,
+  });
+}
+
 export interface CompletedFilters {
   start: Date;
   end: Date;

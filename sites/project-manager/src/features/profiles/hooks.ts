@@ -7,6 +7,7 @@ import {
   listDeveloperProfiles,
   listUserProfiles,
   removeAdminUser,
+  removeUserTeamMembership,
   saveAdminUser,
   setUserRole,
 } from './api';
@@ -74,6 +75,20 @@ export function useSaveAdminUser() {
       void queryClient.invalidateQueries({ queryKey: queryKeys.adminUsers });
       void queryClient.invalidateQueries({ queryKey: queryKeys.adminUser(variables.userId) });
       void queryClient.invalidateQueries({ queryKey: queryKeys.developers });
+      void queryClient.invalidateQueries({ queryKey: ['companies'] });
+      void queryClient.invalidateQueries({ queryKey: ['members'] });
+    },
+  });
+}
+
+export function useRevokeUserTeamMembership(userId: string) {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ teamId, membershipId }: { teamId: string; membershipId: string }) =>
+      removeUserTeamMembership(teamId, membershipId),
+    onSuccess: () => {
+      void queryClient.invalidateQueries({ queryKey: queryKeys.adminUser(userId) });
+      void queryClient.invalidateQueries({ queryKey: queryKeys.adminUsers });
       void queryClient.invalidateQueries({ queryKey: ['companies'] });
       void queryClient.invalidateQueries({ queryKey: ['members'] });
     },

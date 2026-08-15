@@ -6,7 +6,7 @@ import { t as staticT } from '@lingui/core/macro';
 import { getDateRange, type DateRangePreset } from '../../lib/dateRanges';
 import { CheckboxFilterDropdown } from '../../components/CheckboxFilterDropdown';
 import { ProjectFilterDropdown } from '../../components/ProjectFilterDropdown';
-import { IconEdit } from '../../components/icons';
+import { IconChevronDown, IconEdit } from '../../components/icons';
 import { isStaffRole } from '../../auth/RequireStaff';
 import { useProjectsForCompanies } from '../projects/hooks';
 import { useTasksForCompanies } from '../tasks/hooks';
@@ -14,6 +14,7 @@ import { LogHoursDialog } from '../timeEntries/LogHoursDialog';
 import { UnlockTimeEntriesDialog } from '../timeEntries/UnlockTimeEntriesDialog';
 import { useTimeEntriesForCompanies } from '../timeEntries/hooks';
 import { useDeveloperProfiles } from '../profiles/hooks';
+import { isFreeOfChargeEntry } from '../timeEntries/timeEntryBilling';
 import type { ResolvedRole, ProjectRow, TimeEntryRow } from '../../appwrite/types';
 import type { PortalContext } from '../../layouts/PortalLayout';
 import { formatHours } from '../../lib/formatHours';
@@ -92,11 +93,21 @@ function ProjectEntriesCard({
 }) {
   const { t } = useLingui();
   const projectTotal = entries.reduce((sum, entry) => sum + (entry.hours ?? 0), 0);
+  const [expandedRowIds, setExpandedRowIds] = useState<Set<string>>(new Set());
 
   const sortedEntries = useMemo(
     () => entries.slice().sort((a, b) => a.workedDate.localeCompare(b.workedDate)),
     [entries],
   );
+
+  function toggleRowExpanded(entryId: string) {
+    setExpandedRowIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(entryId)) next.delete(entryId);
+      else next.add(entryId);
+      return next;
+    });
+  }
 
   function renderEntryActions(entry: TimeEntryRow) {
     return (
@@ -155,7 +166,7 @@ function ProjectEntriesCard({
         <p className="empty-state"><Trans>Geen uren in deze periode.</Trans></p>
       ) : (
         <div className="data-table-wrap">
-          <table className="data-table report-hours-table">
+          <table className="data-table report-hours-table data-table--collapsible">
             <thead>
               <tr>
                 <th className="data-table-col-date"><Trans>Datum</Trans></th>
@@ -166,18 +177,42 @@ function ProjectEntriesCard({
               </tr>
             </thead>
             <tbody>
-              {sortedEntries.map((entry) => (
-                <tr key={entry.$id}>
-                  <td>{entry.workedDate.slice(0, 10)}</td>
-                  <td>{taskTitle(entry.taskId)}</td>
-                  <td className="data-table-muted">{entry.comment?.trim() || '—'}</td>
-                  <td>{developerName(entry.userId)}</td>
-                  <td className="data-table-num">
-                    {formatHours(entry.hours ?? 0)}
-                    <div className="data-table-actions">{renderEntryActions(entry)}</div>
-                  </td>
-                </tr>
-              ))}
+              {sortedEntries.map((entry) => {
+                const expanded = expandedRowIds.has(entry.$id);
+                return (
+                  <tr key={entry.$id} className={expanded ? 'data-table-row--expanded' : ''}>
+                    <td>
+                      <div className="data-table-title-cell">
+                        <div className="data-table-title-row">
+                          <span className="data-table-title-button">{entry.workedDate.slice(0, 10)}</span>
+                          <span className="data-table-muted">{taskTitle(entry.taskId)}</span>
+                        </div>
+                        <button
+                          type="button"
+                          className="data-table-expand-toggle"
+                          title={expanded ? t`Minder tonen` : t`Meer tonen`}
+                          aria-label={expanded ? t`Minder tonen` : t`Meer tonen`}
+                          onClick={() => toggleRowExpanded(entry.$id)}
+                        >
+                          <IconChevronDown />
+                        </button>
+                      </div>
+                    </td>
+                    <td data-label={t`Taak`}>{taskTitle(entry.taskId)}</td>
+                    <td className="data-table-muted" data-label={t`Toelichting`}>{entry.comment?.trim() || '—'}</td>
+                    <td data-label={t`Developer`}>{developerName(entry.userId)}</td>
+                    <td className="data-table-num" data-label={t`Uren`}>
+                      {formatHours(entry.hours ?? 0)}
+                      {isFreeOfChargeEntry(entry) && (
+                        <span className="badge badge-status--requested" style={{ marginLeft: '0.5rem' }}>
+                          <Trans>Gratis</Trans>
+                        </span>
+                      )}
+                      <div className="data-table-actions">{renderEntryActions(entry)}</div>
+                    </td>
+                  </tr>
+                );
+              })}
             </tbody>
             <tfoot>
               <tr className="data-table-total">
@@ -485,6 +520,7 @@ export function ReportsTabPanel() {
           teamId={companyById(editingEntry.companyId)?.teamId ?? ''}
           task={taskById.get(editingEntry.taskId)!}
           entry={editingEntry}
+          allowFreeOfCharge={isStaffRole(role)}
           onClose={() => setEditingEntry(null)}
         />
       )}

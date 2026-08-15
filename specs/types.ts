@@ -20,6 +20,9 @@ export const TABLES = {
   invoices: 'invoices',
   invoiceItems: 'invoiceItems',
   invoiceSettings: 'invoiceSettings',
+  functionResults: 'functionResults',
+  /** Grouped JSON-blob replacement for invoiceSettings — see AdminSettingsRawRow. */
+  adminSettings: 'adminSettings',
 } as const;
 
 export type TableId = (typeof TABLES)[keyof typeof TABLES];
@@ -129,11 +132,27 @@ export interface CompanyRow extends RowMeta {
   teamId: string;
   email?: string | null;
   address?: string | null;
+  postalCode?: string | null;
+  city?: string | null;
+  country?: string | null;
   phone?: string | null;
   /** Billing rate used by generate-invoices; unset companies are skipped during generation. */
   hourlyRate?: number | null;
   /** Client-editable VAT/BTW number, shown on the invoice's recipient ("Naar") block. */
   vatNumber?: string | null;
+  vatExempt?: boolean | null;
+  invoiceAddress?: string | null;
+  invoicePostalCode?: string | null;
+  invoiceCity?: string | null;
+  invoiceCountry?: string | null;
+  invoiceEmail?: string | null;
+  autoApproveHours?: boolean | null;
+  /** Admin-only default invoice footer for this customer. Pre-fills new invoices
+   * before the global invoiceSettings.footerText fallback. */
+  generalTerms?: string | null;
+  /** Client-editable default payment term (days) for this company. Pre-fills new invoices
+   * before the global invoiceSettings.paymentTermDays fallback. */
+  paymentTermDays?: number | null;
 }
 
 export interface ProjectRow extends RowMeta {
@@ -188,6 +207,8 @@ export interface TimeEntryRow extends RowMeta {
   /** Set by generate-invoices once billed; approved+invoiced rows can no longer be unlocked. */
   invoiced?: boolean | null;
   invoiceId?: string | null;
+  /** Staff-marked hours that skip client approval and are excluded from invoicing. */
+  freeOfCharge?: boolean | null;
 }
 
 export interface UserProfileRow extends RowMeta {
@@ -219,6 +240,8 @@ export interface DiscussionRow extends RowMeta {
   body: string;
   createdBy: string;
   totalReplies?: number | null;
+  /** When set, this topic is the discussion thread for a task. */
+  taskId?: string | null;
 }
 
 export interface DiscussionReplyRow extends RowMeta {
@@ -352,6 +375,26 @@ export interface InvoiceSettingsRow extends RowMeta {
   creditInstructionsText?: string | null;
 }
 
+/**
+ * Raw shape of the `adminSettings` table row — one JSON-string column per AdminSettingsPage tab,
+ * so adding/renaming a field is a pure code change (no Appwrite schema migration). Flattened into
+ * (and split back out of) the app-wide `InvoiceSettingsRow` shape by the invoiceSettings feature's
+ * api.ts — every other consumer (AdminSettingsPage, InvoiceForm, InvoicePreviewDocument, the
+ * invoices function) still works with the flat shape and never sees this directly.
+ */
+export interface AdminSettingsRawRow extends RowMeta {
+  /** JSON-encoded: senderName, contactPerson, senderAddress, senderPostalCode, senderCity,
+   * senderCountry, senderRegistrationNumber, contactPhone, contactEmail, contactWebsite. */
+  company?: string | null;
+  /** JSON-encoded: bankName, bankIban, bankSwiftBic. */
+  bank?: string | null;
+  /** JSON-encoded: vatEnabled, vatRateHigh, vatRateLow, vatLabel, senderVatNumber,
+   * paymentTermDays, currency. */
+  vat?: string | null;
+  /** JSON-encoded: defaultInstructionsText, footerText, creditInstructionsText, creditFooterText. */
+  texts?: string | null;
+}
+
 export interface AccessibleCompany {
   companyId: string;
   teamId: string;
@@ -370,13 +413,25 @@ export interface AdminUserCompany {
   name: string;
 }
 
+/** A single Appwrite team membership, for the "Teams" panel on the user detail page. */
+export interface AdminUserMembership {
+  membershipId: string;
+  teamId: string;
+  teamName: string;
+  roles: string[];
+  confirm: boolean;
+}
+
 export interface AdminUser {
   userId: string;
   email: string;
   displayName: string;
   role: GlobalRole;
   companies: AdminUserCompany[];
+  memberships: AdminUserMembership[];
   profileId?: string | null;
+  status?: boolean;
+  lastLoginAt?: string | null;
 }
 
 export const MAX_TASK_NEST_DEPTH = 3;

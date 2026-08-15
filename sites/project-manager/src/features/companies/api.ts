@@ -80,9 +80,21 @@ export async function updateCompanyDetails(
     name: string;
     email?: string;
     address?: string;
+    postalCode?: string;
+    city?: string;
+    country?: string;
     phone?: string;
     hourlyRate?: number | null;
+    autoApproveHours?: boolean | null;
     vatNumber?: string | null;
+    invoiceEmail?: string | null;
+    generalTerms?: string | null;
+    paymentTermDays?: number | null;
+    invoiceAddress?: string | null;
+    invoicePostalCode?: string | null;
+    invoiceCity?: string | null;
+    invoiceCountry?: string | null;
+    vatExempt?: boolean | null;
   },
 ) {
   return tablesDB.updateRow<CompanyRow>({
@@ -93,18 +105,44 @@ export async function updateCompanyDetails(
       name: data.name,
       email: data.email || null,
       address: data.address || null,
+      postalCode: data.postalCode || null,
+      city: data.city || null,
+      country: data.country || null,
       phone: data.phone || null,
       hourlyRate: data.hourlyRate ?? null,
+      autoApproveHours: data.autoApproveHours ?? false,
       vatNumber: data.vatNumber || null,
+      invoiceEmail: data.invoiceEmail || null,
+      generalTerms: data.generalTerms ?? null,
+      paymentTermDays: data.paymentTermDays ?? null,
+      invoiceAddress: data.invoiceAddress || null,
+      invoicePostalCode: data.invoicePostalCode || null,
+      invoiceCity: data.invoiceCity || null,
+      invoiceCountry: data.invoiceCountry || null,
+      vatExempt: data.vatExempt ?? false,
     },
   });
 }
 
-/** Client-safe update — only contact/invoicing fields, never hourlyRate (admin-only, edited via
- * ClientManagerPage). Used by the client-facing company settings page. */
+/** Client-safe update — contact fields clients may edit on company-settings; never hourlyRate
+ * or paymentTermDays (admin-only, edited via ClientManagerPage). */
 export async function updateCompanyContactDetails(
   companyId: string,
-  data: { name: string; email?: string; address?: string; phone?: string; vatNumber?: string | null },
+  data: {
+    name: string;
+    email?: string;
+    address?: string;
+    postalCode?: string;
+    city?: string;
+    country?: string;
+    phone?: string;
+    vatNumber?: string | null;
+    invoiceEmail?: string | null;
+    invoiceAddress?: string | null;
+    invoicePostalCode?: string | null;
+    invoiceCity?: string | null;
+    invoiceCountry?: string | null;
+  },
 ) {
   return tablesDB.updateRow<CompanyRow>({
     databaseId: DATABASE_ID,
@@ -114,8 +152,16 @@ export async function updateCompanyContactDetails(
       name: data.name,
       email: data.email || null,
       address: data.address || null,
+      postalCode: data.postalCode || null,
+      city: data.city || null,
+      country: data.country || null,
       phone: data.phone || null,
       vatNumber: data.vatNumber || null,
+      invoiceEmail: data.invoiceEmail || null,
+      invoiceAddress: data.invoiceAddress || null,
+      invoicePostalCode: data.invoicePostalCode || null,
+      invoiceCity: data.invoiceCity || null,
+      invoiceCountry: data.invoiceCountry || null,
     },
   });
 }

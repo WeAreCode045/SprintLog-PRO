@@ -33,6 +33,7 @@ import {
   IconGrip,
   IconLockOpen,
   IconPlus,
+  IconTrash,
 } from '../../components/icons';
 import { queryKeys } from '../../lib/queryKeys';
 import { listAssignmentsByProject } from '../assignments/api';
@@ -294,6 +295,7 @@ function SortableHeader({
 export interface DeveloperTasksTableProps {
   companyId: string;
   teamId: string;
+  resolveTeamId?: (companyId: string) => string;
   userId: string;
   role: ResolvedRole;
   tasks: TaskRow[];
@@ -310,6 +312,8 @@ export interface DeveloperTasksTableProps {
   onAccept: (task: TaskRow) => void;
   onView: (task: TaskRow) => void;
   onAddSubtask?: (task: TaskRow) => void;
+  canDelete?: (task: TaskRow) => boolean;
+  onDelete?: (task: TaskRow) => void;
   hideActions?: boolean;
   companion?: ReactNode;
   statusFilter?: TaskStatus | 'all';
@@ -360,7 +364,11 @@ interface SortableTaskRowProps {
   onAccept: () => void;
   onAddSubtask?: () => void;
   onLogHours: () => void;
+  canDelete?: boolean;
+  onDelete?: () => void;
   hideActions?: boolean;
+  expanded: boolean;
+  onToggleExpanded: () => void;
 }
 
 function SortableTaskRow({
@@ -388,7 +396,11 @@ function SortableTaskRow({
   onAccept,
   onAddSubtask,
   onLogHours,
+  canDelete = false,
+  onDelete,
   hideActions = false,
+  expanded,
+  onToggleExpanded,
 }: SortableTaskRowProps) {
   const { t } = useLingui();
   const taskType = (task.taskType ?? 'development') as TaskType;
@@ -410,7 +422,7 @@ function SortableTaskRow({
     <tr
       ref={setNodeRef}
       style={style}
-      className={`${hoursClosed ? 'data-table-row--closed' : ''} ${isDragging ? 'data-table-row--dragging' : ''}`}
+      className={`${hoursClosed ? 'data-table-row--closed' : ''} ${isDragging ? 'data-table-row--dragging' : ''} ${expanded ? 'data-table-row--expanded' : ''}`}
     >
       <td>
         <div
@@ -450,26 +462,35 @@ function SortableTaskRow({
               </button>
             )}
           </div>
+          <button
+            type="button"
+            className="data-table-expand-toggle"
+            title={expanded ? t`Minder tonen` : t`Meer tonen`}
+            aria-label={expanded ? t`Minder tonen` : t`Meer tonen`}
+            onClick={onToggleExpanded}
+          >
+            <IconChevronDown />
+          </button>
         </div>
       </td>
       {showCompanyColumn && (
-        <td className="data-table-muted">
+        <td className="data-table-muted" data-label={t`Bedrijf`}>
           <Link to={`/app/projects/${task.projectId}`}>{companyName?.(task.companyId) ?? '—'}</Link>
         </td>
       )}
       {showProjectColumn && (
-        <td className="data-table-muted">
+        <td className="data-table-muted" data-label={t`Project`}>
           <Link to={`/app/projects/${task.projectId}`}>{projectName?.(task.projectId) ?? '—'}</Link>
         </td>
       )}
-      <td>
+      <td data-label={t`Type`}>
         <span className="badge">{TASK_TYPE_LABELS[taskType]}</span>
       </td>
-      <td>
+      <td data-label={t`Status`}>
         <span className={`badge badge-status badge-status--${task.status}`}>{statusLabel(task.status)}</span>
       </td>
-      <td>{assigneeLabel}</td>
-      <td className={`data-table-num ${hoursClosed ? 'data-table-hours--total' : ''}`}>
+      <td data-label={t`Developer`}>{assigneeLabel}</td>
+      <td data-label={t`Uren`} className={`data-table-num ${hoursClosed ? 'data-table-hours--total' : ''}`}>
         <Link to="/app/reports" title={t`Urenregistratie / rapportages`}>
           {formatHours(task.hours)}
         </Link>
@@ -505,6 +526,16 @@ function SortableTaskRow({
                 <IconPlus />
               </button>
             )}
+            {canDelete && onDelete && (
+              <button
+                type="button"
+                className="icon-button"
+                title={t`Taak verwijderen`}
+                onClick={onDelete}
+              >
+                <IconTrash />
+              </button>
+            )}
           </div>
         )}
       </td>
@@ -519,6 +550,7 @@ export function flattenTasksForTable(tasks: TaskRow[]): TaskRow[] {
 export function DeveloperTasksTable({
   companyId,
   teamId,
+  resolveTeamId,
   userId,
   role,
   tasks,
@@ -535,6 +567,8 @@ export function DeveloperTasksTable({
   onAccept,
   onView,
   onAddSubtask,
+  canDelete,
+  onDelete,
   hideActions = false,
   companion,
   statusFilter: propStatusFilter,
@@ -548,6 +582,7 @@ export function DeveloperTasksTable({
   const { data: developers = [] } = useDeveloperProfiles(true);
   const reorderTasksMutation = useReorderTasks(companyId);
   const [collapsedSubtaskIds, setCollapsedSubtaskIds] = useState<Set<string>>(new Set());
+  const [expandedRowIds, setExpandedRowIds] = useState<Set<string>>(new Set());
   const [loggingTask, setLoggingTask] = useState<TaskRow | null>(null);
   const [activeId, setActiveId] = useState<string | null>(null);
   const [orderByParent, setOrderByParent] = useState<Record<string, string[]>>({
@@ -729,6 +764,15 @@ export function DeveloperTasksTable({
     });
   }
 
+  function toggleRowExpanded(taskId: string) {
+    setExpandedRowIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(taskId)) next.delete(taskId);
+      else next.add(taskId);
+      return next;
+    });
+  }
+
   function assigneeNames(task: TaskRow) {
     const ids = effectiveTaskAssigneeIds(task, projectAssigneesByProjectId);
     if (ids.length === 0) return '—';
@@ -858,7 +902,7 @@ export function DeveloperTasksTable({
           onDragEnd={handleDragEnd}
           onDragCancel={handleDragCancel}
         >
-          <table className="data-table">
+          <table className="data-table data-table--collapsible">
             <thead>
               <tr>
                 <SortableHeader
@@ -961,7 +1005,11 @@ export function DeveloperTasksTable({
                         onAccept={() => onAccept(task)}
                         onAddSubtask={showAddSub ? () => onAddSubtask?.(task) : undefined}
                         onLogHours={() => setLoggingTask(task)}
+                        canDelete={Boolean(canDelete?.(task))}
+                        onDelete={canDelete?.(task) && onDelete ? () => onDelete(task) : undefined}
                         hideActions={hideActions}
+                        expanded={expandedRowIds.has(task.$id)}
+                        onToggleExpanded={() => toggleRowExpanded(task.$id)}
                       />
                     </Fragment>
                   );
@@ -1030,8 +1078,8 @@ export function DeveloperTasksTable({
       )}
       {!hideActions && loggingTask && (
         <TaskHoursDialog
-          companyId={companyId}
-          teamId={teamId}
+          companyId={loggingTask.companyId}
+          teamId={resolveTeamId?.(loggingTask.companyId) ?? teamId}
           task={loggingTask}
           userId={userId}
           role={role}

@@ -21,7 +21,7 @@ export type InvoiceTemplateFields = Pick<
   | 'bankIban'
   | 'bankSwiftBic'
   | 'vatEnabled'
-  | 'vatRate'
+  | 'vatRateHigh'
   | 'vatLabel'
   | 'paymentTermDays'
   | 'currency'
@@ -145,7 +145,7 @@ export function InvoicePreviewDocument({ settings }: { settings: InvoiceTemplate
   const currency = s.currency || 'EUR';
   const vatLabel = s.vatLabel || 'BTW';
   const vatEnabled = s.vatEnabled ?? true;
-  const vatRate = vatEnabled ? (s.vatRate ?? 21) : 0;
+  const vatRate = vatEnabled ? (s.vatRateHigh ?? 21) : 0;
 
   const totalHours = SAMPLE_LINES.reduce((sum, line) => sum + line.hours, 0);
   const totalAmount = Math.round(totalHours * SAMPLE_HOURLY_RATE * 100) / 100;
@@ -206,7 +206,7 @@ export function InvoicePreviewDocument({ settings }: { settings: InvoiceTemplate
             <Text style={styles.metaValue}>10-08-2026</Text>
           </View>
           <View style={styles.metaCol}>
-            <Text style={styles.metaLabel}>{t`Vervaldag`}</Text>
+            <Text style={styles.metaLabel}>{t`Betalen voor`}</Text>
             <Text style={styles.metaValueDue}>{formatDate(dueDateIso)}</Text>
           </View>
         </View>

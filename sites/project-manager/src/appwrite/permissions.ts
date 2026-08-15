@@ -1,11 +1,11 @@
 import { Permission, Role } from 'appwrite';
 import { ADMIN_LABEL, DEVELOPER_LABEL } from './constants';
 
-/** Clients get row-level update so they can maintain their own contact/invoicing details
- * (name, email, address, phone, vatNumber) via the client company settings page. Appwrite has
- * no column-level permissions, so this technically also covers admin-only fields like
- * hourlyRate — the UI never exposes those to clients, matching how the rest of this app
- * trusts client-side gating for lower-stakes fields (see e.g. updateOpenTask). */
+/** Clients get row-level update so they can maintain their own contact details
+ * (name, email, address, phone, vatNumber) via the client company settings page.
+ * Appwrite has no column-level permissions, so this technically also covers admin-only fields like
+ * hourlyRate and paymentTermDays — the UI never exposes those to clients, matching how the rest of
+ * this app trusts client-side gating for lower-stakes fields (see e.g. updateOpenTask). */
 export const companyPermissions = (teamId: string) => [
   Permission.read(Role.label(ADMIN_LABEL)),
   Permission.read(Role.team(teamId)),

@@ -4,6 +4,7 @@ import {
   acceptRequestedTask,
   createTask,
   deleteTask,
+  getTask,
   listCompletedTasksInRange,
   listTasks,
   listTasksForCompanies,
@@ -38,6 +39,14 @@ export function useTasksByProject(projectId: string | undefined) {
     queryKey: queryKeys.tasksByProject(projectId ?? ''),
     queryFn: () => listTasksByProject(projectId!),
     enabled: Boolean(projectId),
+  });
+}
+
+export function useTask(taskId: string | undefined) {
+  return useQuery({
+    queryKey: queryKeys.task(taskId ?? ''),
+    queryFn: () => getTask(taskId!),
+    enabled: Boolean(taskId),
   });
 }
 
