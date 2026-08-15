@@ -641,9 +641,26 @@
   font-size: 0.75rem;
 }
 
+.sidebar-logo-text-group {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.25;
+  min-width: 0;
+}
+
 .sidebar-logo-text {
   color: var(--sidebar-text-strong);
   font-weight: 600;
+}
+
+.sidebar-logo-tagline {
+  font-size: 0.62rem;
+  font-weight: 500;
+  color: var(--sidebar-text);
+  opacity: 0.75;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .sidebar .workspace-switcher {
@@ -1484,9 +1501,27 @@ a.user-teams-panel-item-name:hover {
 .auth-page {
   min-height: 100vh;
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
+  gap: 1.5rem;
   padding: 2rem;
+}
+
+.auth-brand {
+  text-align: center;
+}
+
+.auth-brand-name {
+  margin: 0;
+  font-size: 1.75rem;
+  font-weight: 700;
+}
+
+.auth-brand-tagline {
+  margin: 0.25rem 0 0;
+  color: var(--text-muted);
+  font-size: 0.9rem;
 }
 
 .auth-form {

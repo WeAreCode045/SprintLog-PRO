@@ -32,8 +32,12 @@ export function LoginPage() {
 
   return (
     <div className="auth-page">
+      <div className="auth-brand">
+        <h1 className="auth-brand-name">Scopera</h1>
+        <p className="auth-brand-tagline">Stay in scope, stay informed.</p>
+      </div>
       <form className="form auth-form" onSubmit={handleSubmit}>
-        <h1><Trans>Inloggen</Trans></h1>
+        <h2><Trans>Inloggen</Trans></h2>
         <label>
           <Trans>E-mailadres</Trans>
           <input
